@@ -18,7 +18,8 @@
 		"unclecheese/eventcalendar": "dev-master"
 	},
 	"suggest": {
-		"silverstripe/queuedjobs": "Allows sending out event reminder emails"
+		"silverstripe/queuedjobs": "Allows sending out event reminder emails",
+		"burnbright/silverstripe-omnipay": "Handle accepting payments for events"
 	},
 	"extra": {
 		"installer-name": "eventmanagement"
