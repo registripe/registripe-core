@@ -124,8 +124,8 @@ class EventRegisterPaymentStep extends MultiFormStep {
 
     		return false;
 		} else {
-			throw new SS_HTTPResponse_Exception($response->getMessage());
-
+			$form->sessionMessage($purchase->getMessage(), 'bad');
+			
 			return false;
 		}
 	}
