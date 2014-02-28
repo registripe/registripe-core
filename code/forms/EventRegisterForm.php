@@ -70,9 +70,15 @@ class EventRegisterForm extends MultiForm {
 		$registration = $this->session->getRegistration();
 		$ticketsStep  = $this->getSavedStepByClass('EventRegisterTicketsStep');
 		$tickets      = $ticketsStep->loadData();
+		
+		if(!$tickets || !isset($tickets['tickets'])) {
+			$validate = $registration->Tickets()->map('ID', 'Quantity')->toArray();
+		} else {
+			$validate = $tickets['Tickets'];
+		}
 
 		// Check that the requested tickets are still available.
-		if (!$this->validateTickets($tickets['Tickets'], $form)) {
+		if (!$this->validateTickets($validate, $form)) {
 			Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
 			$this->controller->redirectBack();
 			return false;

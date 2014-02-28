@@ -21,10 +21,10 @@ class EventRegisterPaymentStep extends MultiFormStep {
 	 */
 	public function loadData() {
 		$data    = parent::loadData();
-		$tickets = $this->getForm()->getSavedStepByClass('EventRegisterTicketsStep');
-		$tickets = $tickets->loadData();
 
-		$data['Tickets'] = $tickets['Tickets'];
+		$registration = $this->form->getSession()->getRegistration();
+		$data['Tickets'] = $registration->Tickets();
+
 		return $data;
 	}
 
@@ -35,14 +35,13 @@ class EventRegisterPaymentStep extends MultiFormStep {
 
 		$datetime = $this->getForm()->getController()->getDateTime();
 		$session  = $this->getForm()->getSession();
-		$tickets  = $this->getForm()->getSavedStepByClass('EventRegisterTicketsStep');
-		$total    = $tickets->getTotal();
+
+		$total  = $this->form->getSession()->getRegistration()->Total;
 
 		$table = new EventRegistrationTicketsTableField('Tickets', $datetime);
 		$table->setReadonly(true);
 		$table->setExcludedRegistrationId($session->RegistrationID);
 		$table->setShowUnavailableTickets(false);
-		$table->setShowUnselectedTickets(false);
 		$table->setTotal($total);
 
 		$group = FieldGroup::create('Tickets',
@@ -89,11 +88,9 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		$gateways = GatewayInfo::get_supported_gateways();
 		$gateway = array_shift($gateways);
 
-		$tickets = $this->getForm()->getSavedStepByClass('EventRegisterTicketsStep');
-		$total   = $tickets->getTotal();
-
 		$registration = $this->form->getSession()->getRegistration();
-
+		$total  = $registration->Total;
+		
 		$payment = Payment::create()
 			->init($gateway, $total->getAmount(), $total->getCurrency())
 			->setReturnUrl(sprintf("%s?registration=%s&BackUrl=%s&FormName=%s",
