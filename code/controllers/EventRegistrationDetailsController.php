@@ -65,6 +65,11 @@ class EventRegistrationDetailsController extends Page_Controller {
 		}
 
 		$generator = $this->registration->Time()->Event()->TicketGenerator;
+
+		if($generator == "EventRegistrationHtmlTicketGenerator") {
+			return $this->registration->renderWith('EventRegistrationHtmlTicket');
+		}
+
 		$generator = new $generator();
 
 		$path = $generator->generateTicketFileFor($this->registration);
