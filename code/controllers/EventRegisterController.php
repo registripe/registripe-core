@@ -139,7 +139,10 @@ class EventRegisterController extends Page_Controller {
 	 * @return EventRegisterForm
 	 */
 	public function RegisterForm() {
-		return new EventRegisterForm($this, 'RegisterForm');
+		$form = new EventRegisterForm($this, 'RegisterForm');
+		$this->extend('updateEventRegisterForm', $form);
+
+		return $form;
 	}
 
 	/**
