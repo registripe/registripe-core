@@ -59,6 +59,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 		$fields = new FieldList(
 			$tickets = new EventRegistrationTicketsTableField('Tickets', $datetime)
 		);
+
 		$tickets->setExcludedRegistrationId($session->RegistrationID);
 
 		if ($member = Member::currentUser()) {
@@ -135,6 +136,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 		$registration->MemberID = Member::currentUserID();
 
 		$total = $this->getTotal();
+
 		$registration->Total->setCurrency($total->getCurrency());
 		$registration->Total->setAmount($total->getAmount());
 		$registration->write();
@@ -143,11 +145,13 @@ class EventRegisterTicketsStep extends MultiFormStep {
 
 		foreach ($data['Tickets'] as $id => $quantity) {
 			if ($quantity) {
-				$registration->Tickets()->add($id, array('Quantity' => $quantity));
+				$registration->Tickets()->add($id, array(
+					'Quantity' => $quantity
+				));
 			}
 		}
 
-		return true;
+		return parent::validateStep($data, $form);
 	}
 
 }
