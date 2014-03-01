@@ -90,24 +90,16 @@ class EventRegisterPaymentStep extends MultiFormStep {
 
 		$registration = $this->form->getSession()->getRegistration();
 		$total  = $registration->Total;
-		
-		$payment = Payment::create()
-			->init($gateway, $total->getAmount(), $total->getCurrency())
-			->setReturnUrl(sprintf("%s?registration=%s&BackUrl=%s&FormName=%s",
-				'EventPaymentController/complete/',
-				$registration->ID,
-				$this->Link(),
-				$form->getName()
-			))
-			->setCancelUrl(sprintf("%s?registration=%s&BackUrl=%s&FormName=%s",
-				'EventPaymentController/cancel/',
-				$registration->ID,
-				$this->Link(),
-				$form->getName()
-			));
 
-		$registration->PaymentID = $payment->ID;
-		$registration->write();
+		if(!$registration->Payment()->exists()) {
+			$payment = Payment::create()
+				->init($gateway, $total->getAmount(), $total->getCurrency());
+			$payment->write();
+			
+			$registration->PaymentID = $payment->ID;
+			$registration->write();
+		}
+
 
 		$purchase = $payment->purchase($form->getData());
 
