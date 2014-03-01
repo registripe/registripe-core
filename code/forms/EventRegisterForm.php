@@ -84,13 +84,6 @@ class EventRegisterForm extends MultiForm {
 			return false;
 		}
 
-		// Validate the final step.
-		if (!$step->validateStep($data, $form)) {
-			Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
-			$this->controller->redirectBack();
-			return false;
-		}
-
 		$this->session->delete();
 
 		// If the registrations is already valid, then send a details email.
