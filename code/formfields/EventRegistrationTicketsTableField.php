@@ -146,6 +146,8 @@ class EventRegistrationTicketsTableField extends FormField {
 			}
 		}
 
+		$this->extend('updateTickets', $result);
+
 		return $result;
 	}
 
