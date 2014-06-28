@@ -60,15 +60,21 @@ class EventRegistrationDetailsController extends Page_Controller {
 	}
 
 	public function ticketfile() {
-		if (!$this->HasTicketFile() || $this->registration->Status != 'Valid') {
+		if ($this->registration->Status != 'Valid') {
 			$this->httpError(404);
 		}
 
 		$generator = $this->registration->Time()->Event()->TicketGenerator;
 
+		if(!$generator) {
+			$generator = "EventRegistrationHtmlTicketGenerator";
+		}
+
 		if($generator == "EventRegistrationHtmlTicketGenerator") {
 			return $this->registration->renderWith('EventRegistrationHtmlTicket');
 		}
+
+
 
 		$generator = new $generator();
 
@@ -110,6 +116,7 @@ class EventRegistrationDetailsController extends Page_Controller {
 	 */
 	public function TicketsTable() {
 		$rego  = $this->registration;
+
 		$table = new EventRegistrationTicketsTableField('Tickets', $rego->Time());
 
 		$table->setReadonly(true);
@@ -120,13 +127,6 @@ class EventRegistrationDetailsController extends Page_Controller {
 		$table->setTotal($rego->Total);
 
 		return $table;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function HasTicketFile() {
-		return (bool) $this->registration->Time()->Event()->TicketGenerator;
 	}
 
 	/**
