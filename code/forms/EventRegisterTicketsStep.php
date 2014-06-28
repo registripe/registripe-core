@@ -151,6 +151,8 @@ class EventRegisterTicketsStep extends MultiFormStep {
 			}
 		}
 
+		$this->extend('onAfterValidateStep', $data, $registration);
+
 		return parent::validateStep($data, $form);
 	}
 
