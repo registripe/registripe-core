@@ -132,26 +132,21 @@ class EventRegisterTicketsStep extends MultiFormStep {
 			$registration->Name  = $member->getName();
 			$registration->Email = $member->Email;
 		} else {
-			$check = Member::get()->filter(array(
-				'Email' => $data['Email']
-			))->first();
-
-			if($check) {
-				$form->sessionMessage('Please login to your account to continue with the order.', 'bad');
-				$form->getController()->redirect('Security/login?BackURL='. urlencode($_SERVER['REQUEST_URI']));
-
-				return false;
-			}
-
 			if(Config::inst()->get('EventRegisterTicketsStep', 'create_member')) {
-				$member = Injector::inst()->create('Member');
-				$member->FirstName = trim(substr($data['Name'], strpos($data['Name'], ' ')));
-				$member->Surname = trim(substr($data['Name'], strpos($data['Name'], ''), strlen($data['Name'])));
-				$member->Email = $data['Email'];
+				$member = Member::get()->filter(array(
+					'Email' => $data['Email']
+				))->first();
 
-				$member->extend('onAfterCreateMember');
-				$member->write();
-				$member->logIn();
+				if(!$member) {
+					$member = Injector::inst()->create('Member');
+					$member->FirstName = trim(substr($data['Name'], strpos($data['Name'], ' ')));
+					$member->Surname = trim(substr($data['Name'], strpos($data['Name'], ''), strlen($data['Name'])));
+					$member->Email = $data['Email'];
+
+					$member->extend('onAfterCreateRegistrationMember');
+					$member->write();
+					$member->logIn();
+				}
 			}
 
 			$registration->Name  = $data['Name'];
