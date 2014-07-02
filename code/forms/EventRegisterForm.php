@@ -206,6 +206,7 @@ class EventRegisterForm extends MultiForm {
 		if(!$this->session) {
 			$this->session = new EventRegisterFormSession();
 			$this->session->setForm($this);
+			$this->session->Hash = $this->controller->request->getVar('MultiFormSessionID');
 			$this->session->write();
 		} else {
 			$this->session->setForm($this);
@@ -215,6 +216,15 @@ class EventRegisterForm extends MultiForm {
 		if(!$this->session->Hash) {
 			$this->session->Hash = sha1($this->session->ID . '-' . microtime());
 			$this->session->write();
+		}
+
+		// after generating the hash, if the url does not contain the hash then
+		// redirect them to it
+		if($this->controller->request->requestVar('MultiFormSessionID') !== $this->session->Hash) {
+			return $this->controller->redirect(Controller::join_links(
+				$_SERVER['REQUEST_URI'],
+				'?MultiFormSessionID='. $this->session->Hash
+			));
 		}
 	}
 

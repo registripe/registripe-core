@@ -7,6 +7,8 @@
  */
 class EventRegisterTicketsStep extends MultiFormStep {
 
+	private static $create_member = false;
+
 	public function getTitle() {
 		return 'Event Tickets';
 	}
@@ -89,7 +91,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 	}
 
 	public function validateStep($data, $form) {
-		Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
+		$this->saveData($form->getData());
 
 		$datetime = $this->getForm()->getController()->getDateTime();
 		$data     = $form->getData();
@@ -117,6 +119,8 @@ class EventRegisterTicketsStep extends MultiFormStep {
 
 		// Ensure that the entered ticket data is valid.
 		if (!$this->form->validateTickets($data['Tickets'], $form)) {
+			$form->sessionMessage('Please enter a valid quantity for your ticket order', 'bad');
+
 			return false;
 		}
 
@@ -128,6 +132,28 @@ class EventRegisterTicketsStep extends MultiFormStep {
 			$registration->Name  = $member->getName();
 			$registration->Email = $member->Email;
 		} else {
+			$check = Member::get()->filter(array(
+				'Email' => $data['Email']
+			))->first();
+
+			if($check) {
+				$form->sessionMessage('Please login to your account to continue with the order.', 'bad');
+				$form->getController()->redirect('Security/login?BackURL='. urlencode($_SERVER['REQUEST_URI']));
+
+				return false;
+			}
+
+			if(Config::inst()->get('EventRegisterTicketsStep', 'create_member')) {
+				$member = Injector::inst()->create('Member');
+				$member->FirstName = trim(substr($data['Name'], strpos($data['Name'], ' ')));
+				$member->Surname = trim(substr($data['Name'], strpos($data['Name'], ''), strlen($data['Name'])));
+				$member->Email = $data['Email'];
+
+				$member->extend('onAfterCreateMember');
+				$member->write();
+				$member->logIn();
+			}
+
 			$registration->Name  = $data['Name'];
 			$registration->Email = $data['Email'];
 		}
@@ -152,7 +178,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 		}
 
 		$this->extend('onAfterValidateStep', $data, $registration);
-
+		
 		return parent::validateStep($data, $form);
 	}
 
