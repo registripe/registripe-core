@@ -111,7 +111,7 @@ class EventRegisterPaymentStep extends MultiFormStep {
 				$registration->write();
 
 				return true;
-			} else if ($$purchase->isRedirect()) {
+			} else if ($purchase->isRedirect()) {
     			$purchase->redirect();
 
 	    		return false;

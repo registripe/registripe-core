@@ -63,7 +63,12 @@ class EventRegisterForm extends MultiForm {
 	 * registration object.
 	 */
 	public function finish($data, $form) {
-		parent::finish($data, $form);
+		$result = parent::finish($data, $form);
+
+		// support validation of the parent
+		if($result === false) {
+			return;
+		}
 
 		$step         = $this->getCurrentStep();
 		$datetime     = $this->getController()->getDateTime();
