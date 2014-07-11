@@ -98,24 +98,30 @@ class EventRegisterPaymentStep extends MultiFormStep {
 			
 			$registration->PaymentID = $payment->ID;
 			$registration->write();
+		} else {
+			$payment = $registration->Payment();
 		}
-
 
 		$purchase = $payment->purchase($form->getData());
 
-		if ($purchase->isSuccessful()) {
-			$registration->Status = 'Valid';
-			$registration->write();
+		// will be null if already processed
+		if ($purchase) {
+			if($purchase->isSuccessful()) {
+				$registration->Status = 'Valid';
+				$registration->write();
 
-			return true;
-		} elseif ($purchase->isRedirect()) {
-    		$purchase->redirect();
+				return true;
+			} else if ($$purchase->isRedirect()) {
+    			$purchase->redirect();
 
-    		return false;
+	    		return false;
+			} else {
+				$form->sessionMessage($purchase->getMessage(), 'bad');
+				
+				return false;
+			}
 		} else {
-			$form->sessionMessage($purchase->getMessage(), 'bad');
-			
-			return false;
+			return true;
 		}
 	}
 }
