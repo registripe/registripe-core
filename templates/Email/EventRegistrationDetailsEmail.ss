@@ -15,7 +15,7 @@
 		<dt>Email:</dt>
 		<dd>$Email</dd>
 		<dt>Event:</dt>
-		<dd>$Time.EventTitle ($Time.Summary)</dd>
+		<dd>$Time.Event.Title ($Time.DateRange)</dd>
 		<dt>Created:</dt>
 		<dd>$Created.Nice</dd>
 	</dl>
@@ -49,7 +49,7 @@
 			<h2>Payment Details</h2>
 			<dl>
 				<dt>Method:</dt>
-				<dd>$PaymentMethod</dd>
+				<dd>$GatewayTitle</dd>
 				<dt>Amount:</dt>
 				<dd>$Amount.Nice</dd>
 				<dt>Status:</dt>
