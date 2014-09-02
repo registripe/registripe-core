@@ -59,9 +59,7 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		$gateways = GatewayInfo::get_supported_gateways();
 		//TODO: allow choosing gateway (may require additional step, or hiding groups of fields)
 		//get fields for the first gateway in the list
-		$factory = new GatewayFieldsFactory(array_shift(
-			$gateways
-		));
+		$factory = new GatewayFieldsFactory(key($gateways));
 
 		$paymentFields = $factory->getFields();
 		$fields->merge($paymentFields);
@@ -73,10 +71,8 @@ class EventRegisterPaymentStep extends MultiFormStep {
 
 	public function getValidator() {
 		$gateways = GatewayInfo::get_supported_gateways();
-
-		$validator = new RequiredFields(GatewayInfo::required_fields(
-			array_shift($gateways)
-		));
+		//get first gateway in list
+		$validator = new RequiredFields(GatewayInfo::required_fields(key($gateways)));
 
 		$this->extend('updateValidator', $validator);
 
@@ -95,7 +91,7 @@ class EventRegisterPaymentStep extends MultiFormStep {
 
 		$gateways = GatewayInfo::get_supported_gateways();
 		//use first gateway on list
-		$gateway = array_shift($gateways);
+		$gateway = key($gateways);
 
 		$registration = $this->form->getSession()->getRegistration();
 		$total  = $registration->Total;
@@ -126,10 +122,15 @@ class EventRegisterPaymentStep extends MultiFormStep {
 			$this->Link("RegisterForm")."&action_finish=Submit&payment=finish"
 		);
 
+		$data = array_merge($form->getData(),array(
+			'name' => $registration->Name,
+			'email' => $registration->Email
+		));
+
 		$response = PurchaseService::create($payment)
 	        ->setReturnUrl($returnlink)
 	        ->setCancelUrl($this->Link())
-	        ->purchase($form->getData());
+	        ->purchase($data);
 
 		// will be null if already processed
 		if ($response) {
