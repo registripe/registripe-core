@@ -63,23 +63,27 @@ class EventRegisterForm extends MultiForm {
 	 * registration object.
 	 */
 	public function finish($data, $form) {
-		parent::finish($data, $form);
+		$result = parent::finish($data, $form);
+
+		// support validation of the parent
+		if($result === false) {
+			return;
+		}
 
 		$step         = $this->getCurrentStep();
 		$datetime     = $this->getController()->getDateTime();
 		$registration = $this->session->getRegistration();
 		$ticketsStep  = $this->getSavedStepByClass('EventRegisterTicketsStep');
 		$tickets      = $ticketsStep->loadData();
-
-		// Check that the requested tickets are still available.
-		if (!$this->validateTickets($tickets['Tickets'], $form)) {
-			Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
-			$this->controller->redirectBack();
-			return false;
+		
+		if(!$tickets || !isset($tickets['tickets'])) {
+			$validate = $registration->Tickets()->map('ID', 'Quantity')->toArray();
+		} else {
+			$validate = $tickets['Tickets'];
 		}
 
-		// Validate the final step.
-		if (!$step->validateStep($data, $form)) {
+		// Check that the requested tickets are still available.
+		if (!$this->validateTickets($validate, $form)) {
 			Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
 			$this->controller->redirectBack();
 			return false;
@@ -207,6 +211,7 @@ class EventRegisterForm extends MultiForm {
 		if(!$this->session) {
 			$this->session = new EventRegisterFormSession();
 			$this->session->setForm($this);
+			$this->session->Hash = $this->controller->request->getVar('MultiFormSessionID');
 			$this->session->write();
 		} else {
 			$this->session->setForm($this);
@@ -216,6 +221,15 @@ class EventRegisterForm extends MultiForm {
 		if(!$this->session->Hash) {
 			$this->session->Hash = sha1($this->session->ID . '-' . microtime());
 			$this->session->write();
+		}
+
+		// after generating the hash, if the url does not contain the hash then
+		// redirect them to it
+		if($this->controller->request->requestVar('MultiFormSessionID') !== $this->session->Hash) {
+			return $this->controller->redirect(Controller::join_links(
+				$_SERVER['REQUEST_URI'],
+				'?MultiFormSessionID='. $this->session->Hash
+			));
 		}
 	}
 

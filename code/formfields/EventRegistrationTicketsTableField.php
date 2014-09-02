@@ -126,7 +126,8 @@ class EventRegistrationTicketsTableField extends FormField {
 					'Available'   => $avail === true ? 'Unlimited' : $avail,
 					'Price'       => $ticket->PriceSummary(),
 					'End'         => DBField::create_field('SS_Datetime', $endTime),
-					'Quantity'    => $field
+					'Quantity'    => $field,
+					'Ticket'	=> $ticket
 				)));
 			} elseif ($this->showUnavailableTickets) {
 				$availableAt = null;
@@ -144,6 +145,8 @@ class EventRegistrationTicketsTableField extends FormField {
 				)));
 			}
 		}
+
+		$this->extend('updateTickets', $result);
 
 		return $result;
 	}

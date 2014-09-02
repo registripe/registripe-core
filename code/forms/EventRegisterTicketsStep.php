@@ -7,6 +7,8 @@
  */
 class EventRegisterTicketsStep extends MultiFormStep {
 
+	private static $create_member = false;
+
 	public function getTitle() {
 		return 'Event Tickets';
 	}
@@ -59,6 +61,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 		$fields = new FieldList(
 			$tickets = new EventRegistrationTicketsTableField('Tickets', $datetime)
 		);
+
 		$tickets->setExcludedRegistrationId($session->RegistrationID);
 
 		if ($member = Member::currentUser()) {
@@ -88,7 +91,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 	}
 
 	public function validateStep($data, $form) {
-		Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
+		$this->saveData($form->getData());
 
 		$datetime = $this->getForm()->getController()->getDateTime();
 		$data     = $form->getData();
@@ -116,6 +119,8 @@ class EventRegisterTicketsStep extends MultiFormStep {
 
 		// Ensure that the entered ticket data is valid.
 		if (!$this->form->validateTickets($data['Tickets'], $form)) {
+			$form->sessionMessage('Please enter a valid quantity for your ticket order', 'bad');
+
 			return false;
 		}
 
@@ -127,6 +132,23 @@ class EventRegisterTicketsStep extends MultiFormStep {
 			$registration->Name  = $member->getName();
 			$registration->Email = $member->Email;
 		} else {
+			if(Config::inst()->get('EventRegisterTicketsStep', 'create_member')) {
+				$member = Member::get()->filter(array(
+					'Email' => $data['Email']
+				))->first();
+
+				if(!$member) {
+					$member = Injector::inst()->create('Member');
+					$member->FirstName = trim(substr($data['Name'], strpos($data['Name'], ' ')));
+					$member->Surname = trim(substr($data['Name'], strpos($data['Name'], ''), strlen($data['Name'])));
+					$member->Email = $data['Email'];
+
+					$member->extend('onAfterCreateRegistrationMember');
+					$member->write();
+					$member->logIn();
+				}
+			}
+
 			$registration->Name  = $data['Name'];
 			$registration->Email = $data['Email'];
 		}
@@ -135,6 +157,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 		$registration->MemberID = Member::currentUserID();
 
 		$total = $this->getTotal();
+
 		$registration->Total->setCurrency($total->getCurrency());
 		$registration->Total->setAmount($total->getAmount());
 		$registration->write();
@@ -143,11 +166,15 @@ class EventRegisterTicketsStep extends MultiFormStep {
 
 		foreach ($data['Tickets'] as $id => $quantity) {
 			if ($quantity) {
-				$registration->Tickets()->add($id, array('Quantity' => $quantity));
+				$registration->Tickets()->add($id, array(
+					'Quantity' => $quantity
+				));
 			}
 		}
 
-		return true;
+		$this->extend('onAfterValidateStep', $data, $registration);
+		
+		return parent::validateStep($data, $form);
 	}
 
 }

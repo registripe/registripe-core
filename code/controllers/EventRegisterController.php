@@ -74,6 +74,7 @@ class EventRegisterController extends Page_Controller {
 		if ($datetime->getStartDateTime()->getTimestamp() < time()) {
 			$data = array(
 				'Title'   => $datetime->Event()->Title . ' Has Already Happened',
+				'OldEvent' => true,
 				'Content' => '<p>You can no longer register for this event.</p>'
 			);
 		} elseif ($datetime->getRemainingCapacity($exclude)) {
@@ -84,9 +85,12 @@ class EventRegisterController extends Page_Controller {
 		} else {
 			$data = array(
 				'Title'   => $datetime->Event()->Title . ' Is Full',
+				'SoldOut' => true,
 				'Content' => '<p>There are no more places available at this event.</p>'
 			);
 		}
+
+		$data['Event'] = $datetime->Event();
 
 		return $this->getViewer('index')->process($this->customise($data));
 	}
@@ -139,7 +143,10 @@ class EventRegisterController extends Page_Controller {
 	 * @return EventRegisterForm
 	 */
 	public function RegisterForm() {
-		return new EventRegisterForm($this, 'RegisterForm');
+		$form = new EventRegisterForm($this, 'RegisterForm');
+		$this->extend('updateEventRegisterForm', $form);
+
+		return $form;
 	}
 
 	/**

@@ -47,7 +47,9 @@ class RegistrableEvent extends CalendarEvent {
 	);
 
 	public function getCMSFields() {
+		SiteTree::disableCMSFieldsExtensions();
 		$fields = parent::getCMSFields();
+		SiteTree::enableCMSFieldsExtensions();
 
 		$title = $fields->dataFieldByName('Title');
 		$content = $fields->dataFieldByName('Content');
@@ -131,48 +133,50 @@ class RegistrableEvent extends CalendarEvent {
 			$fields->addFieldToTab('Root.Tickets', $generator);
 		}
 
-		$fields->addFieldsToTab('Root.Registrations', array(
-			new GridField(
-				'Registrations',
-				_t('EventManagement.REGISTRATIONS', 'Registrations'),
-				$this->DateTimes()->relation('Registrations')->filter('Status', 'Valid')
-			),
-			new ToggleCompositeField(
-				'CanceledRegistrations',
-				_t('EventManagement.CANCELED_REGISTRATIONS', 'Canceled Registrations'),
-				array(
-					new GridField(
-						'CanceledRegistrations',
-						'',
-						$this->DateTimes()->relation('Registrations')->filter('Status', 'Canceled')
-					)
-				)
-			)
-		));
-
-		if ($this->RegEmailConfirm) {
-			$fields->addFieldToTab('Root.Registrations', new ToggleCompositeField(
-				'UnconfirmedRegistrations',
-				_t('EventManagement.UNCONFIRMED_REGISTRATIONS', 'Unconfirmed Registrations'),
-				array(
-					new GridField(
-						'UnconfirmedRegistrations',
-						'',
-						$this->DateTimes()->relation('Registrations')->filter('Status', 'Unconfirmed')
+		if($this->ID) {
+			$fields->addFieldsToTab('Root.Registrations', array(
+				new GridField(
+					'Registrations',
+					_t('EventManagement.REGISTRATIONS', 'Registrations'),
+					$this->DateTimes()->relation('Registrations')->filter('Status', 'Valid')
+				),
+				new ToggleCompositeField(
+					'CanceledRegistrations',
+					_t('EventManagement.CANCELED_REGISTRATIONS', 'Canceled Registrations'),
+					array(
+						new GridField(
+							'CanceledRegistrations',
+							'',
+							$this->DateTimes()->relation('Registrations')->filter('Status', 'Canceled')
+						)
 					)
 				)
 			));
+
+			if ($this->RegEmailConfirm) {
+				$fields->addFieldToTab('Root.Registrations', new ToggleCompositeField(
+					'UnconfirmedRegistrations',
+					_t('EventManagement.UNCONFIRMED_REGISTRATIONS', 'Unconfirmed Registrations'),
+					array(
+						new GridField(
+							'UnconfirmedRegistrations',
+							'',
+							$this->DateTimes()->relation('Registrations')->filter('Status', 'Unconfirmed')
+						)
+					)
+				));
+			}
+
+			$fields->addFieldToTab('Root.Invitations', new GridField(
+				'Invitations',
+				_t('EventManagement.INVITATIONS', 'Invitations'),
+				$this->Invitations(),
+				GridFieldConfig_RecordViewer::create()
+					->addComponent(new GridFieldButtonRow('before'))
+					->addComponent(new EventSendInvitationsButton($this))
+			));
 		}
-
-		$fields->addFieldToTab('Root.Invitations', new GridField(
-			'Invitations',
-			_t('EventManagement.INVITATIONS', 'Invitations'),
-			$this->Invitations(),
-			GridFieldConfig_RecordViewer::create()
-				->addComponent(new GridFieldButtonRow('before'))
-				->addComponent(new EventSendInvitationsButton($this))
-		));
-
+		
 		return $fields;
 	}
 
