@@ -22,6 +22,8 @@ class RegistrableDateTime extends CalendarDateTime {
 		'Tickets' => array('Available' => 'Int', 'Sort' => 'Int')
 	);
 
+	private static $singular_name = "Date Time";
+
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 
