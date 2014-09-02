@@ -52,12 +52,13 @@ class EventRegisterPaymentStep extends MultiFormStep {
 
 		$group->addExtraClass('confirm_tickets');
 
-
 		$fields = new FieldList(
 			$group
 		);
 
 		$gateways = GatewayInfo::get_supported_gateways();
+		//TODO: allow choosing gateway (may require additional step, or hiding groups of fields)
+		//get fields for the first gateway in the list
 		$factory = new GatewayFieldsFactory(array_shift(
 			$gateways
 		));
@@ -82,46 +83,71 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		return $validator;
 	}
 
+	public function Link($action = null) {
+		return Controller::join_links(
+			$this->form->getDisplayLink(),
+			$action
+		)."?MultiFormSessionID={$this->Session()->Hash}";
+	}
+
 	public function validateStep($data, $form) {
 		Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
 
 		$gateways = GatewayInfo::get_supported_gateways();
+		//use first gateway on list
 		$gateway = array_shift($gateways);
 
 		$registration = $this->form->getSession()->getRegistration();
 		$total  = $registration->Total;
 
-		if(!$registration->Payment()->exists()) {
-			$payment = Payment::create()
-				->init($gateway, $total->getAmount(), $total->getCurrency());
-			$payment->write();
-			
-			$registration->PaymentID = $payment->ID;
-			$registration->write();
-		} else {
-			$payment = $registration->Payment();
+		$payment = $registration->Payment();
+
+		//save payments that hve been captured
+		if($payment->exists() && $payment->isComplete() ){
+			if($payment->isCaptured()){
+				$registration->Status = 'Valid';
+				$registration->write();
+				return true;
+			}else{
+				$form->sessionMessage($payment->Message, 'bad');
+				return false;
+			}
 		}
 
-		$purchase = $payment->purchase($form->getData());
+		$payment = Payment::create()
+			->init($gateway, $total->getAmount(), $total->getCurrency());
+		$payment->write();
+		
+		$registration->PaymentID = $payment->ID;
+		$registration->write();
+
+		//redirect back to the form after offsite payment for revalidation
+		$returnlink = Director::absoluteURL(
+			$this->Link("RegisterForm")."&action_finish=Submit&payment=finish"
+		);
+
+		$response = PurchaseService::create($payment)
+	        ->setReturnUrl($returnlink)
+	        ->setCancelUrl($this->Link())
+	        ->purchase($form->getData());
 
 		// will be null if already processed
-		if ($purchase) {
-			if($purchase->isSuccessful()) {
+		if ($response) {
+			if($response->isSuccessful()) {
 				$registration->Status = 'Valid';
 				$registration->write();
 
 				return true;
-			} else if ($purchase->isRedirect()) {
-    			$purchase->redirect();
+			} else if ($response->isRedirect()) {
+    			$response->redirect();
 
 	    		return false;
 			} else {
-				$form->sessionMessage($purchase->getMessage(), 'bad');
+				$form->sessionMessage($response->getMessage(), 'bad');
 				
 				return false;
 			}
-		} else {
-			return true;
 		}
+		return true;
 	}
 }
