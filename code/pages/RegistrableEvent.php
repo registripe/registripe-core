@@ -139,19 +139,21 @@ class RegistrableEvent extends CalendarEvent {
 					'Registrations',
 					_t('EventManagement.REGISTRATIONS', 'Registrations'),
 					$this->DateTimes()->relation('Registrations')->filter('Status', 'Valid')
-				),
+				)
+			));
+
+			$cancelled = $this->DateTimes()->relation('Registrations')->filter('Status', 'Canceled');
+			if($cancelled->exists()) {
+				$fields->addFieldsToTab('Root.Registrations', array(
 				new ToggleCompositeField(
 					'CanceledRegistrations',
 					_t('EventManagement.CANCELED_REGISTRATIONS', 'Canceled Registrations'),
 					array(
-						new GridField(
-							'CanceledRegistrations',
-							'',
-							$this->DateTimes()->relation('Registrations')->filter('Status', 'Canceled')
-						)
+							new GridField('CanceledRegistrations', '', $cancelled)
 					)
 				)
 			));
+			}
 
 			if ($this->RegEmailConfirm) {
 				$fields->addFieldToTab('Root.Registrations', new ToggleCompositeField(
