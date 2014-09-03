@@ -41,7 +41,30 @@
 	</dl>
 
 	<h3>Tickets</h3>
-	$TicketsTable.FieldHolder
+	<table id="$ID" class="$CSSClasses event-tickets field">
+		<thead>
+			<tr>
+				<th>Ticket</th>
+				<th>Price</th>
+				<th>Quantity</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% loop $Tickets %>
+				<tr class="$EvenOdd $FirstLast <% if $Last %>last <% end_if %>">
+					<td class="title">$Title</td>
+					<td class="price">$Price.Nice</td>
+					<td class="quantity">$Quantity</td>
+				</tr>
+				<% if $Description %>
+					<tr class="event-tickets-description">
+						<td colspan="5">$Description</td>
+					</tr>
+				<% end_if %>
+			<% end_loop %>
+		</tbody>
+	</table>
+
 
 	<% if $Registration.Payment %>
 		<% with $Registration.Payment %>
