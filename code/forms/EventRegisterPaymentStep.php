@@ -21,9 +21,10 @@ class EventRegisterPaymentStep extends MultiFormStep {
 	 */
 	public function loadData() {
 		$data    = parent::loadData();
+		$tickets = $this->getForm()->getSavedStepByClass('EventRegisterTicketsStep');
 
-		$registration = $this->form->getSession()->getRegistration();
-		$data['Tickets'] = $registration->Tickets();
+		$tickets = $tickets->loadData();
+		$data['Tickets'] = $tickets['Tickets'];
 
 		return $data;
 	}
@@ -42,6 +43,7 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		$table->setReadonly(true);
 		$table->setExcludedRegistrationId($session->RegistrationID);
 		$table->setShowUnavailableTickets(false);
+		$table->setShowUnselectedTickets(false);
 		$table->setTotal($total);
 
 		$group = FieldGroup::create('Tickets',
