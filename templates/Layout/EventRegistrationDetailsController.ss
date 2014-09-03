@@ -33,8 +33,8 @@
 		<dt>Email:</dt>
 		<dd>$Email</dd>
 		<dt>Event:</dt>
-		<dd>$Time.Event.Title</dd>
-		<dt>Created:</dt>
+		<dd><a href="$Time.Event.Link">$Time.Event.Title</a></dd>
+		<dt>Date:</dt>
 		<dd>$Created.Nice</dd>
 		<dt>Status:</dt>
 		<dd>$Status</dd>
