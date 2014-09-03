@@ -119,10 +119,13 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		$registration->PaymentID = $payment->ID;
 		$registration->write();
 
+		//prevent redirect back to homepage
+		$backurl = $this->Link();
+		$linkbase = $this->Link("RegisterForm")."&action_finish=Submit&BackURL=$backurl";
+
 		//redirect back to the form after offsite payment for revalidation
-		$returnlink = Director::absoluteURL(
-			$this->Link("RegisterForm")."&action_finish=Submit&payment=finish"
-		);
+		$successlink = $linkbase."&payment=success";
+		$failurelink = $linkbase."&payment=failure";
 
 		$data = array_merge($form->getData(),array(
 			'name' => $registration->Name,
@@ -130,8 +133,8 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		));
 
 		$response = PurchaseService::create($payment)
-	        ->setReturnUrl($returnlink)
-	        ->setCancelUrl($this->Link())
+	        ->setReturnUrl($successlink)
+	        ->setCancelUrl($failurelink)
 	        ->purchase($data);
 
 		// will be null if already processed
