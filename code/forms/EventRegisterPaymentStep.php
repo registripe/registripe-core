@@ -96,6 +96,12 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		$gateway = key($gateways);
 
 		$registration = $this->form->getSession()->getRegistration();
+
+		//complete registration if registration is already valid
+		if($registration->Status == 'Valid'){
+			return true;
+		}
+
 		$total  = $registration->Total;
 
 		$payment = $registration->Payment();
