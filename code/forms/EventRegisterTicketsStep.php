@@ -92,6 +92,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 
 	public function validateStep($data, $form) {
 		$this->saveData($form->getData());
+		$form->clearMessage(); //hack until MultiForm forTemplate is fixed
 
 		$datetime = $this->getForm()->getController()->getDateTime();
 		$data     = $form->getData();

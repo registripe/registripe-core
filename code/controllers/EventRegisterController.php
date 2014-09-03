@@ -56,9 +56,6 @@ class EventRegisterController extends Page_Controller {
 
 			$this->redirect($this->Link());
 		}
-		else {
-			$form->clearMessage();
-		}
 	}
 
 	public function index() {
