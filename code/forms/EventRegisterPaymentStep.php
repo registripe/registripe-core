@@ -105,17 +105,26 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		$total  = $registration->Total;
 
 		$payment = $registration->Payment();
-
+		$paymentstatus = $form->getRequest()->getVar('payment');
 		//save payments that hve been captured
-		if($payment->exists() && $payment->isComplete() ){
-			if($payment->isCaptured()){
-				$registration->Status = 'Valid';
-				$registration->write();
-				return true;
-			}else{
-				$form->sessionMessage($payment->Message, 'bad');
+		
+		if($payment->exists() && $paymentstatus){
+			if($paymentstatus == "success" && $payment->isComplete()){
+				if($payment->isCaptured()){
+					$registration->Status = 'Valid';
+					$registration->write();
+					return true;
+				}else{
+					$form->sessionMessage($payment->LatestMessage, 'bad');
+					return false;
+				}
+			}
+			if($paymentstatus == "failure"){
+				$form->sessionMessage($payment->LatestMessage, 'bad');
 				return false;
 			}
+			$form->sessionMessage("Payment failed", 'bad');
+			return false;
 		}
 
 		$payment = Payment::create()
