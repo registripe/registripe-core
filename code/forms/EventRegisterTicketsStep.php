@@ -36,7 +36,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 
 		if (isset($data['Tickets'])) {
 			foreach ($data['Tickets'] as $id => $quantity) {
-				$ticket = DataObject::get_by_id('EventTicket', $id);
+				$ticket = EventTicket::get()->byID($id);
 				$price  = $ticket->obj('Price');
 
 				if ($ticket->Type == 'Free' || !$quantity) {
