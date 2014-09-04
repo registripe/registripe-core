@@ -69,7 +69,7 @@ class RegistrableDateTime extends CalendarDateTime {
 			'Title'        => array('title' => 'Title', 'field' => 'ReadonlyField'),
 			'StartSummary' => 'Sales Start',
 			'PriceSummary' => 'Price',
-			'Available'    => array('field' => 'NumericField')
+			'Available'    => array('title' => 'Available', 'field' => 'NumericField')
 		));
 
 		$add->setTitle(_t('EventManagement.ADD_TICKET_TYPE', 'Add Ticket Type'));
