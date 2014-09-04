@@ -97,6 +97,19 @@ class EventRegistration extends DataObject {
 	}
 
 	/**
+	 * Generate a desicrption of the tickets in the registration
+	 * @return string
+	 */
+	public function getDescription() {
+		$parts = array();
+		foreach($this->Tickets() as $ticket){
+			$parts[] = $ticket->Quantity."x".$ticket->Title;
+		}
+
+		return $this->Time()->Event()->Title.": ".implode(",", $parts);
+	}
+
+	/**
 	 * @return string
 	 */
 	public function Link($action = '') {

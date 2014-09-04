@@ -144,7 +144,9 @@ class EventRegisterPaymentStep extends MultiFormStep {
 
 		$data = array_merge($form->getData(),array(
 			'name' => $registration->Name,
-			'email' => $registration->Email
+			'email' => $registration->Email,
+			'description' => $registration->Description
+
 		));
 
 		$response = PurchaseService::create($payment)
