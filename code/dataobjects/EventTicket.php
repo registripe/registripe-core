@@ -143,6 +143,12 @@ class EventTicket extends DataObject {
 		if (!class_exists('Payment')) {
 			$this->Type = 'Free';
 		}
+		//clear price if ticket is free
+		if($this->Type != "Price"){
+			$this->Price = "";
+			$this->PriceAmount = 0;
+			$this->PriceCurrency = "";
+		}
 
 		parent::onBeforeWrite();
 	}
