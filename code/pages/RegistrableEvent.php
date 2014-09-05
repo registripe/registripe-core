@@ -27,8 +27,7 @@ class RegistrableEvent extends CalendarEvent {
 
 	private static $has_many = array(
 		'Tickets'     => 'EventTicket',
-		'DateTimes'   => 'RegistrableDateTime',
-		'Invitations' => 'EventInvitation'
+		'DateTimes'   => 'RegistrableDateTime'
 	);
 
 	private static $defaults = array(
@@ -168,15 +167,6 @@ class RegistrableEvent extends CalendarEvent {
 				)
 			));
 		}
-
-		$fields->addFieldToTab('Root.Invitations', new GridField(
-			'Invitations',
-			_t('EventManagement.INVITATIONS', 'Invitations'),
-			$this->Invitations(),
-			GridFieldConfig_RecordViewer::create()
-				->addComponent(new GridFieldButtonRow('before'))
-				->addComponent(new EventSendInvitationsButton($this))
-		));
 		
 		return $fields;
 	}
