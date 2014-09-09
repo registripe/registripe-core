@@ -1,12 +1,8 @@
 <?php
-/**
- * An email that contains the details for an event registration.
- *
- * @package silverstripe-eventmanagement
- */
-class EventRegistrationDetailsEmail extends Email {
 
-	protected $ss_template = 'EventRegistrationDetailsEmail';
+class EventAdminNotificationEmail extends Email {
+
+	protected $ss_template = 'EventAdminNotificationEmail';
 
 	/**
 	 * Creates an email instance from a registration object.
@@ -17,10 +13,12 @@ class EventRegistrationDetailsEmail extends Email {
 	public static function factory(EventRegistration $registration) {
 		$email      = new self();
 		$siteconfig = SiteConfig::current_site_config();
-
-		$email->setTo($registration->Email);
+		$email->setTo($to);
 		$email->setSubject(sprintf(
-			'Registration Details For %s (%s)',
+			_t(
+				'EventAdminNotificationEmail.SUBJECT',
+				'New Registration for %s (%s)'
+			),
 			$registration->Time()->Event()->Title,
 			$siteconfig->Title));
 

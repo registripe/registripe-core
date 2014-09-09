@@ -93,7 +93,7 @@ class EventRegisterForm extends MultiForm {
 
 		// If the registrations is already valid, then send a details email.
 		if ($registration->Status == 'Valid') {
-			EventRegistrationDetailsEmail::factory($registration)->send();
+			$this->emailRegistration($registration);
 		}
 
 		$this->extend('onRegistrationComplete', $registration);
@@ -104,6 +104,35 @@ class EventRegisterForm extends MultiForm {
 			$registration->ID,
 			'?token=' . $registration->Token
 		));
+	}
+
+	protected function emailRegistration($registration){
+		$email = EventRegistrationDetailsEmail::factory($registration);
+		$this->attachTicketFile($email, $registration);
+		$email->send();
+		$adminemail = EventRegistration::config()->admin_notification_email;
+		if($adminemail){
+			$email = EventAdminNotificationEmail::factory($registration);
+			$email->setTo($adminemail);
+			$email->send();
+		}
+	}
+
+	/**
+	 * Attach a ticket file, if it exists
+	 */
+	protected function attachTicketFile($email, $registration){
+		if ($generator = $registration->Time()->Event()->TicketGenerator) {
+			$generator = new $generator();
+
+			$path = $generator->generateTicketFileFor($registration);
+			$name = $generator->getTicketFilenameFor($registration);
+			$mime = $generator->getTicketMimeTypeFor($registration);
+
+			if ($path) {
+				$email->attachFile($path, $name, $mime);
+			}
+		}
 	}
 
 	/**
