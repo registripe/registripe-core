@@ -288,8 +288,8 @@ class RegistrableDateTime extends CalendarDateTime {
 	/**
 	 * @return string
 	 */
-	public function Link() {
-		return Controller::join_links($this->Event()->Link(), 'details', $this->ID);
+	public function Link($action = 'details') {
+		return Controller::join_links($this->Event()->Link(), $action, $this->ID);
 	}
 
 }
