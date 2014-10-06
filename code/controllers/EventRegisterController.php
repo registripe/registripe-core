@@ -77,7 +77,8 @@ class EventRegisterController extends Page_Controller {
 		} elseif ($datetime->getRemainingCapacity($exclude)) {
 			$data = array(
 				'Title' => 'Register For ' . $datetime->Event()->Title,
-				'Form'  => $this->RegisterForm()
+				'Form'  => $this->RegisterForm(),
+				'Content' => ''
 			);
 		} else {
 			$data = array(
