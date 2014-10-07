@@ -72,7 +72,8 @@ class RegistrableDateTime extends CalendarDateTime {
 			'Available'    => array('title' => 'Available', 'field' => 'NumericField')
 		));
 
-		$add->setTitle(_t('EventManagement.ADD_TICKET_TYPE', 'Add Ticket Type'));
+		$add->setTitle(_t('EventManagement.ADD_TICKET_TYPE', 'Add Ticket Type'))
+			->setSearchList($this->Event()->Tickets());
 		$capacity->setDescription('Set to 0 for unlimited capacity.');
 
 		if (class_exists('AbstractQueuedJob')) {
