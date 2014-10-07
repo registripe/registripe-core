@@ -37,7 +37,7 @@ class EventRegistration extends DataObject {
 	protected function onBeforeWrite() {
 		if (!$this->isInDB()) {
 			$generator = new RandomGenerator();
-			$this->Token = $generator->randomToken();
+			$this->Token = substr($generator->randomToken(), 0,40);
 		}
 
 		parent::onBeforeWrite();

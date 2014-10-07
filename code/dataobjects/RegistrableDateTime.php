@@ -177,12 +177,14 @@ class RegistrableDateTime extends CalendarDateTime {
 
 		if (!$email || !$changed || !$notify) return;
 
-		$emails = DB::query(sprintf(
-			'SELECT "Email", "Name" FROM "EventRegistration" WHERE "TimeID" = %d '
-			. 'AND "Status" = \'Valid\' GROUP BY "Email"',
-			$this->ID
-		));
-		if (!$emails = $emails->map()) return;
+		$registrations = EventRegistration::get()
+							->filter("Email:not", "")
+							->filter("Status", "Valid")
+							->filter("TimeID", $this->ID);
+
+		$emails = $registrations->map("Email", "Name")->toArray();
+
+		if (empty($emails)) return;
 
 		$changed = new ArrayList();
 		foreach ($notify as $field => $data) {
@@ -214,7 +216,6 @@ class RegistrableDateTime extends CalendarDateTime {
 			$_email->populateTemplate(array(
 				'Name' => $name
 			));
-
 			$_email->send();
 		}
 	}

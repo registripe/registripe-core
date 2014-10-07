@@ -22,7 +22,7 @@ class EventRegistrationPurgeTask extends BuildTask {
 	}
 
 	protected function purgeUnsubmittedRegistrations() {		
-		$age = DB::getConn()->datetimeDifferenceClause("now", "EventRegistration.Created");
+		$age = DB::getConn()->datetimeDifferenceClause("now", "\"EventRegistration\".\"Created\"");
 		$items = EventRegistration::get()
 			->filter("Status", "Unsubmitted")
 			->where("($age) > \"RegistrableEvent\".\"RegistrationTimeLimit\"")
@@ -44,7 +44,7 @@ class EventRegistrationPurgeTask extends BuildTask {
 	}
 
 	protected function purgeUnconfirmedRegistrations() {
-		$age = DB::getConn()->datetimeDifferenceClause("now", "EventRegistration.Created");
+		$age = DB::getConn()->datetimeDifferenceClause("now", "\"EventRegistration\".\"Created\"");
 		$items = EventRegistration::get()
 			->filter("Status", "Unconfirmed")
 			->where("($age) > \"RegistrableEvent\".\"ConfirmTimeLimit\"")
