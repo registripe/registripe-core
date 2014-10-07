@@ -203,20 +203,15 @@ class EventTicket extends DataObject {
 			return array('available' => true);
 		}
 
-		$booked = new SQLQuery();
-		$booked->setSelect('SUM("Quantity")');
-		$booked->setFrom('"EventRegistration_Tickets"');
-		$booked->addLeftJoin('EventRegistration', '"EventRegistration"."ID" = "EventRegistrationID"');
-
+		$bookings = EventRegistration::get()
+			->innerJoin("EventRegistration_Tickets",'"EventRegistration"."ID" = "EventRegistrationID"')
+			->filter("Status:not","Canceled")
+			->filter("EventTicketID",$this->ID)
+			->filter("EventRegistration.TimeID",$time->ID);
 		if ($excludeId) {
-			$booked->addWhere('"EventRegistration"."ID"', '<>', $excludeId);
+			$bookings = $bookings->where('"EventRegistration"."ID" != '.$excludeId);
 		}
-
-		$booked->addWhere('"Status"', '<>', 'Canceled');
-		$booked->addWhere('"EventTicketID"', $this->ID);
-		$booked->addWhere('"EventRegistration"."TimeID"', $time->ID);
-
-		$booked = $booked->execute()->value();
+		$booked = $bookings->sum("Quantity");
 
 		if ($booked < $quantity) {
 			return array('available' => $quantity - $booked);

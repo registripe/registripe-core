@@ -110,7 +110,7 @@ class EventRegisterFormTest extends SapphireTest {
 /**
  * @ignore
  */
-class EventRegisterFormTest_Controller {
+class EventRegisterFormTest_Controller extends Controller {
 
 	public $datetime;
 

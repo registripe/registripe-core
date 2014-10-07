@@ -20,6 +20,8 @@ class EventRegistrationPurgeTaskTest extends SapphireTest {
 		$count  = 'SELECT COUNT(*) FROM "EventRegistration" WHERE "Status" = \'Unsubmitted\'';
 		$update = 'UPDATE "EventRegistration" SET "Created" = \'%s\' WHERE "ID" = %d';
 
+		$this->assertEquals(2, DB::query($count)->value());
+
 		ob_start();
 
 		$task->run(null);
@@ -56,7 +58,7 @@ class EventRegistrationPurgeTaskTest extends SapphireTest {
 
 		// Ensure the confirmed event is still there.
 		$confirmed = DB::query(
-			'SELECT COUNT(*) FROM "EventRegistration" WHERE "Status" = \'Confirmed\''
+			'SELECT COUNT(*) FROM "EventRegistration" WHERE "Status" = \'Valid\''
 		);
 		$this->assertEquals(1, $confirmed->value());
 
@@ -72,10 +74,10 @@ class EventRegistrationPurgeTaskTest extends SapphireTest {
 		$unconfirmed2 = $this->objFromFixture('EventRegistration', 'unconfirmed_2');
 
 		$canceled = 'SELECT COUNT(*) FROM "EventRegistration" WHERE "Status" = \'Canceled\'';
-		$update   = 'UPDATE "EventRegistration" SET "Created" = \'%s\' WHERE "ID" = %d';
 
 		ob_start();
 
+		//nothing should be canceled by default
 		$task->run(null);
 		$this->assertEquals(0, DB::query($canceled)->value());
 
@@ -83,35 +85,29 @@ class EventRegistrationPurgeTaskTest extends SapphireTest {
 		// created date.
 		$created = strtotime($unconfirmed1->Created);
 		$created = sfTime::subtract($created, 5, sfTime::HOUR);
-		DB::query(sprintf($update, date('Y-m-d H:i:s', $created), $unconfirmed1->ID));
-
+		$unconfirmed1->Created = date('Y-m-d H:i:s', $created);
+		$unconfirmed1->write();
 		$task->run(null);
 		$this->assertEquals(0, DB::query($canceled)->value());
 
 		// Now push it beyond six hours
-		DB::query(sprintf(
-			$update,
-			date('Y-m-d H:i:s', sfTime::subtract($created, 1, sfTime::HOUR)),
-			$unconfirmed1->ID));
-
+		$created = sfTime::subtract($created, 3, sfTime::HOUR);
+		$unconfirmed1->Created = date('Y-m-d H:i:s', $created);
+		$unconfirmed1->write();
 		$task->run(null);
 		$this->assertEquals(1, DB::query($canceled)->value());
 
 		// Now push the second one way back, and check it's also canceled
 		$created = sfTime::subtract(time(), 1000, sfTime::DAY);
-		DB::query(sprintf(
-			$update,
-			date('Y-m-d H:i:s', $created),
-			$unconfirmed2->ID));
-
+		$unconfirmed2->Created = date('Y-m-d H:i:s', $created);
+		$unconfirmed2->write();
 		$task->run(null);
+
 		$this->assertEquals(2, DB::query($canceled)->value());
 
 		// Ensure the confirmed event is still there.
-		$confirmed = DB::query(
-			'SELECT COUNT(*) FROM "EventRegistration" WHERE "Status" = \'Confirmed\''
-		);
-		$this->assertEquals(1, $confirmed->value());
+		$confirmed = EventRegistration::get()->filter("Status","Valid");
+		$this->assertEquals(1, $confirmed->count());
 
 		ob_end_clean();
 	}

@@ -1,9 +1,9 @@
-<h1>Confirm Registration For $Time.EventTitle ($SiteConfig.Title)</h1>
+<h1>Confirm Registration For $Time.Event.Title ($SiteConfig.Title)</h1>
 
 <p>To $Name,</p>
 
 <p>
-	You have registered for $Time.EventTitle at $Time.Summary. In order to
+	You have registered for $Time.Event.Title at $Time.Summary. In order to
 	confirm your attendance at this event, please <a href="$ConfirmLink">click
 	here</a>, or visit the link below:
 </p>

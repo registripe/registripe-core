@@ -22,7 +22,7 @@ EventRegistration:
     Time: =>RegistrableDateTime.time
   confirmed:
     Name: Third Registration
-    Status: Confirmed
+    Status: Valid
     Time: =>RegistrableDateTime.time
   unsubmitted_1:
     Name: Fourth Registration

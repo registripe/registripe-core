@@ -184,7 +184,7 @@ class RegistrableDateTime extends CalendarDateTime {
 		));
 		if (!$emails = $emails->map()) return;
 
-		$changed = new DataObjectSet();
+		$changed = new ArrayList();
 		foreach ($notify as $field => $data) {
 			$changed->push(new ArrayData(array(
 				'Label'  => singleton('EventRegistration')->fieldLabel($field),
@@ -196,7 +196,7 @@ class RegistrableDateTime extends CalendarDateTime {
 		$email = new Email();
 		$email->setSubject(
 			sprintf('Event Details Changed For %s (%s)',
-			$this->EventTitle(),
+			$this->Event()->Title,
 			SiteConfig::current_site_config()->Title));
 
 		$email->setTemplate('EventRegistrationChangeEmail');
@@ -229,18 +229,14 @@ class RegistrableDateTime extends CalendarDateTime {
 	public function getRemainingCapacity($excludeId = null) {
 		if (!$this->Capacity) return true;
 
-		$taken = new SQLQuery();
-		$taken->setSelect('SUM("Quantity")');
-		$taken->setFrom('EventRegistration_Tickets');
-		$taken->addLeftJoin('EventRegistration', '"EventRegistration"."ID" = "EventRegistrationID"');
-
+		$bookings = EventRegistration::get()
+			->innerJoin("EventRegistration_Tickets",'"EventRegistration"."ID" = "EventRegistrationID"')
+			->filter("Status:not","Canceled")
+			->filter("EventRegistration.TimeID",$this->ID);
 		if ($excludeId) {
-			$taken->addWhere('"EventRegistration"."ID"', '<>', $excludeId);
+			$bookings = $bookings->where('"EventRegistration"."ID" != '.$excludeId);
 		}
-
-		$taken->addWhere('"Status"', '<>', 'Canceled');
-		$taken->addWhere('"EventRegistration"."TimeID"', $this->ID);
-		$taken = $taken->execute()->value();
+		$taken = $bookings->sum("Quantity");
 
 		return ($this->Capacity >= $taken) ? $this->Capacity - $taken : false;
 	}

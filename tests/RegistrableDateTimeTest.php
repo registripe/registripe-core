@@ -39,12 +39,13 @@ class RegistrableDateTimeTest extends SapphireTest {
 		// Now disable notification and do the same and check no emails are
 		// sent.
 		$event->EmailNotifyChanges = false;
+		$event->ParentID = 12345; //prevent complaints about page not allow to be root
 		$event->write();
 
 		$datetime->StartDate = '2011-01-03';
 		$datetime->flushCache();
 
-		$datetime = DataObject::get_by_id('RegistrableDateTime', $datetime->ID);
+		$datetime = RegistrableDateTime::get()->byID($datetime->ID);
 		$datetime->write();
 
 		$this->assertNull($this->findEmail('test@example.com'));
@@ -80,6 +81,5 @@ class RegistrableDateTimeTest extends SapphireTest {
 		$this->assertFalse(!!$datetime->getRemainingCapacity());
 		$this->assertEquals(50, $datetime->getRemainingCapacity($rego->ID));
 	}
-
 
 }

@@ -1,9 +1,9 @@
-<h1>Event Details Changed For $Time.EventTitle ($SiteConfig.Title)</h1>
+<h1>Event Details Changed For $Time.Event.Title ($SiteConfig.Title)</h1>
 
 <p>To $Name,</p>
 
 <p>
-	You recently registered for $Time.EventTitle on $Time.Summary. Some of the
+	You recently registered for $Time.Event.Title on {$Time.Summary}. Some of the
 	details for the event have changed:
 </p>
 

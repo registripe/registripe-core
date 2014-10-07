@@ -1,9 +1,9 @@
-<h1>Confirm Un-Registration For $Time.EventTitle ($SiteConfig.Title)</h1>
+<h1>Confirm Un-Registration For $Time.Event.Title ($SiteConfig.Title)</h1>
 
 <p>To $Registration.Name,</p>
 
 <p>
-	You have indicated that you wish to un-register for $Time.EventTitle on
+	You have indicated that you wish to un-register for $Time.Event.Title on
 	$Time._Dates. To confirm this, please <a href="$ConfirmLink">click
 	here</a>, or visit the link below:
 </p>
