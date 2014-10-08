@@ -12,16 +12,8 @@ class EventTicket extends DataObject {
 		'Type'        => 'Enum("Free, Price")',
 		'Price'       => 'Money',
 		'Description' => 'Text',
-		'StartType'   => 'Enum("Date, TimeBefore")',
 		'StartDate'   => 'SS_Datetime',
-		'StartDays'   => 'Int',
-		'StartHours'  => 'Int',
-		'StartMins'   => 'Int',
-		'EndType'     => 'Enum("Date, TimeBefore")',
 		'EndDate'     => 'SS_Datetime',
-		'EndDays'     => 'Int',
-		'EndHours'    => 'Int',
-		'EndMins'     => 'Int',
 		'MinTickets'  => 'Int',
 		'MaxTickets'  => 'Int'
 	);
@@ -31,12 +23,7 @@ class EventTicket extends DataObject {
 	);
 
 	private static $defaults = array(
-		'MinTickets' => 1,
-		'StartType'  => 'Date',
-		'EndType'    => 'TimeBefore',
-		'EndDays'    => 0,
-		'EndHours'   => 0,
-		'EndMins'    => 0
+		'MinTickets' => 1
 	);
 
 	private static $summary_fields = array(
@@ -57,16 +44,8 @@ class EventTicket extends DataObject {
 		Requirements::javascript('eventmanagement/javascript/event-ticket-cms.js');
 
 		$fields->removeByName('EventID');
-		$fields->removeByName('StartType');
 		$fields->removeByName('StartDate');
-		$fields->removeByName('StartDays');
-		$fields->removeByName('StartHours');
-		$fields->removeByName('StartMins');
-		$fields->removeByName('EndType');
 		$fields->removeByName('EndDate');
-		$fields->removeByName('EndDays');
-		$fields->removeByName('EndHours');
-		$fields->removeByName('EndMins');
 
 		if (class_exists('Payment')) {
 			$fields->insertBefore(
@@ -82,29 +61,16 @@ class EventTicket extends DataObject {
 		}
 
 		foreach (array('Start', 'End') as $type) {
-			$fields->addFieldsToTab('Root.Main', array(
-				new OptionSetField("{$type}Type", "$type sales at", array(
-					'Date'       => 'A specific date and time',
-					'TimeBefore' => 'A time before the event starts'
-				)),
-				$dateTime = new DatetimeField("{$type}Date", ''),
-				$before = new FieldGroup(
-					"{$type}Offset",
-					new NumericField("{$type}Days", 'Days'),
-					new NumericField("{$type}Hours", 'Hours'),
-					new NumericField("{$type}Mins", 'Minutes')
-				)
-			));
-
-			$before->setName("{$type}Offset");
-			$before->setTitle(' ');
-
+			$fields->addFieldsToTab('Root.Main', 
+				$dateTime = new DatetimeField("{$type}Date", "{$type} Date / Time")
+			);
 			$dateTime->getDateField()->setConfig('showcalendar', true);
 			$dateTime->getTimeField()->setConfig('showdropdown', true);
 		}
 
-		$fields->addFieldsToTab('Root.Advanced', array(
+		$fields->addFieldsToTab('Root.Main', array(
 			new TextareaField('Description', 'Description'),
+			new HeaderField("Availability"),
 			new NumericField('MinTickets', 'Minimum tickets per order'),
 			new NumericField('MaxTickets', 'Maximum tickets per order')
 		));
@@ -114,20 +80,13 @@ class EventTicket extends DataObject {
 
 	public function validate() {
 		$result = parent::validate();
-
 		if ($this->Type == 'Price' && !$this->Price->exists()) {
 			$result->error('You must enter a currency and price for fixed price tickets');
 		}
-
-		if ($this->StartType == 'Date') {
-			if (!$this->StartDate) $result->error('You must enter a start date');
-		} else {
-			if (!$this->StartDays && !$this->StartHours && !$this->StartMins) {
-				$result->error('You must enter a time before the event to start the ticket sales');
-			}
+		if (!$this->StartDate){
+			$result->error('You must enter a start date');	
 		}
-
-		if ($this->EndType == 'Date' && !$this->EndDate) {
+		if (!$this->EndDate) {
 			$result->error('You must enter an end date');
 		}
 
@@ -157,7 +116,7 @@ class EventTicket extends DataObject {
 	 * @return RequiredFields
 	 */
 	public function getValidator() {
-		return new RequiredFields('Title', 'Type', 'StartType', 'EndType');
+		return new RequiredFields('Title', 'Type', 'StartDate', 'EndDate');
 	}
 
 	/**
@@ -168,14 +127,7 @@ class EventTicket extends DataObject {
 	 * @return array
 	 */
 	public function getAvailableForDateTime(RegistrableDateTime $time, $excludeId = null) {
-		if ($this->StartType == 'Date') {
-			$start = strtotime($this->StartDate);
-		} else {
-			$start = $time->getStartDateTime()->getTimestamp();
-			$start = sfTime::subtract($start, $this->StartDays, sfTime::DAY);
-			$start = sfTime::subtract($start, $this->StartHours, sfTime::HOUR);
-			$start = sfTime::subtract($start, $this->StartMins, sfTime::MINUTE);
-		}
+		$start = strtotime($this->StartDate);
 
 		if ($start >= time()) {
 			return array(
@@ -184,14 +136,7 @@ class EventTicket extends DataObject {
 				'available_at' => $start);
 		}
 
-		if ($this->EndType == 'Date') {
-			$end = strtotime($this->EndDate);
-		} else {
-			$end = $time->getStartDateTime()->getTimestamp();
-			$end = sfTime::subtract($end, $this->EndDays, sfTime::DAY);
-			$end = sfTime::subtract($end, $this->EndHours, sfTime::HOUR);
-			$end = sfTime::subtract($end, $this->EndMins, sfTime::MINUTE);
-		}
+		$end = strtotime($this->EndDate);
 
 		if (time() >= $end) {
 			return array(
@@ -230,31 +175,14 @@ class EventTicket extends DataObject {
 	 * @return int
 	 */
 	public function getSaleEndForDateTime(RegistrableDateTime $datetime) {
-		if ($this->EndType == 'Date') {
-			return strtotime($this->EndDate);
-		}
-
-		$time = $datetime->getStartDateTime()->getTimestamp();
-		$time = sfTime::subtract($time, $this->EndDays, sfTime::DAY);
-		$time = sfTime::subtract($time, $this->EndHours, sfTime::HOUR);
-		$time = sfTime::subtract($time, $this->EndMins, sfTime::MINUTE);
-
-		return $time;
+		return strtotime($this->EndDate);
 	}
 
 	/**
 	 * @return string
 	 */
 	public function StartSummary() {
-		if ($this->StartType == 'Date') {
-			return $this->obj('StartDate')->Nice();
-		} else {
-			return sprintf(
-				'%d days, %d hours and %d minutes before event',
-				$this->StartDays,
-				$this->StartHours,
-				$this->StartMins);
-		}
+		return $this->obj('StartDate')->Nice();
 	}
 
 	/**

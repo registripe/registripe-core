@@ -2,14 +2,6 @@ jQuery.entwine("ss", function($) {
 	var toggles = {
 		"#Form_ItemEditForm_Type": {
 			"#Price": "Price"
-		},
-		"#Form_ItemEditForm_StartType": {
-			"#StartDate": "Date",
-			"#StartOffset": "TimeBefore"
-		},
-		"#Form_ItemEditForm_EndType": {
-			"#EndDate": "Date",
-			"#EndOffset": "TimeBefore"
 		}
 	};
 
