@@ -7,6 +7,10 @@
  */
 class EventTicketTest extends SapphireTest {
 
+	public function testCMSFields() {
+		$this->markTestIncomplete("Test CMS Fields");
+	}
+
 	/**
 	 * @covers EventTicket::getAvailableForDateTime()
 	 */

@@ -9,6 +9,10 @@ class RegistrableDateTimeTest extends SapphireTest {
 
 	public static $fixture_file = 'eventmanagement/tests/RegistrableDateTimeTest.yml';
 
+	public function testCMSFields() {
+		$this->markTestIncomplete("Test CMS Fields");
+	}
+
 	/**
 	 * @covers RegistrableDateTime::onBeforeWrite()
 	 */

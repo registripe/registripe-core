@@ -47,6 +47,7 @@ class EventRegisterFormTest extends SapphireTest {
 
 		// Check we cannot book over the available quantity of tickets.
 		$this->assertTrue($form->validateTickets(array($quantity => 1), $form));
+		Session::clear("FormInfo.{$form->FormName()}");
 		$this->assertFalse($form->validateTickets(array($quantity => 11), $form));
 		$this->assertEquals('over_quantity', $this->getTicketsError($form));
 		Session::clear("FormInfo.{$form->FormName()}");
