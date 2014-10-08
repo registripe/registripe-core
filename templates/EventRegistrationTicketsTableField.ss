@@ -38,7 +38,7 @@
 						<td class="price">$Price</td>
 						<td class="quantity">$Quantity</td>
 					<% else %>
-						<td colspan="4">$Reason<% if $AvailableAt %> Available at $AvailableAt.Nice.<% end_if %></td>
+						<td colspan="4">$Reason<% if $AvailableAt %> Available at {$AvailableAt.Nice}.<% end_if %></td>
 					<% end_if %>
 				</tr>
 				<% if $Description %>
