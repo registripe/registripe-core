@@ -43,8 +43,6 @@ class RegistrableDateTime extends CalendarDateTime {
 
 			return $fields;
 		}
-
-
 		$fields->push(
 			new GridField(
 				'Tickets',
@@ -281,6 +279,12 @@ class RegistrableDateTime extends CalendarDateTime {
 		}
 
 		return $dt;
+	}
+
+	public function getAvailableTickets() {
+		return $this->Tickets()
+			->filter("StartDate:LessThan", date('Y-m-d H:i:s'))
+			->filter("EndDate:GreaterThan", date('Y-m-d H:i:s'));
 	}
 
 	/**

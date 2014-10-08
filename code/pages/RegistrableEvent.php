@@ -237,6 +237,21 @@ class RegistrableEvent extends CalendarEvent {
 		return $fields;
 	}
 
+	/**
+	 * Check if this event can currently be registered for.
+	 * @return boolean
+	 */
+	function canRegister(){
+		foreach($this->DateTimes() as $time){
+			$tickets = $time->getAvailableTickets();
+			if($tickets && $tickets->exists()){
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }
 
 class RegistrableEvent_Controller extends CalendarEvent_Controller {
