@@ -131,28 +131,34 @@ class RegistrableEvent extends CalendarEvent {
 		}
 
 		$regGridFieldConfig = GridFieldConfig_Base::create()
-		->removeComponentsByType('GridFieldAddNewButton')
-		->removeComponentsByType('GridFieldDeleteAction')
-		->addComponents(
-			new GridFieldButtonRow('after'),
-			new GridFieldPrintButton('buttons-after-left'),
-			new GridFieldExportButton('buttons-after-left')
-		);
+			->removeComponentsByType('GridFieldAddNewButton')
+			->removeComponentsByType('GridFieldDeleteAction')
+			->addComponents(
+				new GridFieldButtonRow('after'),
+				new GridFieldPrintButton('buttons-after-left'),
+				new GridFieldExportButton('buttons-after-left')
+			);
 
-		$fields->addFieldsToTab('Root.Registrations', array(
-			new GridField(
-				'Registrations',
+		$regGrids = array(
+			new GridField('Registrations',
 				_t('EventManagement.REGISTRATIONS', 'Registrations'),
 				$this->DateTimes()->relation('Registrations')->filter('Status', 'Valid'),
 				$regGridFieldConfig
-			),
-			new GridField(
-				'CanceledRegistrations',
-				_t('EventManagement.CANCELLATIONS', 'Cancellations'),
-				$this->DateTimes()->relation('Registrations')->filter('Status', 'Canceled'),
-				$regGridFieldConfig
 			)
-		));
+		);
+		
+		$cancelled = $this->DateTimes()
+			->relation('Registrations')
+			->filter('Status', 'Canceled');
+		if($cancelled->exists()){
+			$regGrids[] = new GridField('CanceledRegistrations',
+				_t('EventManagement.CANCELLATIONS', 'Cancellations'),
+				$cancelled,
+				$regGridFieldConfig
+			);
+		}
+
+		$fields->addFieldsToTab('Root.Registrations', $regGrids);
 
 		if ($this->RegEmailConfirm) {
 			$fields->addFieldToTab('Root.Registrations', new ToggleCompositeField(
@@ -167,7 +173,8 @@ class RegistrableEvent extends CalendarEvent {
 				)
 			));
 		}
-		
+		$this->extend('updateCMSFields',$fields);
+
 		return $fields;
 	}
 

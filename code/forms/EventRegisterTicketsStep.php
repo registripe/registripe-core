@@ -82,7 +82,6 @@ class EventRegisterTicketsStep extends MultiFormStep {
 			$fields->push(new EmailField('Email', 'Email address'));
 		}
 
-
 		$this->extend('updateFields', $fields);
 
 		return $fields;
