@@ -150,7 +150,7 @@ class EventRegisterForm extends MultiForm {
 		if (!array_sum($tickets)) {
 			$form->addErrorMessage(
 				'Tickets',
-				'Please select at least one ticket to purchase.',
+				_t('EventRegisterForm.SELECTATLEASTONE', 'Please select at least one ticket to purchase.'),
 				'required');
 			return false;
 		}
@@ -165,7 +165,7 @@ class EventRegisterForm extends MultiForm {
 			if (!is_int($quantity) && !ctype_digit($quantity)) {
 				$form->addErrorMessage(
 					'Tickets',
-					'Please only enter numerical amounts for ticket quantities.',
+					_t('EventRegisterForm.NONNUMERICALQUANTITY', 'Please only enter numerical amounts for ticket quantities.'),
 					'required');
 				return false;
 			}
@@ -174,7 +174,10 @@ class EventRegisterForm extends MultiForm {
 
 			if (!$ticket = $ticket->First()) {
 				$form->addErrorMessage(
-					'Tickets', 'An invalid ticket ID was entered.', 'required');
+					'Tickets',
+					_t('EventRegisterForm.INVALIDTICKETID', 'An invalid ticket ID was entered.'),
+					'required'
+				);
 				return false;
 			}
 
@@ -184,7 +187,10 @@ class EventRegisterForm extends MultiForm {
 			if (!$avail) {
 				$form->addErrorMessage(
 					'Tickets',
-					sprintf('%s is currently not available.', $ticket->Title),
+					sprintf(
+						_t('EventRegisterForm.NONEAVAILABLE', '%s is currently not available.'),
+						$ticket->Title
+					),
 					'required');
 				return false;
 			}
@@ -192,21 +198,25 @@ class EventRegisterForm extends MultiForm {
 			if (is_int($avail) && $avail < $quantity) {
 				$form->addErrorMessage(
 					'Tickets',
-					sprintf('There are only %d of "%s" available.', $avail, $ticket->Title),
+					sprintf(
+						_t('EventRegisterForm.NOTENOUGHAVAILABLE', 'There are only %d of "%s" available.'),
+						$avail,
+						$ticket->Title
+					),
 					'required');
 				return false;
 			}
 
 			if ($ticket->MinTickets && $quantity < $ticket->MinTickets) {
 				$form->addErrorMessage('Tickets',sprintf(
-					'You must purchase at least %d of "%s".',
+					_t('EventRegisterForm.UNDERMINIMUMQUANTITY', 'You must purchase at least %d of "%s".'),
 					$ticket->MinTickets, $ticket->Title), 'required');
 				return false;
 			}
 
 			if ($ticket->MaxTickets && $quantity > $ticket->MaxTickets) {
 				$form->addErrorMessage('Tickets', sprintf(
-					'You can only purchase at most %d of "%s".',
+					_t('EventRegisterForm.OVERMAXIMUMQUANTITY', 'You can only purchase at most %d of "%s".'),
 					$ticket->MaxTickets, $ticket->Title), 'required');
 				return false;
 			}
@@ -220,9 +230,12 @@ class EventRegisterForm extends MultiForm {
 
 			if ($request > $avail) {
 				$message = sprintf(
-					'The event only has %d overall places remaining, but you '
-					. 'have requested a total of %d places. Please select a '
-					. 'lower number.',
+					_t(
+						'EventRegisterForm.OVERTOTALCAPACITY', 
+						'The event only has %d overall places remaining, but you '
+						. 'have requested a total of %d places. Please select a '
+						. 'lower number.'
+					),
 					$avail, $request
 				);
 				$form->addErrorMessage('Tickets', $message, 'required');

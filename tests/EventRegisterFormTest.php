@@ -10,10 +10,17 @@ class EventRegisterFormTest extends SapphireTest {
 	public static $fixture_file = 'eventmanagement/tests/EventRegisterFormTest.yml';
 
 	public function testValidateTickets() {
+
+		//configure error messages
+		//test strings are stored in lolcats lang
+		i18n::set_locale('lc_XX');
+
+		//configure controller
 		$controller = new EventRegisterFormTest_Controller();
 		$datetime = $this->objFromFixture('RegistrableDateTime', 'datetime');
 		$controller->datetime = $datetime;
 
+		//configure register form
 		$form      = new EventRegisterForm($controller, 'Form');
 		$ended     = $this->idFromFixture('EventTicket', 'ended');
 		$minmax    = $this->idFromFixture('EventTicket', 'minmax');
@@ -74,44 +81,10 @@ class EventRegisterFormTest extends SapphireTest {
 		if ($errors) foreach ($errors as $error) {
 			if ($error['fieldName'] == 'Tickets') {
 				Session::clear("FormInfo.{$form->FormName()}");
-				return $this->getErrorTypeForMessage($error['message']);
+				return $error['message'];
 			}
 		}
 		Session::clear("FormInfo.{$form->FormName()}");
-	}
-
-	/**
-	 * Helper for converting error message into an error code
-	 * @param  Message to convert
-	 * @return string|null
-	 */
-	protected function getErrorTypeForMessage($message) {
-		$static = array(
-			'no_tickets'  => 'Please select at least one ticket to purchase.',
-			'non_numeric' => 'Please only enter numerical amounts for ticket quantities.',
-			'invalid_id'  => 'An invalid ticket ID was entered.');
-
-		$static = array_flip($static);
-		if (array_key_exists($message, $static)) {
-			return $static[$message];
-		}
-
-		$regex = array(
-			'not_available' => '/.+? is currently not available./',
-			'over_quantity' => '/There are only [0-9]+ of "[^"]+" available./',
-			'too_few'       => '/You must purchase at least [0-9]+ of "[^"]+"./',
-			'too_many'      => '/You can only purchase at most [0-9]+ of "[^"]+"./');
-
-		foreach ($regex as $name => $pattern) {
-			if (preg_match($pattern, $message)) return $name;
-		}
-
-		if (strpos($message, 'The event only has') === 0) {
-			return 'over_capacity';
-		}
-
-		 //return the given message to help with debugging
-		return $message;
 	}
 
 }

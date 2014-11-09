@@ -1,0 +1,10 @@
+lc_XX:
+  EventRegisterForm:
+    SELECTATLEASTONE: no_tickets
+    NONNUMERICALQUANTITY: non_numeric
+    INVALIDTICKETID: invalid_id
+    NONEAVAILABLE: not_available
+    NOTENOUGHAVAILABLE: over_quantity
+    UNDERMINIMUMQUANTITY: too_few
+    OVERMAXIMUMQUANTITY: too_many
+    OVERTOTALCAPACITY: over_capacity
