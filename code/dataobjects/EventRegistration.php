@@ -19,6 +19,10 @@ class EventRegistration extends DataObject {
 		'Member' => 'Member'
 	);
 
+	private static $has_many = array(
+		'Attendees' => 'EventAttendee'
+	);
+
 	private static $many_many = array(
 		'Tickets' => 'EventTicket'
 	);

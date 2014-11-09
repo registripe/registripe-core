@@ -173,6 +173,16 @@ class RegistrableEvent extends CalendarEvent {
 				)
 			));
 		}
+
+		$attendees = EventAttendee::get()
+			->innerJoin("EventRegistration", "EventAttendee.RegistrationID = EventRegistration.ID")
+			->filter("EventRegistration.EventID", $this->ID);
+
+		//attendees
+		$fields->addFieldToTab("Root.Attendees",
+			new GridField("Attendees", "Attendees", $attendees)
+		);
+
 		$this->extend('updateCMSFields',$fields);
 
 		return $fields;
