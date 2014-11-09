@@ -63,6 +63,11 @@ class EventRegisterFormTest extends SapphireTest {
 		$this->assertEquals('over_capacity', $this->getTicketsError($form));
 	}
 
+	/**
+	 * Helper for checking form errors
+	 * @param  Form   $form
+	 * @return string|null
+	 */
 	protected function getTicketsError(Form $form) {
 		$errors = Session::get("FormInfo.{$form->FormName()}.errors");
 
@@ -75,6 +80,11 @@ class EventRegisterFormTest extends SapphireTest {
 		Session::clear("FormInfo.{$form->FormName()}");
 	}
 
+	/**
+	 * Helper for converting error message into an error code
+	 * @param  Message to convert
+	 * @return string|null
+	 */
 	protected function getErrorTypeForMessage($message) {
 		$static = array(
 			'no_tickets'  => 'Please select at least one ticket to purchase.',
@@ -99,6 +109,9 @@ class EventRegisterFormTest extends SapphireTest {
 		if (strpos($message, 'The event only has') === 0) {
 			return 'over_capacity';
 		}
+
+		 //return the given message to help with debugging
+		return $message;
 	}
 
 }
