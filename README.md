@@ -1,6 +1,9 @@
 # SilverStripe Event Management Module
-The event management module allows you to manage event details and registrations
-from within the CMS. Some features include:
+The event management module allows you to manage event details and registrations from within the CMS.
+
+[![Build Status](https://travis-ci.org/jedateach/silverstripe-eventmanagement.svg?branch=1.1)](https://travis-ci.org/jedateach/silverstripe-eventmanagement)
+
+## Features
 
 *   Allow people to register, view their registration details and un-register
     for events.
@@ -17,17 +20,17 @@ from within the CMS. Some features include:
 *   Send reminder emails a fixed time before an event starts.
 
 ## Maintainer Contacts
+
 *   Andrew Short (<andrew@silverstripe.com.au>)
+*   Jeremy Shipman (<jeremy@burnbright.net>)
 
 ## Requirements
 *   SilverStripe 3.1+
 *   The [Event Calendar](https://github.com/unclecheese/EventCalendar) module.
 *   The [MultiForm](https://github.com/silverstripe/silverstripe-multiform) module.
 *   The [ItemSetField](https://github.com/ajshort/silverstripe-itemsetfield) module.
-*   Optionally requires the [Omnipay](https://github.com/burnbright/silverstripe-omnipay)
-    module for collecting payments with registration.
-*   Optionally requires the [Queued Jobs](https://github.com/nyeholt/silverstripe-queuedjobs)
-    module for sending out event reminder emails.
+*   Optionally requires the [Omnipay](https://github.com/burnbright/silverstripe-omnipay) module for collecting payments with registration.
+*   Optionally requires the [Queued Jobs](https://github.com/nyeholt/silverstripe-queuedjobs) module for sending out event reminder emails.
 
 ## Installation
 
