@@ -25,49 +25,42 @@ class EventRegisterFormTest extends SapphireTest {
 		// Check it validates we enter at least one ticket.
 		$this->assertFalse($form->validateTickets(array(), $form));
 		$this->assertEquals('no_tickets', $this->getTicketsError($form));
-		Session::clear("FormInfo.{$form->FormName()}");
 
 		// Check that at least one ticket quantity is valid.
 		$this->assertFalse($form->validateTickets(array(1 => 'a', 2 => 1), $form));
 		$this->assertEquals('non_numeric', $this->getTicketsError($form));
-		Session::clear("FormInfo.{$form->FormName()}");
 
 		// Check only valid ticket IDs are allowed.
 		$this->assertFalse($form->validateTickets(array(-1 => 1), $form));
 		$this->assertEquals('invalid_id', $this->getTicketsError($form));
-		Session::clear("FormInfo.{$form->FormName()}");
 
 		// Check expired tickets cannot be registered
 		$this->assertFalse($form->validateTickets(array($ended => 1), $form));
 		$this->assertEquals('not_available', $this->getTicketsError($form));
-		Session::clear("FormInfo.{$form->FormName()}");
 
-		$form->validateTickets(array($quantity => 1), $form);
-		echo $this->getTicketsError($form);
+		// Valid tickets
+		$this->assertTrue((bool)$form->validateTickets(array($quantity => 1), $form));
+		$this->assertNull($this->getTicketsError($form));
 
 		// Check we cannot book over the available quantity of tickets.
 		$this->assertTrue($form->validateTickets(array($quantity => 1), $form));
-		Session::clear("FormInfo.{$form->FormName()}");
+
 		$this->assertFalse($form->validateTickets(array($quantity => 11), $form));
 		$this->assertEquals('over_quantity', $this->getTicketsError($form));
-		Session::clear("FormInfo.{$form->FormName()}");
 
 		// Check the number of tickets booked must be within the allowed range.
 		$this->assertTrue($form->validateTickets(array($minmax => 8), $form));
 
 		$this->assertFalse($form->validateTickets(array($minmax => 4), $form));
 		$this->assertEquals('too_few', $this->getTicketsError($form));
-		Session::clear("FormInfo.{$form->FormName()}");
 
 		$this->assertFalse($form->validateTickets(array($minmax => 11), $form));
 		$this->assertEquals('too_many', $this->getTicketsError($form));
-		Session::clear("FormInfo.{$form->FormName()}");
 
 		// Check we cannot exceed the overall event capacity.
 		$this->assertTrue($form->validateTickets(array($unlimited => 1000), $form));
 		$this->assertFalse($form->validateTickets(array($unlimited => 1001), $form));
 		$this->assertEquals('over_capacity', $this->getTicketsError($form));
-		Session::clear("FormInfo.{$form->FormName()}");
 	}
 
 	protected function getTicketsError(Form $form) {
@@ -75,9 +68,11 @@ class EventRegisterFormTest extends SapphireTest {
 
 		if ($errors) foreach ($errors as $error) {
 			if ($error['fieldName'] == 'Tickets') {
+				Session::clear("FormInfo.{$form->FormName()}");
 				return $this->getErrorTypeForMessage($error['message']);
 			}
 		}
+		Session::clear("FormInfo.{$form->FormName()}");
 	}
 
 	protected function getErrorTypeForMessage($message) {
