@@ -82,6 +82,20 @@ class EventRegistration extends DataObject {
 	}
 
 	/**
+	 * Create an attendee in this registration with the given ticket.
+	 * @param  EventTicket $ticket
+	 * @return EventAttendee
+	 */
+	public function createAttendee(EventTicket $ticket){
+		$attendee = new EventAttendee();
+		$attendee->TicketID = $ticket->ID;
+		$attendee->write();
+		$this->Attendees()->add($attendee);
+
+		return $attendee;
+	}
+
+	/**
 	 * @return SS_Datetime
 	 */
 	public function ConfirmTimeLimit() {

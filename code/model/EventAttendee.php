@@ -30,7 +30,18 @@ class EventAttendee extends DataObject{
 	public function __construct($record = null, $isSingleton = false, $model = null) {
 		parent::__construct($record, $isSingleton, $model);
 		$this->failover = $this->Member();
+	}
 
+	public function validate() {
+		$result = parent::validate();
+		if(!$this->Ticket()){
+			$result->error("Attendee must have a ticket.");
+		}
+		if(!$this->Registration()){
+			$result->error("Attendee must have a registration.");
+		}
+
+		return $result;
 	}
 
 }

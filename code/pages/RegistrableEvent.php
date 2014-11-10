@@ -281,6 +281,37 @@ class RegistrableEvent extends CalendarEvent {
 			->filter("Status","Valid");
 	}
 
+	public function validate() {
+		$result   = parent::validate();
+		$currency = null;
+
+		// Ensure that if we are sending a reminder email it has an interval
+		// to send at.
+		if ($this->EmailReminder && !$this->RemindDays) {
+			$result->error('You must enter a time to send the reminder at.');
+		}
+
+		// Ensure that we only have tickets in one currency, since you can't
+		// make a payment across currencies.
+		foreach ($this->Tickets() as $ticket) {
+			if ($ticket->Type == 'Price') {
+				$ticketCurr = $ticket->Price->getCurrency();
+
+				if ($ticketCurr && $currency && $ticketCurr != $currency) {
+					$result->error(sprintf(
+						'You cannot attach tickets with different currencies '
+						. 'to one event. You have tickets in both "%s" and "%s".',
+						$currency, $ticketCurr));
+					return $result;
+				}
+
+				$currency = $ticketCurr;
+			}
+		}
+
+		return $result;
+	}
+
 	/**
 	 * Returns the overall number of places remaining at this event, TRUE if
 	 * there are unlimited places or FALSE if they are all taken.

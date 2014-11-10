@@ -173,16 +173,15 @@ class EventRegisterTicketsStep extends MultiFormStep {
 		$registration->Total->setAmount($total->getAmount());
 		$registration->write();
 
-		$registration->Tickets()->removeAll();
-
+		//add attendees to registration
+		$registration->Attendees()->removeAll();
 		foreach ($data['Tickets'] as $id => $quantity) {
-			if ($quantity) {
-				$registration->Tickets()->add($id, array(
-					'Quantity' => $quantity
-				));
+			$ticket = EventTicket::get()->byID($id);
+			for ($i=0; $i < $quantity; $i++) {
+				$registration->createAttendee($ticket);
 			}
 		}
-
+		
 		$this->extend('onAfterValidateStep', $data, $registration);
 		
 		return parent::validateStep($data, $form);

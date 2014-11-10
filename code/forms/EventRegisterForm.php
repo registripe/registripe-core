@@ -72,7 +72,6 @@ class EventRegisterForm extends MultiForm {
 		}
 
 		$step         = $this->getCurrentStep();
-		$event        = $this->getController()->getEvent();
 		$registration = $this->session->getRegistration();
 		$ticketsStep  = $this->getSavedStepByClass('EventRegisterTicketsStep');
 		$tickets      = $ticketsStep->loadData();
@@ -99,7 +98,7 @@ class EventRegisterForm extends MultiForm {
 		$this->extend('onRegistrationComplete', $registration);
 
 		return $this->controller->redirect(Controller::join_links(
-			$event->Link(),
+			$this->getController()->getEvent()->Link(),
 			'registration',
 			$registration->ID,
 			'?token=' . $registration->Token

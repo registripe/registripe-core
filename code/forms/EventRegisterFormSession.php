@@ -33,6 +33,7 @@ class EventRegisterFormSession extends MultiFormSession {
 			return $this->registration = $this->Registration();
 		}
 		$this->registration = new EventRegistration();
+		$this->registration->EventID = $this->form->getController()->getEvent()->ID;
 		$this->registration->Status = 'Unsubmitted';
 
 		return $this->registration;
