@@ -15,22 +15,17 @@ class EventRegistration extends DataObject {
 	);
 
 	private static $has_one = array(
-		'Time'   => 'RegistrableDateTime',
+		'Event'   => 'RegistrableEvent',
 		'Member' => 'Member'
 	);
 
-	private static $many_many = array(
-		'Tickets' => 'EventTicket'
-	);
-
-	private static $many_many_extraFields = array(
-		'Tickets' => array('Quantity' => 'Int')
+	private static $has_many = array(
+		'Attendees' => 'EventAttendee'
 	);
 
 	private static $summary_fields = array(
 		'Name'          => 'Name',
 		'Email'         => 'Email',
-		'Time.Title'    => 'Event',
 		'TotalQuantity' => 'Places'
 	);
 
@@ -45,27 +40,20 @@ class EventRegistration extends DataObject {
 
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
-
-		$fields->removeByName('Tickets');
 		$fields->removeByName('Total');
 		$fields->removeByName('Token');
-		$fields->removeByName('TimeID');
-
-		$fields->addFieldToTab('Root.Tickets', $tickets = new TableListField(
-			'Tickets',
-			'EventTicket',
-			array(
-				'Title'        => 'Ticket Title',
-				'PriceSummary' => 'Price',
-				'Quantity'     => 'Quantity'
-			)));
-		$tickets->setCustomSourceItems($this->Tickets());
-
+		$memberfield = $fields->fieldByName("Root.Main.MemberID");
+		$fields->replaceField("MemberID", $memberfield->performReadonlyTransformation());
 		if (class_exists('Payment')) {
-			$fields->addFieldToTab('Root.Tickets', new ReadonlyField(
+			$fields->addFieldToTab('Root.Main', new ReadonlyField(
 				'TotalNice', 'Total', $this->Total->Nice()
 			));
+			$paymentfield = $fields->fieldByName("Root.Main.PaymentID");
+			$fields->replaceField("PaymentID", $paymentfield->performReadonlyTransformation());
 		}
+		$fields->fieldByName("Root.Attendees.Attendees")->getConfig()
+			->removeComponentsByType("GridFieldAddNewButton")
+			->removeComponentsByType("GridFieldAddExistingAutocompleter");
 
 		return $fields;
 	}
@@ -74,14 +62,23 @@ class EventRegistration extends DataObject {
 	 * @see EventRegistration::EventTitle()
 	 */
 	public function getTitle() {
-		return $this->Time()->Title;
+		return $this->Event()->Title;
 	}
 
 	/**
 	 * @return int
 	 */
 	public function TotalQuantity() {
-		return $this->Tickets()->sum('Quantity');
+		return $this->Attendees()->count();
+	}
+
+	/**
+	 * Get all the ticket types selected for this registration.
+	 */
+	public function Tickets() {
+		return EventTicket::get()
+			->innerJoin("EventAttendee", "\"EventTicket\".\"ID\" = \"EventAttendee\".\"TicketID\"")
+			->filter("EventRegistrationID", $this->ID);
 	}
 
 	/**
@@ -89,8 +86,7 @@ class EventRegistration extends DataObject {
 	 */
 	public function ConfirmTimeLimit() {
 		$unconfirmed = $this->Status == 'Unconfirmed';
-		$limit       = $this->Time()->Event()->ConfirmTimeLimit;
-
+		$limit = $this->Event()->ConfirmTimeLimit;
 		if ($unconfirmed && $limit) {
 			return DBField::create_field('SS_Datetime', strtotime($this->Created) + $limit);
 		}
@@ -106,7 +102,7 @@ class EventRegistration extends DataObject {
 			$parts[] = $ticket->Quantity."x".$ticket->Title;
 		}
 
-		return $this->Time()->Event()->Title.": ".implode(",", $parts);
+		return $this->Event()->Title.": ".implode(",", $parts);
 	}
 
 	/**
@@ -114,7 +110,11 @@ class EventRegistration extends DataObject {
 	 */
 	public function Link($action = '') {
 		return Controller::join_links(
-			$this->Time()->Event()->Link(), 'registration', $this->ID, $action, '?token=' . $this->Token
+			$this->Event()->Link(),
+			'registration',
+			$this->ID,
+			$action,
+			'?token=' . $this->Token
 		);
 	}
 

@@ -29,32 +29,26 @@ class EventRegisterFormSession extends MultiFormSession {
 		if ($this->registration) {
 			return $this->registration;
 		}
-
 		if ($this->RegistrationID) {
 			return $this->registration = $this->Registration();
-		} else {
-			$this->registration = new EventRegistration();
-			$this->registration->TimeID = $this->form->getController()->getDateTime()->ID;
-			$this->registration->Status = 'Unsubmitted';
-
-			return $this->registration;
 		}
+		$this->registration = new EventRegistration();
+		$this->registration->Status = 'Unsubmitted';
+
+		return $this->registration;
+		
 	}
 
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
-
-		if (!$this->form->getController()->getDateTime()->Event()->RegistrationTimeLimit) {
+		if (!$this->form->getController()->getEvent()->RegistrationTimeLimit) {
 			return;
 		}
-
 		$isInDb     = $this->getRegistration()->isInDB();
 		$hasTickets = (bool) count($this->getRegistration()->Tickets());
-
 		if ($isInDb || $hasTickets) {
 			$this->getRegistration()->write();
 		}
-
 		$this->RegistrationID = $this->getRegistration()->ID;
 	}
 

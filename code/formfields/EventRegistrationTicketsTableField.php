@@ -7,15 +7,15 @@
  */
 class EventRegistrationTicketsTableField extends FormField {
 
-	protected $datetime;
+	protected $tickets;
 	protected $excludedRegistrationId;
 	protected $showUnavailableTickets = true;
 	protected $showUnselectedTickets = true;
 	protected $forceTotalRow;
 	protected $total;
 
-	public function __construct($name, $datetime, $value = array()) {
-		$this->datetime = $datetime;
+	public function __construct($name, DataList $tickets, $value = array()) {
+		$this->tickets = $tickets;
 		parent::__construct($name, '', $value);
 	}
 
@@ -89,13 +89,12 @@ class EventRegistrationTicketsTableField extends FormField {
 
 	public function Tickets() {
 		$result  = new ArrayList();
-		$tickets = $this->datetime->Tickets('', '"RegistrableDateTime_Tickets"."Sort"');
+		$tickets = $this->tickets;
 
 		foreach ($tickets as $ticket) {
-			$available = $ticket->getAvailableForDateTime(
-				$this->datetime, $this->excludedRegistrationId
+			$available = $ticket->getAvailability(
+				$this->excludedRegistrationId
 			);
-			$endTime = $ticket->getSaleEndForDateTime($this->datetime);
 
 			if ($avail = $available['available']) {
 				$name = "{$this->name}[{$ticket->ID}]";
@@ -125,7 +124,7 @@ class EventRegistrationTicketsTableField extends FormField {
 					'Description' => $ticket->Description,
 					'Available'   => $avail === true ? 'Unlimited' : $avail,
 					'Price'       => $ticket->PriceSummary(),
-					'End'         => DBField::create_field('SS_Datetime', $endTime),
+					'End'         => DBField::create_field('SS_Datetime', strtotime($ticket->EndDate)),
 					'Quantity'    => $field,
 					'Ticket'	=> $ticket
 				)));
@@ -152,13 +151,6 @@ class EventRegistrationTicketsTableField extends FormField {
 	}
 
 	/**
-	 * @return int
-	 */
-	public function RemainingCapacity() {
-		return $this->datetime->getRemainingCapacity($this->excludedRegistrationId);
-	}
-
-	/**
 	 * @return bool
 	 */
 	public function ShowTotalRow() {
@@ -172,11 +164,45 @@ class EventRegistrationTicketsTableField extends FormField {
 		return $this->total;
 	}
 
-	/**
-	 * @return RegistrableDateTime
-	 */
-	public function DateTime() {
-		return $this->datetime;
+
+	public function validate($validator) {
+
+		if($this->readonly){
+			return true;
+		}
+
+		// check there is at least one ticket selected
+		if(empty($this->value) || !is_array($this->value) || !array_filter($this->value)){
+			$validator->validationError($this->name,
+				_t('EventRegistrationTicketsTableField.SELECTATLEASTONE',
+					'Please add a quantity to at least one ticket.'),
+				"validation"
+			);
+			return false;
+		}
+		
+		foreach($this->value as $id => $quantity) {
+			//numeric quantities
+			if ($quantity && !is_int($quantity) && !ctype_digit($quantity)) {
+				$validator->validationError($this->name,
+					_t('EventRegistrationTicketsTableField.NONNUMERICALQUANTITY',
+						'Please only enter numerical amounts for ticket quantities.'),
+					'validation'
+				);
+				return false;
+			}
+			//valid ticket ids
+			if (!$this->tickets->byID($id)) {
+				$validator->validationError($this->name,
+					_t('EventRegistrationTicketsTableField.INVALIDTICKETID',
+						'Invalid ticket selection.'),
+					'validation'
+				);
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 }

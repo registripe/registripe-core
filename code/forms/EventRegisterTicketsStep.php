@@ -65,11 +65,11 @@ class EventRegisterTicketsStep extends MultiFormStep {
 	}
 
 	public function getFields() {
-		$datetime = $this->getForm()->getController()->getDateTime();
+		$tickets = $this->getForm()->getController()->getEvent()->Tickets();
 		$session  = $this->getForm()->getSession();
 
 		$fields = new FieldList(
-			$tickets = new EventRegistrationTicketsTableField('Tickets', $datetime)
+			$tickets = new EventRegistrationTicketsTableField('Tickets', $tickets)
 		);
 
 		$tickets->setExcludedRegistrationId($session->RegistrationID);
@@ -103,20 +103,21 @@ class EventRegisterTicketsStep extends MultiFormStep {
 		$this->saveData($form->getData());
 		$form->clearMessage(); //hack until MultiForm forTemplate is fixed
 
-		$datetime = $this->getForm()->getController()->getDateTime();
-		$data     = $form->getData();
+		$event = $this->getForm()->getController()->getEvent();
+		$data  = $form->getData();
 
-		if ($datetime->Event()->OneRegPerEmail) {
+		if ($event->OneRegPerEmail) {
 			if (Member::currentUserID()) {
 				$email = Member::currentUser()->Email;
 			} else {
 				$email = $data['Email'];
 			}
 
-			$existing = DataObject::get_one('EventRegistration', sprintf(
-				'"Email" = \'%s\' AND "Status" <> \'Canceled\' AND "TimeID" = %d',
-				Convert::raw2sql($email), $datetime->ID
-			));
+			$existing = EventRegistration::get()
+				->filter("Email", $email)
+				->filter("Status:not",'Canceled')
+				->filter("EventID", $event->ID)
+				->first();
 
 			if ($existing) {
 				$form->addErrorMessage(
@@ -163,7 +164,7 @@ class EventRegisterTicketsStep extends MultiFormStep {
 			$registration->Email = $data['Email'];
 		}
 
-		$registration->TimeID   = $datetime->ID;
+		$registration->EventID   = $event->ID;
 		$registration->MemberID = Member::currentUserID();
 
 		$total = $this->getTotal();

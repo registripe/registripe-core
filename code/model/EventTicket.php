@@ -22,6 +22,10 @@ class EventTicket extends DataObject {
 		'Event' => 'RegistrableEvent'
 	);
 
+	private static $has_many = array(
+		'Attendees' => 'EventAttendee'
+	);
+
 	private static $defaults = array(
 		'MinTickets' => 1
 	);
@@ -46,6 +50,7 @@ class EventTicket extends DataObject {
 		$fields->removeByName('EventID');
 		$fields->removeByName('StartDate');
 		$fields->removeByName('EndDate');
+		$fields->removeByName('Attendees');
 
 		if (class_exists('Payment')) {
 			$fields->insertBefore(
@@ -78,6 +83,13 @@ class EventTicket extends DataObject {
 		return $fields;
 	}
 
+	/**
+	 * @return RequiredFields
+	 */
+	public function getValidator() {
+		return new RequiredFields('Title', 'Type', 'StartDate', 'EndDate');
+	}
+
 	public function validate() {
 		$result = parent::validate();
 		if ($this->Type == 'Price' && !$this->Price->exists()) {
@@ -108,15 +120,17 @@ class EventTicket extends DataObject {
 			$this->PriceAmount = 0;
 			$this->PriceCurrency = "";
 		}
-
 		parent::onBeforeWrite();
 	}
 
 	/**
-	 * @return RequiredFields
+	 * Get the attendees that have booked this ticket.
+	 * @return DataList
 	 */
-	public function getValidator() {
-		return new RequiredFields('Title', 'Type', 'StartDate', 'EndDate');
+	public function getBookedAttendees() {
+		return $this->Attendees()
+			->innerJoin("EventRegistration", "EventRegistration.ID = EventAttendee.EventRegistrationID")
+			->filter("Status:not", "Canceled");
 	}
 
 	/**
@@ -126,56 +140,38 @@ class EventTicket extends DataObject {
 	 * @param  int $excludeId A registration ID to exclude from calculations.
 	 * @return array
 	 */
-	public function getAvailableForDateTime(RegistrableDateTime $time, $excludeId = null) {
+	public function getAvailability($excludeId = null) {
 		$start = strtotime($this->StartDate);
-
 		if ($start >= time()) {
 			return array(
 				'available'    => false,
 				'reason'       => 'Tickets are not yet available.',
 				'available_at' => $start);
 		}
-
 		$end = strtotime($this->EndDate);
-
 		if (time() >= $end) {
 			return array(
 				'available' => false,
 				'reason'    => 'Tickets are no longer available.');
 		}
-
 		if (!$quantity = $this->Available) {
-			return array('available' => true);
+			return array(
+				'available' => true
+			);
 		}
-
-		$bookings = EventRegistration::get()
-			->innerJoin("EventRegistration_Tickets",'"EventRegistration"."ID" = "EventRegistrationID"')
-			->filter("Status:not","Canceled")
-			->filter("EventTicketID",$this->ID)
-			->filter("EventRegistration.TimeID",$time->ID);
+		$bookings = $this->getBookedAttendees();
 		if ($excludeId) {
-			$bookings = $bookings->where('"EventRegistration"."ID" != '.$excludeId);
+			$bookings = $bookings->filter('EventRegistration.ID:not', $excludeId);
 		}
-		$booked = $bookings->sum("Quantity");
-
-		if ($booked < $quantity) {
-			return array('available' => $quantity - $booked);
-		} else {
+		$bookedcount = $bookings->count();
+		if ($bookedcount >= $quantity) {
 			return array(
 				'available' => false,
 				'reason'    => 'All tickets have been booked.');
 		}
-	}
-
-	/**
-	 * Calculates the timestamp for when this ticket stops going on sale for an
-	 * event date time.
-	 *
-	 * @param  RegistrableDateTime $datetime
-	 * @return int
-	 */
-	public function getSaleEndForDateTime(RegistrableDateTime $datetime) {
-		return strtotime($this->EndDate);
+		return array(
+			'available' => $quantity - $bookedcount
+		);
 	}
 
 	/**

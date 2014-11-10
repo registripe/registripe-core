@@ -34,12 +34,12 @@ class EventRegisterPaymentStep extends MultiFormStep {
 			'Please install the Omnipay module to accept event payments.'
 		);
 
-		$datetime = $this->getForm()->getController()->getDateTime();
+		$tickets = $this->getForm()->getController()->getEvent()->Tickets();
 		$session  = $this->getForm()->getSession();
 
 		$total  = $this->form->getSession()->getRegistration()->Total;
 
-		$table = new EventRegistrationTicketsTableField('Tickets', $datetime);
+		$table = new EventRegistrationTicketsTableField('Tickets', $tickets);
 		$table->setReadonly(true);
 		$table->setExcludedRegistrationId($session->RegistrationID);
 		$table->setShowUnavailableTickets(false);

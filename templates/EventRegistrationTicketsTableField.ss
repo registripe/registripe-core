@@ -1,3 +1,4 @@
+<% if not $Title && Message %><p class="help-block $MessageType">$Message</p><% end_if %>
 <table id="$ID" class="$CSSClasses event-tickets field">
 	<thead>
 		<tr>
@@ -14,14 +15,6 @@
 				<td colspan="3"></td>
 				<td>Total</td>
 				<td><% if $Total %>$Total.Nice<% else %>Free<% end_if %></td>
-			</tr>
-		</tfoot>
-	<% else_if $DateTime.Capacity %>
-		<tfoot>
-			<tr>
-				<td colspan="3"></td>
-				<td>Remaining Places</td>
-				<td>$RemainingCapacity</td>
 			</tr>
 		</tfoot>
 	<% end_if %>

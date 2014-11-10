@@ -52,9 +52,10 @@ class EventRegisterForm extends MultiForm {
 	public function getExpiryDateTime() {
 		if ($this->getSession()->RegistrationID) {
 			$created = strtotime($this->getSession()->Registration()->Created);
-			$limit   = $this->controller->getDateTime()->Event()->RegistrationTimeLimit;
-
-			if ($limit) return DBField::create_field('SS_Datetime', $created + $limit);
+			$limit = $this->controller->getEvent()->RegistrationTimeLimit;
+			if ($limit){
+				return DBField::create_field('SS_Datetime', $created + $limit);	
+			} 
 		}
 	}
 
@@ -71,7 +72,7 @@ class EventRegisterForm extends MultiForm {
 		}
 
 		$step         = $this->getCurrentStep();
-		$datetime     = $this->getController()->getDateTime();
+		$event        = $this->getController()->getEvent();
 		$registration = $this->session->getRegistration();
 		$ticketsStep  = $this->getSavedStepByClass('EventRegisterTicketsStep');
 		$tickets      = $ticketsStep->loadData();
@@ -85,8 +86,7 @@ class EventRegisterForm extends MultiForm {
 		// Check that the requested tickets are still available.
 		if (!$this->validateTickets($validate, $form)) {
 			Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
-			$this->controller->redirectBack();
-			return false;
+			return $this->controller->redirectBack();
 		}
 
 		$this->session->delete();
@@ -98,8 +98,8 @@ class EventRegisterForm extends MultiForm {
 
 		$this->extend('onRegistrationComplete', $registration);
 
-		$this->controller->redirect(Controller::join_links(
-			$datetime->Event()->Link(),
+		return $this->controller->redirect(Controller::join_links(
+			$event->Link(),
 			'registration',
 			$registration->ID,
 			'?token=' . $registration->Token
@@ -122,7 +122,7 @@ class EventRegisterForm extends MultiForm {
 	 * Attach a ticket file, if it exists
 	 */
 	protected function attachTicketFile($email, $registration){
-		if ($generator = $registration->Time()->Event()->TicketGenerator) {
+		if ($generator = $registration->Event()->TicketGenerator) {
 			$generator = new $generator();
 
 			$path = $generator->generateTicketFileFor($registration);
@@ -143,92 +143,60 @@ class EventRegisterForm extends MultiForm {
 	 * @return bool
 	 */
 	public function validateTickets($tickets, $form) {
-		$datetime = $this->controller->getDateTime();
+		$event = $this->controller->getEvent();
 		$session  = $this->getSession();
-
-		// First check we have at least one ticket.
-		if (!array_sum($tickets)) {
-			$form->addErrorMessage(
-				'Tickets',
-				_t('EventRegisterForm.SELECTATLEASTONE', 'Please select at least one ticket to purchase.'),
-				'required');
-			return false;
-		}
 
 		// Loop through each ticket and check that the data entered is valid
 		// and they are available.
 		foreach ($tickets as $id => $quantity) {
-			if (!$quantity) {
-				continue;
-			}
-
-			if (!is_int($quantity) && !ctype_digit($quantity)) {
-				$form->addErrorMessage(
-					'Tickets',
-					_t('EventRegisterForm.NONNUMERICALQUANTITY', 'Please only enter numerical amounts for ticket quantities.'),
-					'required');
-				return false;
-			}
-
-			$ticket = $datetime->Tickets('"EventTicket"."ID" = ' . (int) $id);
-
-			if (!$ticket = $ticket->First()) {
-				$form->addErrorMessage(
-					'Tickets',
-					_t('EventRegisterForm.INVALIDTICKETID', 'An invalid ticket ID was entered.'),
-					'required'
-				);
-				return false;
-			}
-
-			$avail = $ticket->getAvailableForDateTime($datetime, $session->RegistrationID);
+			$ticket = $event->Tickets()->byID($id);
+			$avail = $ticket->getAvailability($session->RegistrationID);
 			$avail = $avail['available'];
-
 			if (!$avail) {
 				$form->addErrorMessage(
 					'Tickets',
 					sprintf(
-						_t('EventRegisterForm.NONEAVAILABLE', '%s is currently not available.'),
+						_t('EventRegisterForm.NONEAVAILABLE', 
+							'%s is currently not available.'),
 						$ticket->Title
 					),
 					'required');
 				return false;
 			}
-
 			if (is_int($avail) && $avail < $quantity) {
 				$form->addErrorMessage(
 					'Tickets',
 					sprintf(
-						_t('EventRegisterForm.NOTENOUGHAVAILABLE', 'There are only %d of "%s" available.'),
+						_t('EventRegisterForm.NOTENOUGHAVAILABLE', 
+							'There are only %d of "%s" available.'),
 						$avail,
 						$ticket->Title
 					),
 					'required');
 				return false;
 			}
-
 			if ($ticket->MinTickets && $quantity < $ticket->MinTickets) {
 				$form->addErrorMessage('Tickets',sprintf(
-					_t('EventRegisterForm.UNDERMINIMUMQUANTITY', 'You must purchase at least %d of "%s".'),
+					_t('EventRegisterForm.UNDERMINIMUMQUANTITY', 
+						'You must purchase at least %d of "%s".'),
 					$ticket->MinTickets, $ticket->Title), 'required');
 				return false;
 			}
-
 			if ($ticket->MaxTickets && $quantity > $ticket->MaxTickets) {
 				$form->addErrorMessage('Tickets', sprintf(
-					_t('EventRegisterForm.OVERMAXIMUMQUANTITY', 'You can only purchase at most %d of "%s".'),
+					_t('EventRegisterForm.OVERMAXIMUMQUANTITY', 
+						'You can only purchase at most %d of "%s".'),
 					$ticket->MaxTickets, $ticket->Title), 'required');
 				return false;
 			}
 		}
-
 		// Then check the sum of the quantities does not exceed the overall
 		// event capacity.
-		if ($datetime->Capacity) {
-			$avail   = $datetime->getRemainingCapacity($session->RegistrationID);
-			$request = array_sum($tickets);
+		if ($event->Capacity) {
+			$avail = $event->getRemainingCapacity($session->RegistrationID);
+			$totalquantity = array_sum($tickets);
 
-			if ($request > $avail) {
+			if ($totalquantity > $avail) {
 				$message = sprintf(
 					_t(
 						'EventRegisterForm.OVERTOTALCAPACITY', 

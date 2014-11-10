@@ -21,7 +21,7 @@ class EventRegistrationDetailsEmail extends Email {
 		$email->setTo($registration->Email);
 		$email->setSubject(sprintf(
 			'Registration Details For %s (%s)',
-			$registration->Time()->Event()->Title,
+			$registration->Event()->Title,
 			$siteconfig->Title));
 
 		$email->populateTemplate(array(

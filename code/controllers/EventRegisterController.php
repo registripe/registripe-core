@@ -17,17 +17,17 @@ class EventRegisterController extends Page_Controller {
 	);
 
 	protected $parent;
-	protected $datetime;
+	protected $event;
 
 	/**
 	 * Constructs a new controller for creating a registration.
 	 *
 	 * @param ContentController $parent
-	 * @param RegistrableDateTime $datetime
+	 * @param RegistrableEvent $event
 	 */
-	public function __construct($parent, $datetime) {
+	public function __construct($parent, $event) {
 		$this->parent   = $parent;
-		$this->datetime = $datetime;
+		$this->event = $event;
 
 		parent::__construct($parent->data());
 	}
@@ -35,60 +35,51 @@ class EventRegisterController extends Page_Controller {
 	public function init() {
 		parent::init();
 
-		if ($this->datetime->Event()->RequireLoggedIn && !Member::currentUserID()) {
+		if ($this->event->RequireLoggedIn && !Member::currentUserID()) {
 			return Security::permissionFailure($this, array(
 				'default' => 'Please log in to register for this event.'
 			));
 		}
-
 		$form   = $this->RegisterForm();
 		$expiry = $form->getExpiryDateTime();
-
 		if ($expiry && $expiry->InPast()) {
 			$form->getSession()->Registration()->delete();
 			$form->getSession()->delete();
-
 			$message = _t('EventManagement.REGSESSIONEXPIRED', 'Your'
 				. ' registration expired before it was completed. Please'
 				. ' try ordering your tickets again.');
-
 			$form->sessionMessage($message, 'bad');
 
-			$this->redirect($this->Link());
+			return $this->redirect($this->Link());
 		}
 	}
 
 	public function index() {
-		$datetime = $this->datetime;
 		$exclude  = null;
-
 		// If we have a current multiform ID, then exclude the linked
 		// registration from the capacity calculation.
 		if (isset($_GET['MultiFormSessionID'])) {
 			$exclude = $this->RegisterForm()->getSession()->RegistrationID;
 		}
-
-		if ($datetime->getStartDateTime()->getTimestamp() < time()) {
+		if (!$this->event->canRegister()) {
 			$data = array(
-				'Title'   => $datetime->Event()->Title . ' Has Already Happened',
-				'OldEvent' => true,
-				'Content' => '<p>You can no longer register for this event.</p>'
+				'Content' => '<p>This event cannot be registered for.</p>'
 			);
-		} elseif ($datetime->getRemainingCapacity($exclude)) {
+		} elseif ($this->event->getRemainingCapacity($exclude)) {
 			$data = array(
-				'Title' => 'Register For ' . $datetime->Event()->Title,
+				'Title' => 'Register For ' . $this->event->Title,
 				'Form'  => $this->RegisterForm(),
 				'Content' => ''
 			);
 		} else {
 			$data = array(
-				'Title'   => $datetime->Event()->Title . ' Is Full',
+				'Title'   => $this->event->Title . ' Is Full',
 				'SoldOut' => true,
 				'Content' => '<p>There are no more places available at this event.</p>'
 			);
 		}
 
-		$data['Event'] = $datetime->Event();
+		$data['Event'] = $this->event;
 
 		return $this->getViewer('index')->process($this->customise($data));
 	}
@@ -103,15 +94,12 @@ class EventRegisterController extends Page_Controller {
 		if (!$rego = DataObject::get_by_id('EventRegistration', $id)) {
 			return $this->httpError(404);
 		}
-
 		if ($rego->Token != $token) {
 			return $this->httpError(403);
 		}
-
 		if ($rego->Status != 'Unconfirmed') {
 			return $this->redirect($rego->Link());
 		}
-
 		try {
 			$rego->Status = 'Valid';
 			$rego->write();
@@ -125,16 +113,16 @@ class EventRegisterController extends Page_Controller {
 		}
 
 		return array(
-			'Title'   => $this->datetime->Event()->AfterConfirmTitle,
-			'Content' => $this->datetime->Event()->obj('AfterConfirmContent')
+			'Title'   => $this->event->AfterConfirmTitle,
+			'Content' => $this->event->obj('AfterConfirmContent')
 		);
 	}
 
 	/**
-	 * @return RegistrableDateTime
+	 * @return RegistrableEvent
 	 */
-	public function getDateTime() {
-		return $this->datetime;
+	public function getEvent() {
+		return $this->event;
 	}
 
 	/**

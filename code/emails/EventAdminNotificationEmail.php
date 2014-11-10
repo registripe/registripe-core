@@ -19,7 +19,7 @@ class EventAdminNotificationEmail extends Email {
 				'EventAdminNotificationEmail.SUBJECT',
 				'New Registration for %s (%s)'
 			),
-			$registration->Time()->Event()->Title,
+			$registration->Event()->Title,
 			$siteconfig->Title));
 
 		$email->populateTemplate(array(

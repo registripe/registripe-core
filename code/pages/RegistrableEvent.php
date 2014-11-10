@@ -22,12 +22,15 @@ class RegistrableEvent extends CalendarEvent {
 		'AfterRegTitle'         => 'Varchar(255)',
 		'AfterRegContent'       => 'HTMLText',
 		'AfterUnregTitle'       => 'Varchar(255)',
-		'AfterUnregContent'     => 'HTMLText'
+		'AfterUnregContent'     => 'HTMLText',
+		'Capacity'              => 'Int',
+		'EmailReminder'         => 'Boolean',
+		'RemindDays'            => 'Int'
 	);
 
 	private static $has_many = array(
 		'Tickets'     => 'EventTicket',
-		'DateTimes'   => 'RegistrableDateTime'
+		'Registrations'   => 'EventRegistration'
 	);
 
 	private static $defaults = array(
@@ -53,6 +56,9 @@ class RegistrableEvent extends CalendarEvent {
 		SiteTree::disableCMSFieldsExtensions();
 		$fields = parent::getCMSFields();
 		SiteTree::enableCMSFieldsExtensions();
+
+		//remove recursion options from RegistrableEvents
+		$fields->removeByName(_t('CalendarEvent.RECURSION','Recursion'));
 
 		$fields->insertAfter(
 			new ToggleCompositeField(
@@ -108,19 +114,16 @@ class RegistrableEvent extends CalendarEvent {
 		));
 
 		$generators = ClassInfo::implementorsOf('EventRegistrationTicketGenerator');
-
 		if ($generators) {
 			foreach ($generators as $generator) {
 				$instance = new $generator();
 				$generators[$generator] = $instance->getGeneratorTitle();
 			}
-
 			$generator = new DropdownField(
 				'TicketGenerator',
 				_t('EventRegistration.TICKET_GENERATOR', 'Ticket generator'),
 				$generators
 			);
-
 			$generator->setEmptyString(_t('EventManagement.NONE', '(None)'));
 			$generator->setDescription(_t(
 				'EventManagement.TICKET_GENERATOR_NOTE',
@@ -130,7 +133,8 @@ class RegistrableEvent extends CalendarEvent {
 			$fields->addFieldToTab('Root.Tickets', $generator);
 		}
 
-		$regGridFieldConfig = GridFieldConfig_Base::create()
+		//registrations
+		$regGridFieldConfig = GridFieldConfig_RecordEditor::create()
 			->removeComponentsByType('GridFieldAddNewButton')
 			->removeComponentsByType('GridFieldDeleteAction')
 			->addComponents(
@@ -138,17 +142,14 @@ class RegistrableEvent extends CalendarEvent {
 				new GridFieldPrintButton('buttons-after-left'),
 				new GridFieldExportButton('buttons-after-left')
 			);
-
 		$regGrids = array(
 			new GridField('Registrations',
 				_t('EventManagement.REGISTRATIONS', 'Registrations'),
-				$this->DateTimes()->relation('Registrations')->filter('Status', 'Valid'),
+				$this->Registrations()->filter('Status', 'Valid'),
 				$regGridFieldConfig
 			)
 		);
-		
-		$cancelled = $this->DateTimes()
-			->relation('Registrations')
+		$cancelled = $this->Registrations()
 			->filter('Status', 'Canceled');
 		if($cancelled->exists()){
 			$regGrids[] = new GridField('CanceledRegistrations',
@@ -157,7 +158,6 @@ class RegistrableEvent extends CalendarEvent {
 				$regGridFieldConfig
 			);
 		}
-
 		$fields->addFieldsToTab('Root.Registrations', $regGrids);
 
 		if ($this->RegEmailConfirm) {
@@ -168,11 +168,21 @@ class RegistrableEvent extends CalendarEvent {
 					new GridField(
 						'UnconfirmedRegistrations',
 						'',
-						$this->DateTimes()->relation('Registrations')->filter('Status', 'Unconfirmed')
+						$this->Registrations()->filter('Status', 'Unconfirmed')
 					)
 				)
 			));
 		}
+
+		$attendees = EventAttendee::get()
+			->innerJoin("EventRegistration", "EventAttendee.RegistrationID = EventRegistration.ID")
+			->filter("EventRegistration.EventID", $this->ID);
+
+		//attendees
+		$fields->addFieldToTab("Root.Attendees",
+			new GridField("Attendees", "Attendees", $attendees)
+		);
+
 		$this->extend('updateCMSFields',$fields);
 
 		return $fields;
@@ -246,14 +256,49 @@ class RegistrableEvent extends CalendarEvent {
 
 	/**
 	 * Check if this event can currently be registered for.
+	 * Checks 
 	 * @return boolean
 	 */
-	function canRegister(){
-		foreach($this->DateTimes() as $time){
-			$tickets = $time->getAvailableTickets();
-			if($tickets && $tickets->exists()){
-				return true;
-			}
+	public function canRegister(){
+		$tickets = $this->getAvailableTickets();
+		if($tickets && $tickets->exists()){
+			return true;
+		}
+
+		return false;
+	}
+
+	public function getAvailableTickets() {
+		$now = date('Y-m-d H:i:s');
+
+		return $this->Tickets()
+			->filter("StartDate:LessThan", $now)
+			->filter("EndDate:GreaterThan", $now);
+	}
+
+	public function getCompletedRegistrations() {
+		return $this->Registrations()
+			->filter("Status","Valid");
+	}
+
+	/**
+	 * Returns the overall number of places remaining at this event, TRUE if
+	 * there are unlimited places or FALSE if they are all taken.
+	 *
+	 * @param  int $excludeId A registration ID to exclude from calculations.
+	 * @return int|bool
+	 */
+	public function getRemainingCapacity($excludeId = null) {
+		if (!$this->Capacity){
+			return true;
+		}
+		$bookings = $this->Registrations()->filter("Status:not", "Canceled");
+		if ($excludeId) {
+			$bookings = $bookings->where('"EventRegistration"."ID" != '.$excludeId);
+		}
+		$taken = $bookings->sum("Quantity");
+		if($this->Capacity >= $taken){
+			return $this->Capacity - $taken;
 		}
 
 		return false;
@@ -264,34 +309,23 @@ class RegistrableEvent extends CalendarEvent {
 class RegistrableEvent_Controller extends CalendarEvent_Controller {
 
 	public static $allowed_actions = array(
-		'details',
+		'register',
+		'unregister',
 		'registration'
 	);
 
 	/**
-	 * Shows details for an individual event date time, as well as forms for
-	 * registering and un-registering.
-	 *
-	 * @param SS_HTTPRequest $request
-	 * @return array
+	 * @return EventRegisterController
 	 */
-	public function details($request) {
-		$id = $request->param('ID');
+	public function register() {
+		return new EventRegisterController($this, $this->dataRecord);
+	}
 
-		if (!ctype_digit($id)) {
-			$this->httpError(404);
-		}
-
-		$time = RegistrableDateTime::get()->byID($id);
-
-		if (!$time || $time->EventID != $this->ID) {
-			$this->httpError(404);
-		}
-
-		$request->shift();
-		$request->shiftAllParams();
-
-		return new EventTimeDetailsController($this, $time);
+	/**
+	 * @return EventUnregisterController
+	 */
+	public function unregister() {
+		return new EventUnregisterController($this, $this->dataRecord);
 	}
 
 	/**
@@ -302,17 +336,13 @@ class RegistrableEvent_Controller extends CalendarEvent_Controller {
 	 */
 	public function registration($request) {
 		$id = $request->param('ID');
-
 		if (!ctype_digit($id)) {
 			$this->httpError(404);
 		}
-
 		$rego = EventRegistration::get()->byID($id);
-
-		if (!$rego || $rego->Time()->EventID != $this->ID) {
+		if (!$rego || $rego->EventID != $this->ID) {
 			$this->httpError(404);
 		}
-
 		$request->shift();
 		$request->shiftAllParams();
 

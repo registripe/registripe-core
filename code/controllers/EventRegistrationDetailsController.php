@@ -63,26 +63,18 @@ class EventRegistrationDetailsController extends Page_Controller {
 		if ($this->registration->Status != 'Valid') {
 			$this->httpError(404);
 		}
-
-		$generator = $this->registration->Time()->Event()->TicketGenerator;
-
+		$generator = $this->registration->Event()->TicketGenerator;
 		if(!$generator) {
 			$generator = "EventRegistrationHtmlTicketGenerator";
 		}
-
 		if($generator == "EventRegistrationHtmlTicketGenerator") {
 			return $this->registration->renderWith('EventRegistrationHtmlTicket');
 		}
-
-
-
 		$generator = new $generator();
-
 		$path = $generator->generateTicketFileFor($this->registration);
 		$path = Director::getAbsFile($path);
 		$name = $generator->getTicketFilenameFor($this->registration);
 		$mime = $generator->getTicketMimeTypeFor($this->registration);
-
 		if (!$path || !file_exists($path)) {
 			$this->httpError(404, 'The ticket file could not be generated.');
 		}
@@ -101,7 +93,7 @@ class EventRegistrationDetailsController extends Page_Controller {
 	 * @return string
 	 */
 	public function Title() {
-		return 'Registration Details for ' . $this->registration->Time()->Event()->Title;
+		return 'Registration Details for ' . $this->registration->Event()->Title;
 	}
 
 	/**
@@ -116,9 +108,7 @@ class EventRegistrationDetailsController extends Page_Controller {
 	 */
 	public function TicketsTable() {
 		$rego  = $this->registration;
-
-		$table = new EventRegistrationTicketsTableField('Tickets', $rego->Time());
-
+		$table = new EventRegistrationTicketsTableField('Tickets', $rego->Tickets());
 		$table->setReadonly(true);
 		$table->setShowUnavailableTickets(false);
 		$table->setShowUnselectedTickets(false);
