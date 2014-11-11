@@ -55,10 +55,6 @@ class EventRegistrationDetailsController extends Page_Controller {
 		Session::clear($message);
 	}
 
-	public function index() {
-		return $this->getViewer('index')->process($this);
-	}
-
 	public function ticketfile() {
 		if ($this->registration->Status != 'Valid') {
 			$this->httpError(404);

@@ -62,7 +62,7 @@ class EventRegistration extends DataObject {
 	 * @see EventRegistration::EventTitle()
 	 */
 	public function getTitle() {
-		return $this->Event()->Title;
+		return $this->Name;
 	}
 
 	/**
@@ -78,7 +78,7 @@ class EventRegistration extends DataObject {
 	public function Tickets() {
 		return EventTicket::get()
 			->innerJoin("EventAttendee", "\"EventTicket\".\"ID\" = \"EventAttendee\".\"TicketID\"")
-			->filter("EventRegistrationID", $this->ID);
+			->filter("EventAttendee.RegistrationID", $this->ID);
 	}
 
 	/**
