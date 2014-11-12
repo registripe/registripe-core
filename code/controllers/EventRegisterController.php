@@ -28,28 +28,17 @@ class EventRegisterController extends Page_Controller {
 	public function __construct($parent, $event) {
 		$this->parent   = $parent;
 		$this->event = $event;
-
 		parent::__construct($parent->data());
 	}
 
 	public function init() {
 		parent::init();
-
 		if ($this->event->RequireLoggedIn && !Member::currentUserID()) {
 			return Security::permissionFailure($this, array(
 				'default' => 'Please log in to register for this event.'
 			));
 		}
-		$form   = $this->RegisterForm();
-		$expiry = $form->getExpiryDateTime();
-		if ($expiry && $expiry->InPast()) {
-			$form->getSession()->Registration()->delete();
-			$form->getSession()->delete();
-			$message = _t('EventManagement.REGSESSIONEXPIRED', 'Your'
-				. ' registration expired before it was completed. Please'
-				. ' try ordering your tickets again.');
-			$form->sessionMessage($message, 'bad');
-
+		if($this->checkRegistrationExpired()){
 			return $this->redirect($this->Link());
 		}
 	}
@@ -85,6 +74,52 @@ class EventRegisterController extends Page_Controller {
 	}
 
 	/**
+	 * @return RegistrableEvent
+	 */
+	public function getEvent() {
+		return $this->event;
+	}
+
+	/**
+	 * @param  string $action
+	 * @return string
+	 */
+	public function Link($action = null) {
+		return Controller::join_links(
+			$this->parent->Link(), 'register', $action
+		);
+	}
+
+	/**
+	 * @return EventRegisterForm
+	 */
+	public function RegisterForm() {
+		$form = new EventRegisterForm($this, 'RegisterForm');
+		$this->extend('updateEventRegisterForm', $form);
+
+		return $form;
+	}
+
+	/**
+	 * Check if the current registration has expired.
+	 * @return boolean
+	 */
+	public function checkRegistrationExpired() {
+		$form   = $this->RegisterForm();
+		$expiry = $form->getExpiryDateTime();
+		if ($expiry && $expiry->InPast()) {
+			$form->getSession()->Registration()->delete();
+			$form->getSession()->delete();
+			$message = _t('EventManagement.REGSESSIONEXPIRED', 'Your'
+				. ' registration expired before it was completed. Please'
+				. ' try ordering your tickets again.');
+			$form->sessionMessage($message, 'bad');
+
+			return true;
+		}
+	}
+
+	/**
 	 * Handles a user clicking on a registration confirmation link in an email.
 	 */
 	public function confirm($request) {
@@ -115,33 +150,6 @@ class EventRegisterController extends Page_Controller {
 		return array(
 			'Title'   => $this->event->AfterConfirmTitle,
 			'Content' => $this->event->obj('AfterConfirmContent')
-		);
-	}
-
-	/**
-	 * @return RegistrableEvent
-	 */
-	public function getEvent() {
-		return $this->event;
-	}
-
-	/**
-	 * @return EventRegisterForm
-	 */
-	public function RegisterForm() {
-		$form = new EventRegisterForm($this, 'RegisterForm');
-		$this->extend('updateEventRegisterForm', $form);
-
-		return $form;
-	}
-
-	/**
-	 * @param  string $action
-	 * @return string
-	 */
-	public function Link($action = null) {
-		return Controller::join_links(
-			$this->parent->Link(), 'register', $action
 		);
 	}
 
