@@ -34,14 +34,13 @@ class EventRegisterPaymentStep extends EventRegistrationStep {
 
 		$tickets = $this->getEvent()->Tickets();
 		$registration  = $this->getRegistration();
-		$total  = $registration->Total;
 
 		$table = new EventRegistrationTicketsTableField('Tickets', $tickets);
 		$table->setReadonly(true);
 		$table->setExcludedRegistrationId($registration->ID);
 		$table->setShowUnavailableTickets(false);
 		$table->setShowUnselectedTickets(false);
-		$table->setTotal($total);
+		$table->setTotal($this->getTotalCost());
 
 		$group = FieldGroup::create('Tickets',
 				new LiteralField('ConfirmTicketsNote',
@@ -99,7 +98,7 @@ class EventRegisterPaymentStep extends EventRegistrationStep {
 			return true;
 		}
 
-		$total  = $registration->Total;
+		$total  = $this->getTotalCost();
 
 		$payment = $registration->Payment();
 		$paymentstatus = $form->getRequest()->getVar('payment');

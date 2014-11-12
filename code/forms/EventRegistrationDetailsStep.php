@@ -22,11 +22,16 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 			$availabletickets = $this->form->getController()->getEvent()
 									->getAvailableTickets();
 			$attendeefields->push(
-				new DropdownField("TicketID", "Ticket", $availabletickets->map('ID', 'Summary')->toArray())
+				new DropdownField("TicketID", "Ticket",
+					$availabletickets->map('ID', 'Summary')->toArray()
+				)
 			);
-			$detailform = $editorconfig->getComponentByType("FrontEndGridFieldDetailForm");
+			$detailform = $editorconfig
+					->getComponentByType("FrontEndGridFieldDetailForm");
 			$detailform->setFields($attendeefields);
-			$detailform->setValidator(new RequiredFields("FirstName", "Surname", "Email", "TicketID"));
+			$detailform->setValidator(new RequiredFields(
+				"FirstName", "Surname", "Email", "TicketID"
+			));
 
 		}
 		$this->extend('updateFields', $fields);
@@ -57,22 +62,28 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 		return $data;
 	}
 
-	public function validateStep($data, $form) {
+	public function saveData($data) {
 		$rego = $this->getRegistration();
-		//TODO: fix me - not working properly
-		// if($rego->isInDB() && !$rego->Attendees()->exists()) {
-		// 	$form->sessionMessage('You need to add attendees', 'bad');
-		// 	return false;
-		// }
-
-		return parent::validateStep($data, $form);
+		$rego->update(Convert::raw2sql($data));
+		if($id = Member::currentUserID()) {
+			$rego->MemberID = $id;
+		}
+		parent::saveData($data);
 	}
 
-	public function saveData($data) {
-		$registration = $this->getRegistration();
-		$registration->update($data);
-		$registration->write();
-		parent::saveData($data);
+	public function validateStep($data, $form) {
+		$rego = $this->getRegistration();
+		if($rego->isInDB() && !$rego->Attendees()->exists()) {
+			$form->sessionMessage('You need to add one or more attendees.', 'bad');
+			return false;
+		}
+		$valid = parent::validateStep($data, $form);
+		//write/start the registration once the first step is correctly validated
+		if($valid){
+			$this->getRegistration()->write();
+		}
+		
+		return $valid;
 	}
 
 	/**
@@ -80,15 +91,23 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 	 */
 	public function getNextStep() {
 		$registration = $this->getRegistration();
-		//if not attendees, redirect back here
+		//if no attendees, redirect back to this step
 		if(!$registration || !$registration->Attendees()->exists()){
 			return 'EventRegistrationStep';
 		}
 
-		if ($this->getTotalCost($registration) > 0) {
+		if ($this->getTotalCost($registration)->Amount > 0) {
 			return 'EventRegisterPaymentStep';
 		}
 		return 'EventRegisterFreeConfirmationStep';
+	}
+
+	public function getNextText(){
+		if(!$this->getRegistration()->isInDB()){
+			return 'Start Registration';
+		}
+
+		return parent::getNextText();
 	}
 
 	/**

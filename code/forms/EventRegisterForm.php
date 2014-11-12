@@ -17,10 +17,9 @@ class EventRegisterForm extends MultiForm {
 
 		parent::__construct($controller, $name);
 
-		if ($expiryfield = $this->getExpiryField()) {
-			$this->fields->insertAfter($expiryfield, 'Tickets');
+		if ($expiryfield = $this->getExpiryField()) {	
+			$this->fields->push($expiryfield);
 		}
-
 	}
 
 	protected function getExpiryField(){
@@ -46,7 +45,7 @@ class EventRegisterForm extends MultiForm {
 				str_pad($secs, 2, '0', STR_PAD_LEFT)
 			);
 
-			$field = new LiteralField('CompleteRegistrationWithin', sprintf(
+			return new LiteralField('CompleteRegistrationWithin', sprintf(
 				"<p id=\"complete-registration-within\">$message</p>",
 				$expires->TimeDiff(), $remaining));
 		}
@@ -77,13 +76,9 @@ class EventRegisterForm extends MultiForm {
 			return;
 		}
 
-		$step         = $this->getCurrentStep();
 		$registration = $this->session->getRegistration();
-		$ticketsStep  = $this->getSavedStepByClass('EventRegisterTicketsStep');
-		$tickets      = $ticketsStep->loadData();
-		
 		if(!$tickets || !isset($tickets['tickets'])) {
-			$validate = $registration->Tickets()->map('ID', 'Quantity')->toArray();
+			$validate = $registration->getTicketQuantities();
 		} else {
 			$validate = $tickets['Tickets'];
 		}
@@ -219,6 +214,9 @@ class EventRegisterForm extends MultiForm {
 		return true;
 	}
 
+	/**
+	 * Override the MultiForm setSession function so we can use our own session.
+	 */
 	protected function setSession() {
 		$this->session = $this->getCurrentSession();
 
@@ -245,13 +243,6 @@ class EventRegisterForm extends MultiForm {
 				$_SERVER['REQUEST_URI'],
 				'?MultiFormSessionID='. $this->session->Hash
 			));
-		}
-	}
-
-	public function add($data, $form){
-		$currentStep = $this->getCurrentStep();
-		if($currentStep && method_exists($currentStep, "add")){
-			$currentStep->add($data);
 		}
 	}
 

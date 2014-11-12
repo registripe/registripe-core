@@ -17,7 +17,7 @@ class EventRegisterTicketsStep extends EventRegistrationStep {
 	 * @return string
 	 */
 	public function getNextStep() {
-		if ($this->getTotal()->getAmount() > 0) {
+		if ($this->getTotalCost()->getAmount() > 0) {
 			return 'EventRegisterPaymentStep';
 		}
 		return 'EventRegisterFreeConfirmationStep';
@@ -31,36 +31,6 @@ class EventRegisterTicketsStep extends EventRegistrationStep {
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Returns the total sum of all the tickets the user is purchasing.
-	 *
-	 * @return Money
-	 */
-	public function getTotal() {
-		$amount   = 0;
-		$currency = null;
-		$data     = $this->loadData();
-
-		if (isset($data['Tickets'])) {
-			foreach ($data['Tickets'] as $id => $quantity) {
-				$ticket = EventTicket::get()->byID($id);
-				$price  = $ticket->obj('Price');
-
-				if ($ticket->Type == 'Free' || !$quantity) {
-					continue;
-				}
-
-				$amount  += $price->getAmount() * $quantity;
-				$currency = $price->getCurrency();
-			}
-		}
-
-		return DBField::create_field('Money', array(
-			'Amount'   => $amount,
-			'Currency' => $currency
-		));
 	}
 
 	public function getFields() {

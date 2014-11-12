@@ -136,8 +136,10 @@ class EventRegistration extends DataObject {
 	 */
 	public function getDescription() {
 		$parts = array();
-		foreach($this->Tickets() as $ticket){
-			$parts[] = $ticket->Quantity."x".$ticket->Title;
+		foreach($this->getTicketQuantities() as $ticketid => $quantity){
+			if($ticket = EventTicket::get()->byID($ticketid)){
+				$parts[] = $quantity."x".$ticket->Title;
+			}
 		}
 
 		return $this->Event()->Title.": ".implode(",", $parts);

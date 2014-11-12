@@ -10,9 +10,26 @@ class EventRegistrationStep extends MultiFormStep{
 		return $this->form->getController()->getEvent();
 	}
 
-	protected function getTotalCost($registration) {
-		//TODO: calculator
-		return 100;
+	protected function getTotalCost() {
+		$calculator = new EventRegistrationCostCalculator($this->getRegistration());
+		
+		return DBField::create_field('Money', array(
+			'Amount'   => $calculator->calculate(),
+			'Currency' => $this->getRegistration()->Tickets()->first()->PriceCurrency
+		));
+	}
+
+	/**
+	 * Calculate the total each time we save the form.
+	 */
+	public function saveData($data) {
+		parent::saveData($data);
+		$total = $this->getTotalCost();
+		if($this->updatemodel){
+			$this->registration->Total->setCurrency($total->getCurrency());
+			$this->registration->Total->setAmount($total->getAmount());
+		}
+		
 	}
 
 }
