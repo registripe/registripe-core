@@ -58,6 +58,15 @@ class EventRegistration extends DataObject {
 		return $fields;
 	}
 
+	public function getFrontEndFields($params = null) {
+		$fields = parent::getFrontEndFields();
+		$fields->removeByName(array(
+			"PaymentID", "MemberID", "EventID", "Status", "Total", "Token"
+		));
+
+		return $fields;
+	}
+
 	/**
 	 * @see EventRegistration::EventTitle()
 	 */
@@ -79,6 +88,21 @@ class EventRegistration extends DataObject {
 		return EventTicket::get()
 			->innerJoin("EventAttendee", "\"EventTicket\".\"ID\" = \"EventAttendee\".\"TicketID\"")
 			->filter("EventAttendee.RegistrationID", $this->ID);
+	}
+
+	/**
+	 * Get an array of ticketid => quantity
+	 * @return array
+	 */
+	public function getTicketQuantities() {
+		$quantities = array();
+		foreach($this->Tickets() as $ticket){
+			$quantities[$ticket->ID] = $this->Attendees()
+										->filter("TicketID", $ticket->ID)
+										->count();
+		}
+		
+		return $quantities;
 	}
 
 	/**
