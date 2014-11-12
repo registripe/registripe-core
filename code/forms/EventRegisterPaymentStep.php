@@ -6,7 +6,7 @@
  *
  * @package silverstripe-eventmanagement
  */
-class EventRegisterPaymentStep extends MultiFormStep {
+class EventRegisterPaymentStep extends EventRegistrationStep {
 
 	public static $is_final_step = true;
 
@@ -21,10 +21,8 @@ class EventRegisterPaymentStep extends MultiFormStep {
 	 */
 	public function loadData() {
 		$data    = parent::loadData();
-		$tickets = $this->getForm()->getSavedStepByClass('EventRegisterTicketsStep');
-
-		$tickets = $tickets->loadData();
-		$data['Tickets'] = $tickets['Tickets'];
+		$registration = $this->form->getSession()->getRegistration();
+		$data['Tickets'] = $registration->getTicketQuantities();
 
 		return $data;
 	}
@@ -34,14 +32,13 @@ class EventRegisterPaymentStep extends MultiFormStep {
 			'Please install the Omnipay module to accept event payments.'
 		);
 
-		$tickets = $this->getForm()->getController()->getEvent()->Tickets();
-		$session  = $this->getForm()->getSession();
-
-		$total  = $this->form->getSession()->getRegistration()->Total;
+		$tickets = $this->getEvent()->Tickets();
+		$registration  = $this->getRegistration();
+		$total  = $registration->Total;
 
 		$table = new EventRegistrationTicketsTableField('Tickets', $tickets);
 		$table->setReadonly(true);
-		$table->setExcludedRegistrationId($session->RegistrationID);
+		$table->setExcludedRegistrationId($registration->ID);
 		$table->setShowUnavailableTickets(false);
 		$table->setShowUnselectedTickets(false);
 		$table->setTotal($total);
@@ -95,7 +92,7 @@ class EventRegisterPaymentStep extends MultiFormStep {
 		//use first gateway on list
 		$gateway = key($gateways);
 
-		$registration = $this->form->getSession()->getRegistration();
+		$registration = $this->getRegistration();
 
 		//complete registration if registration is already valid
 		if($registration->Status == 'Valid'){

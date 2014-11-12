@@ -23,6 +23,7 @@ class EventRegisterFormSession extends MultiFormSession {
 	}
 
 	/**
+	 * Find ore make the registration associated with this form session.
 	 * @return EventRegistration
 	 */
 	public function getRegistration() {
@@ -45,12 +46,14 @@ class EventRegisterFormSession extends MultiFormSession {
 		if (!$this->form->getController()->getEvent()->RegistrationTimeLimit) {
 			return;
 		}
-		$isInDb     = $this->getRegistration()->isInDB();
-		$hasTickets = (bool) count($this->getRegistration()->Tickets());
-		if ($isInDb || $hasTickets) {
+		$isInDb = $this->getRegistration()->isInDB();
+		$hasAttendees = $this->getRegistration()->Attendees()->exists();
+		if ($isInDb || $hasAttendees) {
 			$this->getRegistration()->write();
 		}
-		$this->RegistrationID = $this->getRegistration()->ID;
+		if($this->registration) {
+			$this->RegistrationID = $this->registration->ID;
+		}
 	}
 
 }

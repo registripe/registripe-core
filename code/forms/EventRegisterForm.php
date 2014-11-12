@@ -8,7 +8,8 @@
  */
 class EventRegisterForm extends MultiForm {
 
-	public static $start_step = 'EventRegisterTicketsStep';
+	//public static $start_step = 'EventRegisterTicketsStep';
+	public static $start_step = 'EventRegistrationDetailsStep';
 
 	public function __construct($controller, $name) {
 		$this->controller = $controller;
@@ -16,7 +17,14 @@ class EventRegisterForm extends MultiForm {
 
 		parent::__construct($controller, $name);
 
-		if ($expires = $this->getExpiryDateTime()) {
+		if ($expiryfield = $this->getExpiryField()) {
+			$this->fields->insertAfter($expiryfield, 'Tickets');
+		}
+
+	}
+
+	protected function getExpiryField(){
+		if($expires = $this->getExpiryDateTime()){
 			Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
 			Requirements::add_i18n_javascript('eventmanagement/javascript/lang');
 			Requirements::javascript('eventmanagement/javascript/EventRegisterForm.js');
@@ -41,8 +49,6 @@ class EventRegisterForm extends MultiForm {
 			$field = new LiteralField('CompleteRegistrationWithin', sprintf(
 				"<p id=\"complete-registration-within\">$message</p>",
 				$expires->TimeDiff(), $remaining));
-
-			$this->fields->insertAfter($field, 'Tickets');
 		}
 	}
 
@@ -239,6 +245,13 @@ class EventRegisterForm extends MultiForm {
 				$_SERVER['REQUEST_URI'],
 				'?MultiFormSessionID='. $this->session->Hash
 			));
+		}
+	}
+
+	public function add($data, $form){
+		$currentStep = $this->getCurrentStep();
+		if($currentStep && method_exists($currentStep, "add")){
+			$currentStep->add($data);
 		}
 	}
 

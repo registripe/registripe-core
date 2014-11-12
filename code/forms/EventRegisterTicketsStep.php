@@ -5,7 +5,7 @@
  *
  * @package silverstripe-eventmanagement
  */
-class EventRegisterTicketsStep extends MultiFormStep {
+class EventRegisterTicketsStep extends EventRegistrationStep {
 
 	private static $create_member = false;
 
@@ -19,9 +19,8 @@ class EventRegisterTicketsStep extends MultiFormStep {
 	public function getNextStep() {
 		if ($this->getTotal()->getAmount() > 0) {
 			return 'EventRegisterPaymentStep';
-		} else {
-			return 'EventRegisterFreeConfirmationStep';
 		}
+		return 'EventRegisterFreeConfirmationStep';
 	}
 
 	public function loadData() {

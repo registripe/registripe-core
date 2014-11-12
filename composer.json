@@ -11,11 +11,12 @@
 		}
 	],
 	"require": {
-		"ajshort/silverstripe-gridfieldextensions": "dev-master",
-		"silverstripe/cms": ">=3.1",
 		"silverstripe/framework": ">=3.1",
-		"silverstripe/multiform": "~1.1",
-		"unclecheese/eventcalendar": "dev-master"
+		"silverstripe/cms": ">=3.1",
+		"unclecheese/eventcalendar": "dev-master",
+		"ajshort/silverstripe-gridfieldextensions": "dev-master",
+		"webbuilders-group/silverstripe-frontendgridfield": "dev-master",
+		"silverstripe/multiform": "~1.1"
 	},
 	"suggest": {
 		"silverstripe/queuedjobs": "Allows sending out event reminder emails",

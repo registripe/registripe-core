@@ -5,7 +5,7 @@
  *
  * @package silverstripe-eventmanagement
  */
-class EventRegisterFreeConfirmationStep extends MultiFormStep {
+class EventRegisterFreeConfirmationStep extends EventRegistrationStep {
 
 	public static $is_final_step = true;
 
@@ -22,19 +22,21 @@ class EventRegisterFreeConfirmationStep extends MultiFormStep {
 		$data    = parent::loadData();
 		$tickets = $this->getForm()->getSavedStepByClass('EventRegisterTicketsStep');
 
-		$tickets = $tickets->loadData();
-		$data['Tickets'] = $tickets['Tickets'];
+		if($tickets) {
+			$tickets = $tickets->loadData();
+			$data['Tickets'] = $tickets['Tickets'];
+		}
 
 		return $data;
 	}
 
 	public function getFields() {
-		$datetime = $this->getForm()->getController()->getDateTime();
+		$tickets = $this->getForm()->getController()->getEvent()->Tickets();
 		$session  = $this->getForm()->getSession();
 		$tickets  = $this->getForm()->getSavedStepByClass('EventRegisterTicketsStep');
-		$total    = $tickets->getTotal();
+		$total    = 0;
 
-		$table = new EventRegistrationTicketsTableField('Tickets', $datetime);
+		$table = new EventRegistrationTicketsTableField('Tickets', $tickets);
 		$table->setReadonly(true);
 		$table->setExcludedRegistrationId($session->RegistrationID);
 		$table->setShowUnavailableTickets(false);
@@ -64,8 +66,8 @@ class EventRegisterFreeConfirmationStep extends MultiFormStep {
 	 */
 	public function validateStep($data, $form) {
 		$form         = $this->getForm();
-		$datetime     = $form->getController()->getDateTime();
-		$confirmation = $datetime->Event()->RegEmailConfirm;
+		$event     = $form->getController()->getEvent();
+		$confirmation = $event->RegEmailConfirm;
 		$registration = $this->getForm()->getSession()->getRegistration();
 
 		// If we require email validation for free registrations, then send
@@ -75,7 +77,7 @@ class EventRegisterFreeConfirmationStep extends MultiFormStep {
 			$email   = new Email();
 			$config  = SiteConfig::current_site_config();
 
-			$registration->TimeID = $datetime->ID;
+			$registration->EventID = $event->ID;
 			$registration->Status = 'Unconfirmed';
 			$registration->write();
 
@@ -95,13 +97,13 @@ class EventRegisterFreeConfirmationStep extends MultiFormStep {
 			);
 
 			$regLink = Controller::join_links(
-				$datetime->Event()->Link(), 'registration', $registration->ID,
+				$event->Link(), 'registration', $registration->ID,
 				'?token=' . $registration->Token
 			);
 
 			$email->setTo($details['Email']);
 			$email->setSubject(sprintf(
-				'Confirm Registration For %s (%s)', $datetime->EventTitle(), $config->Title
+				'Confirm Registration For %s (%s)', $event->Title(), $config->Title
 			));
 
 			$email->setTemplate('EventRegistrationConfirmationEmail');
@@ -109,7 +111,7 @@ class EventRegisterFreeConfirmationStep extends MultiFormStep {
 				'Name'         => $details['Name'],
 				'Registration' => $registration,
 				'RegLink'      => $regLink,
-				'Time'         => $datetime,
+				//'Time'         => $datetime,
 				'SiteConfig'   => $config,
 				'ConfirmLink'  => Director::absoluteURL($link)
 			));
@@ -118,7 +120,7 @@ class EventRegisterFreeConfirmationStep extends MultiFormStep {
 
 			Session::set(
 				"EventRegistration.{$registration->ID}.message",
-				$datetime->Event()->EmailConfirmMessage
+				$event->EmailConfirmMessage
 			);
 		} else {
 			$registration->Status = 'Valid';
