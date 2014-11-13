@@ -21,7 +21,7 @@ class EventRegisterPaymentStep extends EventRegistrationStep {
 	 */
 	public function loadData() {
 		$data    = parent::loadData();
-		$registration = $this->form->getSession()->getRegistration();
+		$registration = $this->getRegistration();
 		$data['Tickets'] = $registration->getTicketQuantities();
 
 		return $data;
@@ -40,7 +40,7 @@ class EventRegisterPaymentStep extends EventRegistrationStep {
 		$table->setExcludedRegistrationId($registration->ID);
 		$table->setShowUnavailableTickets(false);
 		$table->setShowUnselectedTickets(false);
-		$table->setTotal($this->getTotalCost());
+		$table->setTotal($this->form->getSession()->getTotalCost());
 
 		$group = FieldGroup::create('Tickets',
 				new LiteralField('ConfirmTicketsNote',

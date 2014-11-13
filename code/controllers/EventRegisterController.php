@@ -94,8 +94,11 @@ class EventRegisterController extends Page_Controller {
 	 * @return EventRegisterForm
 	 */
 	public function RegisterForm() {
-		$form = new EventRegisterForm($this, 'RegisterForm');
-		$this->extend('updateEventRegisterForm', $form);
+		static $form; //only build the form once
+		if(!$form){
+			$form = new EventRegisterForm($this, 'RegisterForm');
+			$this->extend('updateEventRegisterForm', $form);
+		}
 
 		return $form;
 	}

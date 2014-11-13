@@ -97,10 +97,10 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 		if(!$registration || !$registration->Attendees()->exists()){
 			return 'EventRegistrationStep';
 		}
-
-		if ($this->getTotalCost($registration)->Amount > 0) {
+		if ($this->form->getSession()->getTotalCost()->Amount > 0) {
 			return 'EventRegisterPaymentStep';
 		}
+
 		return 'EventRegisterFreeConfirmationStep';
 	}
 
@@ -137,4 +137,3 @@ class FrontEndGridFieldConfig_SimpleEditor extends GridFieldConfig{
     }
 
 }
-

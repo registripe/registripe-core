@@ -53,4 +53,19 @@ class EventRegisterFormSession extends MultiFormSession {
 		}
 	}
 
+	public function getTotalCost() {
+		static $cost;
+		//calculate once
+		if($cost === null){
+			$calculator = Injector::inst()->get("EventRegistrationCostCalculator", true,  array($this->getRegistration()));	
+			$cost = DBField::create_field('Money', array(
+				'Amount'   => $calculator->calculate(),
+				'Currency' => $this->getRegistration()->Tickets()->first()->PriceCurrency
+			));
+		}
+
+		return $cost;
+	}
+
+
 }
