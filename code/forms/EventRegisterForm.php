@@ -46,7 +46,7 @@ class EventRegisterForm extends MultiForm {
 			);
 
 			return new LiteralField('CompleteRegistrationWithin', sprintf(
-				"<p id=\"complete-registration-within\">$message</p>",
+				"<p id=\"complete-registration-within\" class=\"message warning\">$message</p>",
 				$expires->TimeDiff(), $remaining));
 		}
 	}
