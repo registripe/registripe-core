@@ -43,9 +43,6 @@ class EventRegisterFormSession extends MultiFormSession {
 
 	public function onBeforeWrite() {
 		parent::onBeforeWrite();
-		if (!$this->form->getController()->getEvent()->RegistrationTimeLimit) {
-			return;
-		}
 		$isInDb = $this->getRegistration()->isInDB();
 		$hasAttendees = $this->getRegistration()->Attendees()->exists();
 		if ($isInDb || $hasAttendees) {
