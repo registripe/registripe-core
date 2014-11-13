@@ -188,6 +188,14 @@ class EventTicket extends DataObject {
 	}
 
 	/**
+	 * Check if this ticket has a price
+	 * @return boolean
+	 */
+	public function hasPrice(){
+		return $this->Type == "Price" && $this->obj('Price')->getAmount() > 0;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function Summary() {

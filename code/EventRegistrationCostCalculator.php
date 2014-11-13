@@ -8,23 +8,23 @@ class EventRegistrationCostCalculator{
 		$this->registration = $registration;
 	}
 
-	public function calculate(){
-		$amount = 0;
-		$currency = "";
-		$tickets = $this->registration->getTicketQuantities();
-		if ($tickets) {
-			foreach ($tickets as $id => $quantity) {
-				$ticket = EventTicket::get()->byID($id);
-				$price  = $ticket->obj('Price');
-				if ($ticket->Type == 'Free' || !$quantity) {
-					continue;
-				}
-				$amount  += $price->getAmount() * $quantity;
-				$currency = $price->getCurrency();
-			}
+	public function calculate() {
+		$cost = 0;
+		foreach($this->registration->Attendees() as $attendee) {
+			$cost += $this->calculateAttendeeCost($attendee);
 		}
 
-		return $amount;
+		return $cost;
+	}
+
+	protected function calculateAttendeeCost(EventAttendee $attendee) {
+		$cost = 0;
+		$ticket = $attendee->Ticket();
+		if($ticket->hasPrice()){
+			$cost += $ticket->obj('Price')->getAmount();
+		}
+
+		return $cost;
 	}
 
 }
