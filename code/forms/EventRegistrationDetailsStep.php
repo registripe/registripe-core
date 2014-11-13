@@ -13,9 +13,10 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 
 		$registration = $this->getRegistration();
 		if($registration->isInDB()){
+			Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
 			$fields->push(
 				new FrontEndGridField("Attendees", "Attendees", $registration->Attendees(),
-					$editorconfig = new FrontEndGridFieldConfig_RecordEditor()
+					$editorconfig = new FrontEndGridFieldConfig_SimpleEditor()
 				)
 			);
 			$attendeefields = singleton('EventAttendee')->getFrontEndFields();
@@ -26,6 +27,7 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 					$availabletickets->map('ID', 'Summary')->toArray()
 				)
 			);
+
 			$detailform = $editorconfig
 					->getComponentByType("FrontEndGridFieldDetailForm");
 			$detailform->setFields($attendeefields);
@@ -118,3 +120,21 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 	}
 
 }
+
+class FrontEndGridFieldConfig_SimpleEditor extends GridFieldConfig{
+
+    public function __construct($itemsPerPage=null) {
+        parent::__construct($itemsPerPage);
+
+        $this->addComponent(new GridFieldButtonRow('before'));
+		$this->addComponent(new GridFieldAddNewButton('buttons-before-left'));
+        $this->addComponent(new GridFieldTitleHeader());
+        $this->addComponent(new GridFieldDataColumns());
+        $this->addComponent(new GridFieldEditButton());
+		$this->addComponent(new GridFieldDeleteAction());
+		$this->addComponent(new GridFieldFooter(null, false));
+		$this->addComponent(new FrontEndGridFieldDetailForm());
+    }
+
+}
+
