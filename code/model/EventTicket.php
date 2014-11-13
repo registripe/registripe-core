@@ -26,10 +26,6 @@ class EventTicket extends DataObject {
 		'Attendees' => 'EventAttendee'
 	);
 
-	private static $defaults = array(
-		'MinTickets' => 1
-	);
-
 	private static $summary_fields = array(
 		'Title'        => 'Title',
 		'StartSummary' => 'Sales Start',
