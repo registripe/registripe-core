@@ -40,7 +40,7 @@ class EventRegisterPaymentStep extends EventRegistrationStep {
 		$table->setExcludedRegistrationId($registration->ID);
 		$table->setShowUnavailableTickets(false);
 		$table->setShowUnselectedTickets(false);
-		$table->setTotal($this->form->getSession()->getTotalCost());
+		$table->setTotal($this->getTotalCost());
 
 		$group = FieldGroup::create('Tickets',
 				new LiteralField('ConfirmTicketsNote',
@@ -71,7 +71,6 @@ class EventRegisterPaymentStep extends EventRegistrationStep {
 		$gateways = GatewayInfo::get_supported_gateways();
 		//get first gateway in list
 		$validator = new RequiredFields(GatewayInfo::required_fields(key($gateways)));
-
 		$this->extend('updateValidator', $validator);
 
 		return $validator;
@@ -84,26 +83,25 @@ class EventRegisterPaymentStep extends EventRegistrationStep {
 		)."?MultiFormSessionID={$this->Session()->Hash}";
 	}
 
+	/**
+	 * @todo strip out payment logic from this validation function
+	 */
 	public function validateStep($data, $form) {
 		Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
-
 		$gateways = GatewayInfo::get_supported_gateways();
 		//use first gateway on list
 		$gateway = key($gateways);
-
 		$registration = $this->getRegistration();
 
 		//complete registration if registration is already valid
 		if($registration->Status == 'Valid'){
 			return true;
 		}
-
 		$total  = $this->getTotalCost();
-
 		$payment = $registration->Payment();
 		$paymentstatus = $form->getRequest()->getVar('payment');
+
 		//save payments that hve been captured
-		
 		if($payment->exists() && $paymentstatus){
 			if($paymentstatus == "success" && $payment->isComplete()){
 				if($payment->isCaptured()){
@@ -126,7 +124,6 @@ class EventRegisterPaymentStep extends EventRegistrationStep {
 		$payment = Payment::create()
 			->init($gateway, $total->getAmount(), $total->getCurrency());
 		$payment->write();
-		
 		$registration->PaymentID = $payment->ID;
 		$registration->write();
 

@@ -53,15 +53,24 @@ class EventRegisterFormSession extends MultiFormSession {
 		}
 	}
 
+	/**
+	 * Caclculate registration cost, and store in registration + cache.
+	 * @return Money cost
+	 */
 	public function getTotalCost() {
 		static $cost;
 		//calculate once
 		if($cost === null){
-			$calculator = Injector::inst()->get("EventRegistrationCostCalculator", true,  array($this->getRegistration()));	
-			$cost = DBField::create_field('Money', array(
-				'Amount'   => $calculator->calculate(),
-				'Currency' => $this->getRegistration()->Tickets()->first()->PriceCurrency
-			));
+			$registration = $this->getRegistration();
+			$calculator = Injector::inst()->get(
+				"EventRegistrationCostCalculator", true,  array($registration)
+			);
+			$amount = $calculator->calculate();
+			$currency = $registration->Tickets()->first()->PriceCurrency;
+			$total = $registration->obj('Total');
+			$total->setAmount($amount);
+			$total->setCurrency($currency);
+			$cost = $total;
 		}
 
 		return $cost;

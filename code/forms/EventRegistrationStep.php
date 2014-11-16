@@ -16,12 +16,16 @@ class EventRegistrationStep extends MultiFormStep{
 	 */
 	public function saveData($data) {
 		parent::saveData($data);
-		$total = $this->form->getSession()->getTotalCost();
+		$total = $this->getTotalCost();
 		if($this->updatemodel){
 			$this->registration->Total->setCurrency($total->getCurrency());
 			$this->registration->Total->setAmount($total->getAmount());
 		}
 		
+	}
+
+	public function getTotalCost() {
+		return $this->form->getSession()->getTotalCost();
 	}
 
 }

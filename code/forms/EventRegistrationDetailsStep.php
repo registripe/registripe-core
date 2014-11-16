@@ -97,7 +97,7 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 		if(!$registration || !$registration->Attendees()->exists()){
 			return 'EventRegistrationStep';
 		}
-		if ($this->form->getSession()->getTotalCost()->Amount > 0) {
+		if ($this->getTotalCost()->Amount > 0) {
 			return 'EventRegisterPaymentStep';
 		}
 
