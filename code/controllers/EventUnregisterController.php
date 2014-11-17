@@ -13,17 +13,17 @@ class EventUnregisterController extends Page_Controller {
 	);
 
 	protected $parent;
-	protected $time;
+	protected $event;
 
 	/**
 	 * Constructs a new controller for deleting a registration.
 	 *
 	 * @param Controller $parent
-	 * @param RegistrableDateTiem $time
+	 * @param RegistrableEvent $event
 	 */
-	public function __construct($parent, $time) {
+	public function __construct($parent, $event) {
 		$this->parent = $parent;
-		$this->time   = $time;
+		$this->event   = $event;
 
 		parent::__construct($parent->data());
 	}
@@ -50,7 +50,7 @@ class EventUnregisterController extends Page_Controller {
 	 * @param Form  $form
 	 */
 	public function doUnregister($data, $form) {
-		$regos = $this->time->Registrations()->filter('Email', $data['Email']);
+		$regos = $this->event->Registrations()->filter('Email', $data['Email']);
 
 		if (!$regos || !count($regos)) {
 			$form->sessionMessage(_t(
@@ -60,7 +60,7 @@ class EventUnregisterController extends Page_Controller {
 			return $this->redirectBack();
 		}
 
-		if ($this->time->Event()->UnRegEmailConfirm) {
+		if ($this->event->UnRegEmailConfirm) {
 			$addr         = $data['Email'];
 			$email        = new Email();
 			$registration = $regos->First();
@@ -68,12 +68,12 @@ class EventUnregisterController extends Page_Controller {
 			$email->setTo($addr);
 			$email->setSubject(sprintf(
 				_t('EventManagement.CONFIRMUNREGFOR', 'Confirm Un-Registration For %s (%s)'),
-				$this->time->Event()->Title, SiteConfig::current_site_config()->Title));
+				$this->event->Title, SiteConfig::current_site_config()->Title));
 
 			$email->setTemplate('EventUnregistrationConfirmationEmail');
 			$email->populateTemplate(array(
 				'Registration' => $registration,
-				'Time'         => $this->time,
+				'Event'         => $this->event,
 				'SiteConfig'   => SiteConfig::current_site_config(),
 				'ConfirmLink'  => Director::absoluteURL(Controller::join_links(
 					$this->Link(), 'confirm',
@@ -96,8 +96,8 @@ class EventUnregisterController extends Page_Controller {
 	 */
 	public function afterunregistration() {
 		return array(
-			'Title'   => $this->time->Event()->AfterUnregTitle,
-			'Content' => $this->time->Event()->obj('AfterUnregContent')
+			'Title'   => $this->event->AfterUnregTitle,
+			'Content' => $this->event->obj('AfterUnregContent')
 		);
 	}
 
@@ -109,29 +109,28 @@ class EventUnregisterController extends Page_Controller {
 		$token = $request->getVar('token');
 
 		// Attempt to get at least one registration with the email and token,
-		// and if we do then delete all the other ones as well.
-		$first = DataObject::get_one('EventRegistration', sprintf(
-			'"Email" = \'%s\' AND "Token" = \'%s\'',
-			Convert::raw2sql($email), Convert::raw2sql($token)
-		));
+		// and if we do then cancel all the other ones as well.
+		$registration = EventRegistration::get()
+					->filter("Email", $email)
+					->filter("Token", $token)
+					->first();
 
-		if (!$first) {
+		if (!$registration) {
 			return $this->httpError(404);
 		}
 
-		// Now delete all registrations with the same email.
-		$regos = DataObject::get('EventRegistration', sprintf(
-			'"Email" = \'%s\'', Convert::raw2sql($email)
-		));
-
+		// Now cancel all registrations with the same email.
+		$regos = EventRegistration::get()
+					->filter("Email", $email)
+					->filter("ID:not", $registration->ID);
 		foreach ($regos as $rego) {
 			$rego->Status = 'Canceled';
 			$rego->write();
 		}
 
 		return array(
-			'Title'   => $this->time->Event()->AfterConfUnregTitle,
-			'Content' => $this->time->Event()->obj('AfterConfUnregContent')
+			'Title'   => $this->event->AfterConfUnregTitle,
+			'Content' => $this->event->obj('AfterConfUnregContent')
 		);
 	}
 
