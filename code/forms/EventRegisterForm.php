@@ -70,30 +70,27 @@ class EventRegisterForm extends MultiForm {
 	 */
 	public function finish($data, $form) {
 		$result = parent::finish($data, $form);
-
 		// support validation of the parent
 		if($result === false) {
+
 			return;
 		}
-
 		$registration = $this->session->getRegistration();
-		if(!$tickets || !isset($tickets['tickets'])) {
-			$validate = $registration->getTicketQuantities();
-		} else {
-			$validate = $tickets['Tickets'];
-		}
+		$tickets = $registration->getTicketQuantities();
 
 		// Check that the requested tickets are still available.
-		if (!$this->validateTickets($validate, $form)) {
+		if (!$this->validateTickets($tickets, $form)) {
 			Session::set("FormInfo.{$form->FormName()}.data", $form->getData());
+
 			return $this->controller->redirectBack();
 		}
-
 		$this->session->delete();
 
 		// If the registrations is already valid, then send a details email.
 		if ($registration->Status == 'Valid') {
-			$this->emailRegistration($registration);
+			$mailer = new EventRegistrationEmailer($registration);
+			$mailer->sendConfirmation();
+			$mailer->notifyAdmin();
 		}
 
 		$this->extend('onRegistrationComplete', $registration);
@@ -104,35 +101,6 @@ class EventRegisterForm extends MultiForm {
 			$registration->ID,
 			'?token=' . $registration->Token
 		));
-	}
-
-	protected function emailRegistration($registration){
-		$email = EventRegistrationDetailsEmail::factory($registration);
-		$this->attachTicketFile($email, $registration);
-		$email->send();
-		$adminemail = EventRegistration::config()->admin_notification_email;
-		if($adminemail){
-			$email = EventAdminNotificationEmail::factory($registration);
-			$email->setTo($adminemail);
-			$email->send();
-		}
-	}
-
-	/**
-	 * Attach a ticket file, if it exists
-	 */
-	protected function attachTicketFile($email, $registration){
-		if ($generator = $registration->Event()->TicketGenerator) {
-			$generator = new $generator();
-
-			$path = $generator->generateTicketFileFor($registration);
-			$name = $generator->getTicketFilenameFor($registration);
-			$mime = $generator->getTicketMimeTypeFor($registration);
-
-			if ($path) {
-				$email->attachFile($path, $name, $mime);
-			}
-		}
 	}
 
 	/**
