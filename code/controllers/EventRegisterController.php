@@ -129,7 +129,7 @@ class EventRegisterController extends Page_Controller {
 		$id    = $request->param('ID');
 		$token = $request->getVar('token');
 
-		if (!$rego = DataObject::get_by_id('EventRegistration', $id)) {
+		if (!$rego = EventRegistration::get()->byID($id)) {
 			return $this->httpError(404);
 		}
 		if ($rego->Token != $token) {

@@ -19,7 +19,7 @@ class EventRegistrationDetailsController extends Page_Controller {
 	protected $registration;
 	protected $message;
 
-	public function __construct($parent, $registration) {
+	public function __construct(Controller $parent, EventRegistration $registration) {
 		$this->parent       = $parent;
 		$this->registration = $registration;
 

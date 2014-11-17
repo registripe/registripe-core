@@ -13,7 +13,6 @@ class EventRegistrationDetailsStep extends EventRegistrationStep {
 
 		$registration = $this->getRegistration();
 		if($registration->isInDB()){
-			Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
 			$fields->push(
 				new FrontEndGridField("Attendees", "Attendees", $registration->Attendees(),
 					$editorconfig = new FrontEndGridFieldConfig_SimpleEditor()

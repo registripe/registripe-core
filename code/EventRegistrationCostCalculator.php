@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Calculate the cost of a given registration
+ * 
+ * @package silverstripe-eventmanagement
+ */
 class EventRegistrationCostCalculator{
 
 	protected $registration;
