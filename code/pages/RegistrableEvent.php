@@ -174,18 +174,27 @@ class RegistrableEvent extends CalendarEvent {
 			));
 		}
 
-		$attendees = EventAttendee::get()
-			->innerJoin("EventRegistration", "EventAttendee.RegistrationID = EventRegistration.ID")
-			->filter("EventRegistration.EventID", $this->ID);
-
 		//attendees
-		$fields->addFieldToTab("Root.Attendees",
-			new GridField("Attendees", "Attendees", $attendees)
-		);
+		if($attendeesfield = $this->getAttendeesGridField()) {
+			$fields->addFieldToTab("Root.Attendees", $attendeesfield);
+		}
 
 		$this->extend('updateCMSFields',$fields);
 
 		return $fields;
+	}
+
+	protected function getAttendeesGridField() {
+		$attendees = $this->getValidAttendees();
+		$config = new GridFieldConfig_RecordViewer();
+		$exportcolumns = EventAttendee::config()->export_fields;
+		$config->addComponents(
+			new GridFieldButtonRow('after'),
+			new GridFieldPrintButton('buttons-after-left'),
+			new GridFieldExportButton('buttons-after-left')
+		);
+
+		return new GridField("Attendees", "Attendees", $attendees, $config);			
 	}
 
 	public function getSettingsFields() {
@@ -281,6 +290,13 @@ class RegistrableEvent extends CalendarEvent {
 			->filter("Status","Valid");
 	}
 
+	public function getValidAttendees() {
+		return EventAttendee::get()
+			->innerJoin("EventRegistration", "\"EventAttendee\".\"RegistrationID\" = \"EventRegistration\".\"ID\"")
+			->filter("EventRegistration.Status", "Valid")
+			->filter("EventRegistration.EventID", $this->ID);
+	}
+
 	public function validate() {
 		$result   = parent::validate();
 		$currency = null;
@@ -296,7 +312,6 @@ class RegistrableEvent extends CalendarEvent {
 		foreach ($this->Tickets() as $ticket) {
 			if ($ticket->Type == 'Price') {
 				$ticketCurr = $ticket->Price->getCurrency();
-
 				if ($ticketCurr && $currency && $ticketCurr != $currency) {
 					$result->error(sprintf(
 						'You cannot attach tickets with different currencies '
@@ -304,7 +319,6 @@ class RegistrableEvent extends CalendarEvent {
 						$currency, $ticketCurr));
 					return $result;
 				}
-
 				$currency = $ticketCurr;
 			}
 		}
@@ -325,7 +339,7 @@ class RegistrableEvent extends CalendarEvent {
 		}
 		$bookings = $this->Registrations()->filter("Status:not", "Canceled");
 		if ($excludeId) {
-			$bookings = $bookings->where('"EventRegistration"."ID" != '.$excludeId);
+			$bookings = $bookings->filter("ID:not", $excludeId);
 		}
 		$taken = $bookings->sum("Quantity");
 		if($this->Capacity >= $taken){
