@@ -74,6 +74,14 @@ class EventRegistration extends DataObject {
 		return $this->Name;
 	}
 
+	public function getRegistrant() {
+		return sprintf(
+			_t("EventRegistration.REGISTRANT", "%s (%s)"),
+			$this->Name,
+			$this->Email
+		);
+	}
+
 	/**
 	 * @return int
 	 */
