@@ -20,17 +20,20 @@ class EventAttendee extends DataObject{
 	public static $default_sort = "Surname ASC, FirstName ASC";
 
 	private static $summary_fields = array(
-	 	'FirstName' => 'First Name',
-	 	'Surname' => 'Last Name',
-	 	'Email' => 'Email',
-	 	'Ticket.Summary' => 'Ticket'
-	 );
+		'FirstName' => 'First Name',
+		'Surname' => 'Last Name',
+		'Email' => 'Email',
+		'Ticket.Summary' => 'Ticket'
+	);
 
-	//TODO:: test me, or perhaps only failover certian fields
-	public function __construct($record = null, $isSingleton = false, $model = null) {
-		parent::__construct($record, $isSingleton, $model);
-		$this->failover = $this->Member();
-	}
+	private static $export_fields = array(
+		'FirstName' => 'First Name',
+		'Surname' => 'Last Name',
+		'Email' => 'Email',
+		'Ticket.Title' => 'Ticket',
+		'Ticket.Price.Nice' => 'Price',
+		'Registration.Registrant' => 'Registrant'
+	);
 
 	public function getFrontEndFields($params = null) {
 		$fields = parent::getFrontEndFields();
