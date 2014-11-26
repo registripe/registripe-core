@@ -8,7 +8,8 @@ class EventAttendee extends DataObject{
 	private static $db = array(
 		'FirstName' => 'Varchar',
 		'Surname' => 'Varchar',
-		'Email' => 'Varchar(256)'
+		'Email' => 'Varchar(256)',
+		'Cost' => 'Currency'
 	);
 
 	public static $has_one = array(
@@ -38,7 +39,7 @@ class EventAttendee extends DataObject{
 	public function getFrontEndFields($params = null) {
 		$fields = parent::getFrontEndFields();
 		$fields->removeByName(array(
-			'RegistrationID', 'TicketID', 'MemberID'
+			'RegistrationID', 'MemberID', 'Cost'
 		));
 
 		return $fields;

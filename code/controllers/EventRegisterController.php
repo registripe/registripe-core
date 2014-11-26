@@ -7,17 +7,17 @@
  */
 class EventRegisterController extends Page_Controller {
 
-	public static $url_handlers = array(
-		'' => 'index'
-	);
-
 	public static $allowed_actions = array(
-		'RegisterForm',
-		'confirm'
+		'attendee',
+		'review',
+		'ReviewForm',
+		'payment',
+		'complete'
 	);
 
 	protected $parent;
 	protected $event;
+	protected $registration;
 
 	/**
 	 * Constructs a new controller for creating a registration.
@@ -38,39 +38,178 @@ class EventRegisterController extends Page_Controller {
 				'default' => 'Please log in to register for this event.'
 			));
 		}
-		if($this->checkRegistrationExpired()){
-			return $this->redirect($this->Link());
-		}
 	}
 
+	/**
+	 * Select ticket step
+	 */
 	public function index() {
 		$exclude  = null;
-		// If we have a current multiform ID, then exclude the linked
-		// registration from the capacity calculation.
-		if (isset($_GET['MultiFormSessionID'])) {
-			$exclude = $this->RegisterForm()->getSession()->RegistrationID;
-		}
 		if (!$this->event->canRegister()) {
 			$data = array(
 				'Content' => '<p>This event cannot be registered for.</p>'
 			);
-		} elseif ($this->event->getRemainingCapacity($exclude)) {
-			$data = array(
-				'Title' => 'Register For ' . $this->event->Title,
-				'Form'  => $this->RegisterForm(),
-				'Content' => ''
-			);
-		} else {
+		} elseif (!$this->event->getRemainingCapacity($exclude)) {
 			$data = array(
 				'Title'   => $this->event->Title . ' Is Full',
 				'SoldOut' => true,
 				'Content' => '<p>There are no more places available at this event.</p>'
 			);
-		}
+		} else {
+			$content = $this->event->renderWith("EventTicketSelector");
+			$registration = $this->getCurrentRegistration();
 
+			if($registration->Attendees()->exists()){
+				$link = $this->Link("review");
+				$content .= "<a href=\"$link\">Back to review</a>";
+			}
+
+			$data = array(
+				'Title' => 'Register For ' . $this->event->Title,
+				'Form'  => '',
+				'Content' => $content
+			);
+		}
 		$data['Event'] = $this->event;
 
 		return $this->getViewer('index')->process($this->customise($data));
+	}
+
+	/**
+	 * Create/edit attendee step
+	 */
+	public function attendee() {
+		$registration = $this->getCurrentRegistration();
+		$nexturl = $this->Link('review');
+		$backurl = $this->canReview() ?	$nexturl : $this->Link();
+		$record = new Page(array(
+			'ID' => -1,
+			'Title' => $this->Title,
+			'ParentID' => $this->ID,
+			'URLSegment' => 'register/attendee',
+			'BackURL' => $backurl,
+			'NextURL' => $this->Link('review')
+		));
+
+		return new EventAttendeeController($record, $registration);
+	}
+
+	/**
+	 * Review step
+	 */
+	public function review() {
+		if(!$this->canReview()){
+			return $this->redirect($this->Link());
+		}
+		$registration = $this->getCurrentRegistration()
+			->customise(array(
+				'EditLink' => $this->Link('attendee/edit'),
+				'DeleteLink' => $this->Link('attendee/delete')
+			))->renderWith("AttendeesReviewTable");
+
+		return array(
+			'Title' => 'Review',
+			'Content' => $registration,
+			'Form' => $this->ReviewForm()
+		);
+	}
+
+
+	public function canReview(){
+		$registration = $this->getCurrentRegistration(false);
+		return $registration && $registration->Attendees()->exists();
+	}
+
+	public function ReviewForm() {
+		$registration = $this->getCurrentRegistration();
+		$fields = new FieldList(
+			new DropdownField("RegistrantAttendeeID", "You are",
+				$registration->Attendees()
+					->map()->toArray()
+			)
+		);
+		$actions = new FieldList(
+			new LiteralField(
+				"addticket",
+				sprintf("<a href=\"%s\">%s</a>",
+					$this->Link(),
+					"Add another ticket"
+				)
+				
+			),
+			$nextaction = new FormAction("submitreview", "Next Step")
+		);
+		if($registration->getTotalOutstanding() > 0){
+			$nextaction->setTitle("Make Payment");
+		}
+
+		$form = new Form($this, "ReviewForm", $fields, $actions);
+		return $form;
+	}
+
+	public function submitreview($data, $form) {
+		$registration = $this->getCurrentRegistration();
+		//save registrant
+		$registrantid = isset($data['RegistrantAttendeeID']) ? (int)$data['RegistrantAttendeeID'] : null;
+		if($registrantid && $attendee = $registration->Attendees()->byID($registrantid)) {
+			$registration->update(array(
+				'FirstName' => $attendee->FirstName,
+				'Surname' => $attendee->Surname,
+				'Email' => $attendee->Email
+			));
+		}
+		$form->saveInto($registration);
+		$registration->write();
+
+		//redirect to appropriate place, based on total cost
+		if($registration->canPay()){
+			return $this->redirect($this->Link('payment'));
+		}
+		return $this->redirect($this->Link('complete'));
+	}
+
+	public function payment() {
+		$registration = $this->getCurrentRegistration(false);
+		if(!$registration){
+			return $this->redirect($this->Link());
+		}
+		if(!$registration->canPay()){
+			return $this->redirect($this->Link('review'));
+		}
+
+		$nexturl = $this->Link('complete');
+
+		$record = new Page(array(
+			'ID' => -1,
+			'Title' => "Payment",
+			'ParentID' => $this->ID,
+			'URLSegment' => 'register/payment'
+		));
+		return new PaymentController($record, $registration, $registration->Total, $nexturl);
+	}
+
+	public function complete() {
+		$registration = $this->getCurrentRegistration(false);
+		if(!$registration){
+			return $this->redirect($this->Link());
+		}
+		if(!$registration->canSubmit()){
+			return $this->redirect($this->Link('review'));
+		}
+
+		//update registration status
+		$registration->Status = "Valid";
+		$registration->write();
+		//email registration
+		$mailer = new EventRegistrationEmailer($registration);
+		$mailer->sendConfirmation();
+		$mailer->notifyAdmin();
+		
+		//end session
+		$this->endRegistrationSession();
+		
+		//redirect to registration details
+		return $this->redirect($registration->Link());
 	}
 
 	/**
@@ -81,78 +220,51 @@ class EventRegisterController extends Page_Controller {
 	}
 
 	/**
+	 * Find or make the current regisratrion.
+	 * @return EventRegistration
+	 */
+	public function getCurrentRegistration($forcestart = true) {
+		$registration = $this->registration;
+		//look for regisration in session
+		if(!$registration){
+			$registration = EventRegistration::get()->byID(
+				Session::get("EventRegistration.".$this->event->ID)
+			);
+		}
+		//end any submitted registrations
+		if($registration && $registration->isSubmitted()){
+			$this->endRegistrationSession();
+			$registration = null;
+		}
+
+		//start a new registration
+		if(!$registration && $forcestart){
+			$registration = $this->startRegistrationSession();
+		}
+		$this->registration = $registration;
+		return $this->registration;
+	}
+
+	public function startRegistrationSession() {
+		$registration =  new EventRegistration();
+		$registration->EventID = $this->event->ID;
+		$registration->write();
+		Session::set("EventRegistration.".$this->event->ID, $registration->ID);
+		return $registration;
+	}
+
+	public function endRegistrationSession() {
+		Session::set("EventRegistration.".$this->event->ID, null);
+		Session::clear("EventRegistration.".$this->event->ID);
+	}
+
+	/**
 	 * @param  string $action
 	 * @return string
 	 */
 	public function Link($action = null) {
 		return Controller::join_links(
 			$this->parent->Link(), 'register', $action
-		);
-	}
-
-	/**
-	 * @return EventRegisterForm
-	 */
-	public function RegisterForm() {
-		static $form; //only build the form once
-		if(!$form){
-			$form = new EventRegisterForm($this, 'RegisterForm');
-			$this->extend('updateEventRegisterForm', $form);
-		}
-
-		return $form;
-	}
-
-	/**
-	 * Check if the current registration has expired.
-	 * @return boolean
-	 */
-	public function checkRegistrationExpired() {
-		$form   = $this->RegisterForm();
-		$expiry = $form->getExpiryDateTime();
-		if ($expiry && $expiry->InPast()) {
-			$form->getSession()->Registration()->delete();
-			$form->getSession()->delete();
-			$message = _t('EventManagement.REGSESSIONEXPIRED', 'Your'
-				. ' registration expired before it was completed. Please'
-				. ' try ordering your tickets again.');
-			$form->sessionMessage($message, 'bad');
-
-			return true;
-		}
-	}
-
-	/**
-	 * Handles a user clicking on a registration confirmation link in an email.
-	 */
-	public function confirm($request) {
-		$id    = $request->param('ID');
-		$token = $request->getVar('token');
-
-		if (!$rego = EventRegistration::get()->byID($id)) {
-			return $this->httpError(404);
-		}
-		if ($rego->Token != $token) {
-			return $this->httpError(403);
-		}
-		if ($rego->Status != 'Unconfirmed') {
-			return $this->redirect($rego->Link());
-		}
-		try {
-			$rego->Status = 'Valid';
-			$rego->write();
-
-			EventRegistrationDetailsEmail::factory($rego)->send();
-		} catch (ValidationException $e) {
-			return array(
-				'Title'   => 'Could Not Confirm Registration',
-				'Content' => '<p>' . $e->getResult()->message() . '</p>'
-			);
-		}
-
-		return array(
-			'Title'   => $this->event->AfterConfirmTitle,
-			'Content' => $this->event->obj('AfterConfirmContent')
 		);
 	}
 

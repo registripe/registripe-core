@@ -6,16 +6,18 @@
 	<dt>Status:</dt><dd>$Status</dd>
 </dl>
 
-<% if Tickets %>
-	<h3>Tickets</h3>
-	<% include EventTicketsTable %>
+<% if HasBasicDetails %>
+<%-- For cases where no attendee details are recorded, only ticket selections --%>
+	<% if $Tickets %>
+		<h3>Tickets</h3>
+		<% include EventTicketsTable %>
+	<% end_if %>
+<% else %>
+	<% if $Attendees %>
+		<h3>Attendees</h3>
+		<% include EventAttendeesTable %>
+	<% end_if %>
 <% end_if %>
-
-<% if ShowAttendeesList && $Attendees %>
-	<h3>Attendees</h3>
-	<% include EventAttendeesTable %>
-<% end_if %>
-
 
 <% if $Payment %>
 	<% with $Payment %>

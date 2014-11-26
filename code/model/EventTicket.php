@@ -129,6 +129,18 @@ class EventTicket extends DataObject {
 			->filter("Status:not", "Canceled");
 	}
 
+	public function isAvailable() {
+		$availability = $this->getAvailability();
+		return (bool)$availability['available'];
+	}
+
+	public function getAvailabilityReason(){
+		$availability = $this->getAvailability();
+		if(isset($availability['reason'])){
+			return $availability['reason'];
+		}
+	}
+
 	/**
 	 * Returns the number of tickets available for an event time.
 	 *

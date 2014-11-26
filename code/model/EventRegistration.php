@@ -7,16 +7,18 @@
 class EventRegistration extends DataObject {
 
 	private static $db = array(
-		'Name'   => 'Varchar(255)',
+		'FirstName'   => 'Varchar',
+		'Surname' => 'Varchar',
 		'Email'  => 'Varchar(255)',
-		'Status' => 'Enum("Unsubmitted, Unconfirmed, Valid, Canceled")',
-		'Total'  => 'Money',
+		'Status' => 'Enum("Unsubmitted, Unconfirmed, Valid, Canceled","Unsubmitted")',
+		'Total'  => 'Currency',
 		'Token'  => 'Varchar(40)'
 	);
 
 	private static $has_one = array(
 		'Event'   => 'RegistrableEvent',
-		'Member' => 'Member'
+		'Member' => 'Member',
+		'RegistrantAttendee' => 'EventAttendee'
 	);
 
 	private static $has_many = array(
@@ -27,6 +29,10 @@ class EventRegistration extends DataObject {
 		'Name'          => 'Name',
 		'Email'         => 'Email',
 		'TotalQuantity' => 'Places'
+	);
+
+	private static $extensions = array(
+		"Payable"
 	);
 
 	protected function onBeforeWrite() {
@@ -72,6 +78,14 @@ class EventRegistration extends DataObject {
 	 */
 	public function getTitle() {
 		return $this->Name;
+	}
+
+	/**
+	 * Get the full name of the registrant
+	 * @return [type] [description]
+	 */
+	public function getName() {
+		return ($this->Surname) ? trim($this->FirstName . ' ' . $this->Surname) : $this->FirstName;
 	}
 
 	public function getRegistrant() {
@@ -151,6 +165,38 @@ class EventRegistration extends DataObject {
 		}
 
 		return $this->Event()->Title.": ".implode(",", $parts);
+	}
+
+	public function calculateTotal(){
+		$calculator = Injector::inst()->get(
+			"EventRegistrationCostCalculator", true,  array($this)
+		);
+		$amount = $calculator->calculate();
+
+		return $this->Total = $amount;
+	}
+
+	public function getTotalOutstanding() {
+		$outstanding = $this->Total - $this->TotalPaid();
+		if($outstanding < 0){
+			$outstanding = 0;
+		}
+		return $outstanding;
+	}
+
+	public function isSubmitted() {
+		return ($this->Status != "Unsubmitted");
+	}
+
+	public function canPay() {
+		return !$this->isSubmitted() && ($this->getTotalOutstanding() > 0);
+	}
+
+	public function canSubmit() {
+		$hasattendees = $this->Attendees()->exists();
+		$hasoutstanding = $this->getTotalOutstanding() > 0;
+
+		return $hasattendees && !$hasoutstanding;
 	}
 
 	/**

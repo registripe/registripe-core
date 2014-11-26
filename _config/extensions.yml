@@ -4,6 +4,9 @@ name: eventmanagement
 Member:
   extensions:
     - EventRegisterMemberExtension
+Currency:
+  extensions:
+    - EventCurrencyExtension
 ---
 only:
   classexists: Payment

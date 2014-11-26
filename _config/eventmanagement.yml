@@ -4,3 +4,6 @@ name: eventmanagement#admin
 LeftAndMain:
   extra_requirements_javascript:
     - eventmanagement/javascript/cms.js
+Payment:
+  has_one:
+    EventRegistration: EventRegistration

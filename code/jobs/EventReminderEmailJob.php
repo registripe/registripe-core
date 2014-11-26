@@ -32,6 +32,7 @@ class EventReminderEmailJob extends AbstractQueuedJob {
 	        $this->emails     = $registrations->map('Email', 'Name');
 	        $this->totalSteps = count($this->emails);
 	}
+
 	public function process() {
 		$config   = SiteConfig::current_site_config();
 		$datetime = $this->getDatetime();
@@ -41,13 +42,11 @@ class EventReminderEmailJob extends AbstractQueuedJob {
 			$this->isComplete = true;
 			return;
 		}
-
 		$email = new Email();
 		$email->setSubject(sprintf(
 			_t('EventManagement.EVENTREMINDERSUBJECT', 'Event Reminder For %s (%s)'),
 			$datetime->EventTitle(), $config->Title
 		));
-
 		$email->setTemplate('EventReminderEmail');
 		$email->populateTemplate(array(
 			'SiteConfig' => $config,

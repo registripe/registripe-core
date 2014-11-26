@@ -363,7 +363,9 @@ class RegistrableEvent_Controller extends CalendarEvent_Controller {
 	 * @return EventRegisterController
 	 */
 	public function register() {
-		return new EventRegisterController($this, $this->dataRecord);
+		$record = $this->dataRecord;
+		$record->Content = "";
+		return new EventRegisterController($this, $record);
 	}
 
 	/**
