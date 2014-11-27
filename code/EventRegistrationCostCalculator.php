@@ -44,4 +44,10 @@ class EventRegistrationCostCalculator{
 		return $cost;
 	}
 
+	public function getDiscountableAttendees() {
+		return $this->registration->Attendees()
+			->innerJoin("EventTicket", "\"EventAttendee\".\"TicketID\" = \"EventTicket\".\"ID\"")
+			->where("PriceAmount > 0");
+	}
+
 }
