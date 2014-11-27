@@ -14,8 +14,8 @@
 				<td>$Ticket.Title</td>
 				<td>$Cost.Nicer</td>
 				<td>
-					<a href="$Up.EditLink/$ID" class="btn btn-primary">edit</a>
-					<a href="$Up.DeleteLink/$ID" class="btn btn-danger">remove</a>
+					<a href="$Up.EditLink/$ID" class="btn btn-primary btn-sm">edit</a>
+					<a href="$Up.DeleteLink/$ID" class="btn btn-danger btn-sm">remove</a>
 				</td>
 			</tr>
 		<% end_loop %>
