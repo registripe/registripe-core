@@ -24,7 +24,8 @@ class EventAttendee extends DataObject{
 		'FirstName' => 'First Name',
 		'Surname' => 'Last Name',
 		'Email' => 'Email',
-		'Ticket.Summary' => 'Ticket'
+		'Ticket.Title' => 'Ticket',
+		'Cost.Nicer' => 'Cost'
 	);
 
 	private static $export_fields = array(

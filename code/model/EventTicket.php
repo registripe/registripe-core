@@ -68,7 +68,6 @@ class EventTicket extends DataObject {
 			$dateTime->getDateField()->setConfig('showcalendar', true);
 			$dateTime->getTimeField()->setConfig('showdropdown', true);
 		}
-
 		$fields->addFieldsToTab('Root.Main', array(
 			new TextareaField('Description', 'Description'),
 			new HeaderField("Availability"),

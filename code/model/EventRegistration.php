@@ -28,7 +28,8 @@ class EventRegistration extends DataObject {
 	private static $summary_fields = array(
 		'Name'          => 'Name',
 		'Email'         => 'Email',
-		'TotalQuantity' => 'Places'
+		'TotalQuantity' => 'Places',
+		'Created.Nice' 		=> 'Date'
 	);
 
 	private static $extensions = array(
