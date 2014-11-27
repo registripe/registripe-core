@@ -114,7 +114,6 @@ class EventRegisterController extends Page_Controller {
 		);
 	}
 
-
 	public function canReview(){
 		$registration = $this->getCurrentRegistration(false);
 		return $registration && $registration->Attendees()->exists();
@@ -172,9 +171,6 @@ class EventRegisterController extends Page_Controller {
 		$registration = $this->getCurrentRegistration(false);
 		if(!$registration){
 			return $this->redirect($this->Link());
-		}
-		if(!$registration->canPay()){
-			return $this->redirect($this->Link('review'));
 		}
 
 		$nexturl = $this->Link('complete');
