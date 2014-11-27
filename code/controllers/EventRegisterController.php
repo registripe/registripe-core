@@ -56,14 +56,17 @@ class EventRegisterController extends Page_Controller {
 				'Content' => '<p>There are no more places available at this event.</p>'
 			);
 		} else {
-			$content = $this->event->renderWith("EventTicketSelector");
+			$tickets = $this->event->getAvailableTickets();
+			$data = new ArrayData(array(
+				'Tickets' => $tickets,
+				'Link' => $this->event->Link()
+			));
+			$content = $data->renderWith("EventTicketSelector");
 			$registration = $this->getCurrentRegistration();
-
 			if($registration->Attendees()->exists()){
 				$link = $this->Link("review");
 				$content .= "<a href=\"$link\">Back to review</a>";
 			}
-
 			$data = array(
 				'Title' => 'Register For ' . $this->event->Title,
 				'Form'  => '',
