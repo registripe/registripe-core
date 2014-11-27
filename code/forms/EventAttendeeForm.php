@@ -20,9 +20,14 @@ class EventAttendeeForm extends Form{
 		$actions = new FieldList(
 			new FormAction("save", "Next Step")
 		);
-		$validator = new EventAttendeeFormValidator(
-			"FirstName", "Surname", "Email", "TicketID"
-		);
+		//default required fields are configurable
+		$required = EventAttendee::config()->required_fields;
+		if(!$required){
+			$required = array("FirstName", "Surname", "Email");
+		}
+		 //ticket is always required
+		$required[] = "TicketID";
+		$validator = new RequiredFields($required);
 
 		parent::__construct($controller, $name, $fields, $actions, $validator);
 		$this->extend("updateForm", $this);
@@ -60,11 +65,5 @@ class EventAttendeeForm extends Form{
 			)
 		);
 	}
-
-}
-
-class EventAttendeeFormValidator extends RequiredFields{
-
-	
 
 }
