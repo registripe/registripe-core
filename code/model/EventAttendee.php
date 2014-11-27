@@ -42,6 +42,9 @@ class EventAttendee extends DataObject{
 		$fields->removeByName(array(
 			'RegistrationID', 'MemberID', 'Cost'
 		));
+		$fields->replaceField("Email",
+			EmailField::create("Email")
+		);
 
 		return $fields;
 	}
