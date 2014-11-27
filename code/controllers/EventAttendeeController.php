@@ -34,6 +34,14 @@ class EventAttendeeController extends Page_Controller{
 				$this->registration->Event()->getAvailableTickets()
 			);
 		}
+		//automatically populate from previous attendee
+		if($prepops = EventAttendee::config()->prepopulated_fields){
+			$latestattendee = $this->registration->Attendees()
+				->sort("LastEdited", "DESC")->first();
+			if($latestattendee){
+				$form->loadDataFrom($latestattendee, 0, $prepops);	
+			}
+		}
 
 		return array(
 			'Title' => $ticket ? $ticket->Title : null,
