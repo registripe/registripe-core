@@ -14,6 +14,7 @@ class PaymentController extends Page_Controller{
 	protected $amount;
 	protected $successurl;
 	protected $cancelurl;
+	protected $currency;
 
 	public function __construct($record, $payable, $amount, $successurl) {
 		parent::__construct($record);
@@ -80,21 +81,20 @@ class PaymentController extends Page_Controller{
 	}
 
 	public function select($data, $form) {
-		$currency = "NZD"; //TODO: move this
 		if(!GatewayInfo::is_supported($data['Gateway'])){
 			$form->addErrorMessage("Gateway", "Method is not supported", "bad");
 			return $this->redirectBack();
 		}
 		//create payment using gateway
-		$payment = $this->createPayment($data['Gateway'], $currency); 
+		$payment = $this->createPayment($data['Gateway']); 
 
 		//redirect to offsite gateway, if there are no fields to fill out
 		return $this->redirectBack();
 	}
 
-	protected function createPayment($gateway, $currency) {
+	protected function createPayment($gateway) {
 		$payment = Payment::create()
-					->init($gateway, $this->amount, $currency);
+					->init($gateway, $this->amount, $this->currency);
 		$this->payable->Payments()->add($payment);
 
 		return $payment;
@@ -105,31 +105,26 @@ class PaymentController extends Page_Controller{
 	 */
 	public function GatewayDataForm() {
 		$payment = $this->getCurrentPayment();
-
 		$factory = new GatewayFieldsFactory($payment->Gateway);
 		$fields = $factory->getFields();
-		//collect the required on-site data
-		//choose different gateway
-		//back to app?
 		$actions = new FieldList(
 			new FormAction("cancel", "Choose Different Method"),
 			new FormAction("pay", "Make Payment")
 			
 		);
 		$validator = new RequiredFields(
-			//GatewayInfo::required_fields($payment->Gateway)
-			//TODO: required fields
-				//but disable validation for cancel
+			GatewayInfo::required_fields($payment->Gateway)
+			//TODO: disable cancel validation
 		);
+
 		return new Form($this, "GatewayDataForm", $fields, $actions, $validator);
 	}
 
 	public function cancel($data, $form) {
 		$payment = $this->getCurrentPayment();
 		if($payment){
-			//TODO: store message / log
-			$payment->Status = $void;
-			$payment->write();
+			$response = PurchaseService::create($payment)
+				->cancelPurchase();
 		}
 		return $this->redirect($this->Link());
 	}
