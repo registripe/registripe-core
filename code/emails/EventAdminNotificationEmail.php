@@ -13,7 +13,6 @@ class EventAdminNotificationEmail extends Email {
 	public static function factory(EventRegistration $registration) {
 		$email      = new self();
 		$siteconfig = SiteConfig::current_site_config();
-		$email->setTo($to);
 		$email->setSubject(sprintf(
 			_t(
 				'EventAdminNotificationEmail.SUBJECT',
