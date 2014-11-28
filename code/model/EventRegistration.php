@@ -29,6 +29,7 @@ class EventRegistration extends DataObject {
 		'Name'          => 'Name',
 		'Email'         => 'Email',
 		'TotalQuantity' => 'Places',
+		'Total.Nicer' 		=> 'Total',
 		'Created.Nice' 		=> 'Date'
 	);
 
