@@ -33,7 +33,7 @@ class EventAttendee extends DataObject{
 		'Surname' => 'Last Name',
 		'Email' => 'Email',
 		'Ticket.Title' => 'Ticket',
-		'Ticket.Price.Nice' => 'Price',
+		'Cost' => 'Cost',
 		'Registration.Registrant' => 'Registrant'
 	);
 
