@@ -18,11 +18,11 @@
 		"silverstripe/framework": ">=3.1",
 		"silverstripe/cms": ">=3.1",
 		"unclecheese/eventcalendar": "dev-master",
-		"ajshort/silverstripe-gridfieldextensions": "dev-master"
+		"ajshort/silverstripe-gridfieldextensions": "dev-master",
+		"burnbright/silverstripe-omnipay": "Handle accepting payments for events"
 	},
 	"suggest": {
-		"silverstripe/queuedjobs": "Allows sending out event reminder emails",
-		"burnbright/silverstripe-omnipay": "Handle accepting payments for events"
+		"silverstripe/queuedjobs": "Allows sending out event reminder emails"
 	},
 	"extra": {
 		"installer-name": "eventmanagement"

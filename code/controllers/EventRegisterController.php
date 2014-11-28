@@ -176,15 +176,11 @@ class EventRegisterController extends Page_Controller {
 			return $this->redirect($this->Link());
 		}
 
-		$nexturl = $this->Link('complete');
-
-		$record = new Page(array(
-			'ID' => -1,
-			'Title' => "Payment",
-			'ParentID' => $this->ID,
-			'URLSegment' => 'register/payment'
-		));
-		return new PaymentController($record, $registration, $registration->Total, $nexturl);
+		$controller = new PaymentController($this, "payment", $registration, $registration->Total);
+		$controller->setSuccessURL($this->Link('complete'));
+		//hack the url segment until the parent controller of this works properly
+		$controller->data()->URLSegment = "register/payment";
+		return $controller;
 	}
 
 	public function complete() {
@@ -220,6 +216,7 @@ class EventRegisterController extends Page_Controller {
 
 	/**
 	 * Find or make the current regisratrion.
+	 * Store reference in the session.
 	 * @return EventRegistration
 	 */
 	public function getCurrentRegistration($forcestart = true) {
