@@ -114,7 +114,7 @@ class RegistrableEvent extends CalendarEvent {
 		));
 
 		$generators = ClassInfo::implementorsOf('EventRegistrationTicketGenerator');
-		if ($generators) {
+		if (self::config()->generate_ticket_files && $generators) {
 			foreach ($generators as $generator) {
 				$instance = new $generator();
 				$generators[$generator] = $instance->getGeneratorTitle();
