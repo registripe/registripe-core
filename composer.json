@@ -20,7 +20,7 @@
 		"unclecheese/eventcalendar": "dev-master",
 		"ajshort/silverstripe-gridfieldextensions": "dev-master",
 		"burnbright/silverstripe-anchorfield": "dev-master",
-		"burnbright/silverstripe-omnipay": "dev-master"
+		"burnbright/silverstripe-omnipay": "1.2.x"
 	},
 	"suggest": {
 		"silverstripe/queuedjobs": "Allows sending out event reminder emails"
