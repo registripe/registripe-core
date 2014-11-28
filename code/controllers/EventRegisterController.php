@@ -65,7 +65,9 @@ class EventRegisterController extends Page_Controller {
 			$registration = $this->getCurrentRegistration();
 			if($registration->Attendees()->exists()){
 				$link = $this->Link("review");
-				$content .= "<a href=\"$link\">Back to review</a>";
+				$content .= AnchorField::create("review",
+					_t("EventRegisterController.BACKTOREVIEW", "Back to Review"), $link
+				)->Field();
 			}
 			$data = array(
 				'Title' => 'Register For ' . $this->event->Title,
@@ -125,21 +127,15 @@ class EventRegisterController extends Page_Controller {
 	public function ReviewForm() {
 		$registration = $this->getCurrentRegistration();
 		$fields = new FieldList(
-			new DropdownField("RegistrantAttendeeID", "You are",
+			new DropdownField("RegistrantAttendeeID",
+				_t("EventRegisterController.MAINCONTACT", "Main Contact"),
 				$registration->Attendees()
 					->map()->toArray()
 			)
 		);
 		$actions = new FieldList(
-			new LiteralField(
-				"addticket",
-				sprintf("<a href=\"%s\">%s</a>",
-					$this->Link(),
-					"Add another ticket"
-				)
-				
-			),
-			$nextaction = new FormAction("submitreview", "Next Step")
+			new AnchorField("addticket", "Add Ticket", $this->Link()),
+			$nextaction = new FormAction("submitreview", _t("EventRegisterController.NEXTSTEP","Next Step"))
 		);
 		if($registration->getTotalOutstanding() > 0){
 			$nextaction->setTitle("Make Payment");

@@ -40,9 +40,7 @@ class EventAttendeeForm extends Form{
 	 */
 	public function addCancelLink($url, $label = "Cancel") {
 		$this->actions->removeByname("cancellink");
-		$cancellink = new LiteralField("cancellink",
-			sprintf("<a href=\"%s\">%s</a>", $url, $label)
-		);
+		$cancellink = new AnchorField("cancellink", $label, $url);
 		$this->actions->unshift($cancellink);
 	}
 
