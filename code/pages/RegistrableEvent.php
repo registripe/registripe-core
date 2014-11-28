@@ -191,8 +191,9 @@ class RegistrableEvent extends CalendarEvent {
 		$config->addComponents(
 			new GridFieldButtonRow('after'),
 			new GridFieldPrintButton('buttons-after-left'),
-			new GridFieldExportButton('buttons-after-left')
+			$export = new GridFieldExportButton('buttons-after-left')
 		);
+		$export->setExportColumns($exportcolumns);
 
 		return new GridField("Attendees", "Attendees", $attendees, $config);			
 	}
