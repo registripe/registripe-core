@@ -20,7 +20,7 @@
 		"unclecheese/eventcalendar": "dev-master",
 		"ajshort/silverstripe-gridfieldextensions": "dev-master",
 		"burnbright/silverstripe-anchorfield": "dev-master",
-		"burnbright/silverstripe-omnipay": "Handle accepting payments for events"
+		"burnbright/silverstripe-omnipay": "dev-master"
 	},
 	"suggest": {
 		"silverstripe/queuedjobs": "Allows sending out event reminder emails"
