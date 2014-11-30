@@ -9,13 +9,6 @@ Currency:
     - EventCurrencyExtension
 ---
 only:
-  classexists: Payment
----
-EventRegistration:
-  extensions:
-    - EventRegistrationPaymentExtension
----
-only:
   classexists: QueuedJob
 ---
 RegistrableDateTime:
