@@ -18,7 +18,7 @@
 		"silverstripe/framework": ">=3.1",
 		"silverstripe/cms": ">=3.1",
 		"unclecheese/eventcalendar": "dev-master",
-		"ajshort/silverstripe-gridfieldextensions": "dev-master",
+		"silverstripe-australia/gridfieldextensions": "dev-master",
 		"burnbright/silverstripe-anchorfield": "dev-master",
 		"burnbright/silverstripe-omnipay": "1.2.x"
 	},
