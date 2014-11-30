@@ -1,5 +1,5 @@
 {
-	"name": "ajshort/silverstripe-eventmanagement",
+	"name": "silverstripe-australia/eventmanagement",
 	"description": "SilverStripe event management and registration module",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe", "event"],
