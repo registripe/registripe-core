@@ -174,6 +174,7 @@ class EventRegisterController extends Page_Controller {
 
 		$controller = new PaymentController($this, "payment", $registration, $registration->Total);
 		$controller->setSuccessURL($this->Link('complete'));
+		$controller->setCancelURL($this->Link('payment'));
 		//hack the url segment until the parent controller of this works properly
 		$controller->data()->URLSegment = "register/payment";
 		return $controller;
