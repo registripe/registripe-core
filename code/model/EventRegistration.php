@@ -53,11 +53,16 @@ class EventRegistration extends DataObject {
 		$memberfield = $fields->fieldByName("Root.Main.MemberID");
 		$fields->replaceField("MemberID", $memberfield->performReadonlyTransformation());
 		if (class_exists('Payment')) {
-			$fields->addFieldToTab('Root.Main', new ReadonlyField(
-				'TotalNice', 'Total', $this->Total->Nice()
-			));
-			$paymentfield = $fields->fieldByName("Root.Main.PaymentID");
-			$fields->replaceField("PaymentID", $paymentfield->performReadonlyTransformation());
+			if($total = $this->Total){
+				$totalcur = $this->obj('Total');
+				$totalcur->setValue($total);
+				$fields->addFieldToTab('Root.Main', new ReadonlyField(
+					'TotalNice', 'Total', $totalcur->Nice()
+				));
+			}
+			if($paymentfield = $fields->fieldByName("Root.Main.PaymentID")){
+				$fields->replaceField("PaymentID", $paymentfield->performReadonlyTransformation());
+			}
 		}
 		$fields->fieldByName("Root.Attendees.Attendees")->getConfig()
 			->removeComponentsByType("GridFieldAddNewButton")
