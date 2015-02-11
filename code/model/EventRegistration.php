@@ -47,26 +47,26 @@ class EventRegistration extends DataObject {
 	}
 
 	public function getCMSFields() {
-		$fields = parent::getCMSFields();
-		$fields->removeByName('Total');
-		$fields->removeByName('Token');
-		$memberfield = $fields->fieldByName("Root.Main.MemberID");
-		$fields->replaceField("MemberID", $memberfield->performReadonlyTransformation());
+		$fields = $this->scaffoldFormFields(array(
+			'restrictFields' => array(
+				'FirstName', 'Surname', 'Email',
+				'Status',
+				'Attendees'
+			),
+			'includeRelations' => true
+		));
+
+		$conf = GridFieldConfig_RecordEditor::create()
+				 ->removeComponentsByType(
+				 	"GridFieldAddNewButton"
+				 );
+		$fields->fieldByName("Attendees")->setConfig($conf);
+		
 		if (class_exists('Payment')) {
-			if($total = $this->Total){
-				$totalcur = $this->obj('Total');
-				$totalcur->setValue($total);
-				$fields->addFieldToTab('Root.Main', new ReadonlyField(
-					'TotalNice', 'Total', $totalcur->Nice()
-				));
-			}
-			if($paymentfield = $fields->fieldByName("Root.Main.PaymentID")){
-				$fields->replaceField("PaymentID", $paymentfield->performReadonlyTransformation());
-			}
+			$fields->fieldByname("Payments")
+				->setConfig($conf)
+				->performReadonlyTransformation();
 		}
-		$fields->fieldByName("Root.Attendees.Attendees")->getConfig()
-			->removeComponentsByType("GridFieldAddNewButton")
-			->removeComponentsByType("GridFieldAddExistingAutocompleter");
 
 		return $fields;
 	}
