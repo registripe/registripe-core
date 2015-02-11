@@ -134,45 +134,7 @@ class RegistrableEvent extends CalendarEvent {
 		}
 
 		//registrations
-		$regGridFieldConfig = GridFieldConfig_RecordEditor::create()
-			->removeComponentsByType('GridFieldAddNewButton')
-			->removeComponentsByType('GridFieldDeleteAction')
-			->addComponents(
-				new GridFieldButtonRow('after'),
-				new GridFieldPrintButton('buttons-after-left'),
-				new GridFieldExportButton('buttons-after-left')
-			);
-		$regGrids = array(
-			new GridField('Registrations',
-				_t('EventManagement.REGISTRATIONS', 'Registrations'),
-				$this->Registrations()->filter('Status', 'Valid'),
-				$regGridFieldConfig
-			)
-		);
-		$cancelled = $this->Registrations()
-			->filter('Status', 'Canceled');
-		if($cancelled->exists()){
-			$regGrids[] = new GridField('CanceledRegistrations',
-				_t('EventManagement.CANCELLATIONS', 'Cancellations'),
-				$cancelled,
-				$regGridFieldConfig
-			);
-		}
-		$fields->addFieldsToTab('Root.Registrations', $regGrids);
-
-		if ($this->RegEmailConfirm) {
-			$fields->addFieldToTab('Root.Registrations', new ToggleCompositeField(
-				'UnconfirmedRegistrations',
-				_t('EventManagement.UNCONFIRMED_REGISTRATIONS', 'Unconfirmed Registrations'),
-				array(
-					new GridField(
-						'UnconfirmedRegistrations',
-						'',
-						$this->Registrations()->filter('Status', 'Unconfirmed')
-					)
-				)
-			));
-		}
+		$fields->addFieldToTab('Root.Registrations', $this->getRegistrationsFields());
 
 		//attendees
 		if($attendeesfield = $this->getAttendeesGridField()) {
@@ -182,6 +144,71 @@ class RegistrableEvent extends CalendarEvent {
 		$this->extend('updateCMSFields',$fields);
 
 		return $fields;
+	}
+
+	/**
+	 * Get the grid fields for registrations that are:
+	 * completed, unconfirmed, incomplete, cancelled
+	 * @return FormField
+	 */
+	protected function getRegistrationsFields() {
+
+		$tabset = new TabSet("Registrations");
+
+		//common config
+		$regGridFieldConfig = GridFieldConfig_RecordEditor::create()
+			->removeComponentsByType('GridFieldAddNewButton')
+			->removeComponentsByType('GridFieldDeleteAction')
+			->addComponents(
+				new GridFieldButtonRow('after'),
+				new GridFieldPrintButton('buttons-after-left'),
+				new GridFieldExportButton('buttons-after-left')
+			);
+
+		//complete
+		$registrationsGrid = new GridField('Registrations',
+			_t('EventManagement.REGISTRATIONS', 'Registrations'),
+			$this->getCompletedRegistrations()
+				->sort("LastEdited", "DESC"),
+			$regGridFieldConfig
+		);
+		$tabset->push(new Tab("Completed", $registrationsGrid));
+
+		//unconfirmed
+		if ($this->RegEmailConfirm) {
+			$unconfirmedGrid = new GridField('UnconfirmedRegistrations',
+				_t('EventManagement.UNCONFIRMED', 'Unconfirmed'),
+				$this->getUnconfirmedRegistrations()
+					->sort("LastEdited", "DESC")
+			);
+			$tabset->push(new Tab("Unconfirmed", $unconfirmedGrid));
+		}
+
+		//incomplete
+		$incomplete = $this->getIncompleteRegistrations()
+						->sort("LastEdited", "DESC");
+		if($incomplete->exists()){
+			$incompleteGrid = new GridField('IncompleteRegistrations',
+				_t('EventManagement.INCOMPLETE', 'Incomplete'),
+				$incomplete,
+				$regGridFieldConfig
+			);
+			$tabset->push(new Tab("Incomplete", $incompleteGrid));
+		}		
+
+		//cancelled
+		$cancelled = $this->getCancelledRegistrations()
+						->sort("LastEdited", "DESC");
+		if($cancelled->exists()){
+			$cancelledGrid = new GridField('CancelledRegistrations',
+				_t('EventManagement.CANCELLATIONS', 'Cancellations'),
+				$cancelled,
+				$regGridFieldConfig
+			);
+			$tabset->push(new Tab("Cancelled", $cancelledGrid));
+		}
+
+		return $tabset;
 	}
 
 	protected function getAttendeesGridField() {
@@ -286,9 +313,43 @@ class RegistrableEvent extends CalendarEvent {
 			->filter("EndDate:GreaterThan", $now);
 	}
 
+	/**
+	 * Get all the completed registrations
+	 * @return DataList
+	 */
 	public function getCompletedRegistrations() {
 		return $this->Registrations()
 			->filter("Status","Valid");
+	}
+
+	/**
+	 * Get the registrations that need to be confirmed
+	 * @return DataList
+	 */
+	public function getUnconfirmedRegistrations() {
+		return $this->Registrations()
+			->filter('Status', 'Unconfirmed');
+	}
+
+	/**
+	 * Get incompleted registrations
+	 * Restricts to registrations with an email.
+	 * @return DataList
+	 */
+	public function getIncompleteRegistrations() {
+		return $this->Registrations()
+				->filter('Status', 'Unsubmitted')
+				->filter('Email:not', '');
+	}
+
+	/**
+	 * Get cancelled registrations
+	 * Restricts to registrations with an email.
+	 * @return DataList
+	 */
+	public function getCancelledRegistrations() {
+		return $this->Registrations()
+				->filter('Status', 'Canceled');
 	}
 
 	public function getValidAttendees() {
