@@ -81,20 +81,24 @@ class EventRegistration extends DataObject {
 	}
 
 	/**
-	 * @see EventRegistration::EventTitle()
+	 * Return an appropriate name for this registration
 	 */
 	public function getTitle() {
 		return $this->Name;
 	}
 
 	/**
-	 * Get the full name of the registrant
-	 * @return [type] [description]
+	 * Get the full name of the registrant.
+	 * @return string name
 	 */
 	public function getName() {
 		return ($this->Surname) ? trim($this->FirstName . ' ' . $this->Surname) : $this->FirstName;
 	}
 
+	/**
+	 * Get the name and email of the reistrant
+	 * @return string
+	 */
 	public function getRegistrant() {
 		return sprintf(
 			_t("EventRegistration.REGISTRANT", "%s (%s)"),
@@ -104,6 +108,7 @@ class EventRegistration extends DataObject {
 	}
 
 	/**
+	 * Total number of atendees / spaces for this registration
 	 * @return int
 	 */
 	public function TotalQuantity() {
@@ -139,7 +144,7 @@ class EventRegistration extends DataObject {
 	 * @param  EventTicket $ticket
 	 * @return EventAttendee
 	 */
-	public function createAttendee(EventTicket $ticket){
+	public function createAttendee(EventTicket $ticket) {
 		$attendee = new EventAttendee();
 		$attendee->TicketID = $ticket->ID;
 		$attendee->write();
