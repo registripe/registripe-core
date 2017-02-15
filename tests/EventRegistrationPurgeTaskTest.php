@@ -7,7 +7,7 @@
  */
 class EventRegistrationPurgeTaskTest extends SapphireTest {
 
-	public static $fixture_file = 'eventmanagement/tests/EventRegistrationPurgeTaskTest.yml';
+	public static $fixture_file = 'fixtures/EventRegistrationPurgeTaskTest.yml';
 
 	/**
 	 * @covers EventRegistrationPurgeTask::purgeUnsubmittedRegistrations

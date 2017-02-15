@@ -4,7 +4,7 @@ RegistrableEvent:
     ConfirmTimeLimit: 21600
     RegistrationTimeLimit: 900
 
-RegistrableDateTime:
+CalendarDateTime:
   time:
     Title: Test Time
     StartDate: 2011-01-01

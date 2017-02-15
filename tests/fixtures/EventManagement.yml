@@ -1,0 +1,22 @@
+Calendar:
+  calendar:
+    Title: Calendar
+
+RegistrableEvent:
+  event:
+    Parent: =>Calendar.calendar
+    Title: Test Event
+
+CalendarDateTime:
+  time:
+    Title: Test Time
+    StartDate: 2011-01-01
+    EndDate: 2011-01-01
+    Event: =>RegistrableEvent.event
+
+EventTicket:
+  ticket_a:
+    Event: =>RegistrableEvent.event
+    Title: Test Ticket
+    Type: Price
+    PriceAmount: 100
