@@ -20,3 +20,16 @@ EventTicket:
     Title: Test Ticket
     Type: Price
     PriceAmount: 100
+
+EventRegistration:
+  reg_a:
+    Event: =>RegistrableEvent.event
+    FirstName: Foobie
+
+EventAttendee:
+  attendee_reg_a_1:
+    Registration: =>EventRegistration.reg_a
+    Ticket: =>EventTicket.ticket_a
+    FirstName: Alice
+    Surname: Bob
+
