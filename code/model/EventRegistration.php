@@ -33,10 +33,6 @@ class EventRegistration extends DataObject {
 		'Created.Nice' 		=> 'Date'
 	);
 
-	private static $extensions = array(
-		"Payable"
-	);
-
 	protected function onBeforeWrite() {
 		if (!$this->isInDB()) {
 			$generator = new RandomGenerator();

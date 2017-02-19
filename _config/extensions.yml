@@ -7,6 +7,9 @@ Member:
 Currency:
   extensions:
     - EventCurrencyExtension
+EventRegistration:
+  extensions:
+    - Payable
 ---
 only:
   classexists: QueuedJob
