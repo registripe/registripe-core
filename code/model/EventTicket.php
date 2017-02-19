@@ -29,6 +29,7 @@ class EventTicket extends DataObject {
 	private static $summary_fields = array(
 		'Title'        => 'Title',
 		'StartSummary' => 'Sales Start',
+		'EndSummary' => 'Sales End',
 		'PriceSummary' => 'Price'
 	);
 
@@ -186,6 +187,13 @@ class EventTicket extends DataObject {
 	 */
 	public function StartSummary() {
 		return $this->obj('StartDate')->Nice();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function EndSummary() {
+		return $this->obj('EndDate')->Nice();
 	}
 
 	/**
