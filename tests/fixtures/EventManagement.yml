@@ -32,4 +32,5 @@ EventAttendee:
     Ticket: =>EventTicket.ticket_a
     FirstName: Alice
     Surname: Bob
+    Email: alice.bob@example.com
 

@@ -1,0 +1,61 @@
+RegistrableEvent:
+  event:
+    Title: Standard Test Event
+
+CalendarDateTime:
+  event_time:
+    Event: =>RegistrableEvent.event
+    Title: Test Time
+    StartDate: 2011-01-01
+    EndDate: 2011-01-01
+
+EventTicket:
+  standard:
+    Event: =>RegistrableEvent.event
+    Title: Standard
+    Type: Price
+    PriceAmount: 10
+  free:
+    Event: =>RegistrableEvent.event
+    Title: Infant
+    Type: Free
+    PriceAmount: 0
+
+EventRegistration:
+  single:
+    FirstName: Joe
+    Surname: Bloggs
+    Email: foo@bar.net
+  multiple:
+    FirstName: Zac
+    Surname: Smith
+    Email: zac.smith@example.com
+  group:
+    FirstName: Bob
+    Surname: Jones
+    Email: bob.jones@example.com
+
+EventAttendee:
+  single_1:
+    Registration: =>EventRegistration.single
+    Ticket: =>EventTicket.standard
+    FirstName: Joe
+    Surname: Bloggs
+    Email: foo@bar.net
+  multiple_1:
+    Registration: =>EventRegistration.multiple
+    Ticket: =>EventTicket.standard
+    FirstName: Zac
+    Surname: Smith
+    Email:  zac.smith@example.com
+  multiple_2:
+    Registration: =>EventRegistration.multiple
+    Ticket: =>EventTicket.standard
+    FirstName: Suzanne
+    Surname: Smith
+    Email:  suzanne.smith@example.com
+  multiple_3:
+    Registration: =>EventRegistration.multiple
+    Ticket: =>EventTicket.free
+    FirstName: Ziggy
+    Surname: Smith
