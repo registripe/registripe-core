@@ -28,6 +28,7 @@ class EventRegisterController extends Page_Controller {
 	public function __construct($parent, $event) {
 		$this->parent   = $parent;
 		$this->event = $event;
+		$this->regSession = new EventRegistrationSession($this->event);
 		parent::__construct($parent->data());
 	}
 
@@ -196,59 +197,36 @@ class EventRegisterController extends Page_Controller {
 		$mailer = new EventRegistrationEmailer($registration);
 		$mailer->sendConfirmation();
 		$mailer->notifyAdmin();
-		
+
 		//end session
-		$this->endRegistrationSession();
+		$this->regSession->end();
 		
 		//redirect to registration details
 		return $this->redirect($registration->Link());
 	}
 
 	/**
-	 * @return RegistrableEvent
+	 * Find or make the current registration in the session.
+	 * @param boolean $autostart
+	 * @return EventRegistration|null
 	 */
-	public function getEvent() {
-		return $this->event;
-	}
+	public function getCurrentRegistration($autostart = true) {
+		// local reference
+		if($this->registration && !$this->registration->isSubmitted()) {
+			return $this->registration;
+		}
+		// get from session
+		$this->registration = $this->regSession->get();
+		if($this->registration){
+			return $this->registration;
+		}
+		if(!$autostart){
+			return null;
+		}
+		// auto start new
+		$this->registration = $this->regSession->start();
 
-	/**
-	 * Find or make the current regisratrion.
-	 * Store reference in the session.
-	 * @return EventRegistration
-	 */
-	public function getCurrentRegistration($forcestart = true) {
-		$registration = $this->registration;
-		//look for regisration in session
-		if(!$registration){
-			$registration = EventRegistration::get()->byID(
-				Session::get("EventRegistration.".$this->event->ID)
-			);
-		}
-		//end any submitted registrations
-		if($registration && $registration->isSubmitted()){
-			$this->endRegistrationSession();
-			$registration = null;
-		}
-
-		//start a new registration
-		if(!$registration && $forcestart){
-			$registration = $this->startRegistrationSession();
-		}
-		$this->registration = $registration;
 		return $this->registration;
-	}
-
-	public function startRegistrationSession() {
-		$registration =  new EventRegistration();
-		$registration->EventID = $this->event->ID;
-		$registration->write();
-		Session::set("EventRegistration.".$this->event->ID, $registration->ID);
-		return $registration;
-	}
-
-	public function endRegistrationSession() {
-		Session::set("EventRegistration.".$this->event->ID, null);
-		Session::clear("EventRegistration.".$this->event->ID);
 	}
 
 	/**
