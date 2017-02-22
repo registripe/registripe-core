@@ -16,15 +16,34 @@ class EventAttendeeController extends Page_Controller{
 		$this->registration = $registration;
 	}
 	
+	protected function createAttendee() {
+		$attendee = EventAttendee::create();
+		$attendee->RegistrationID = $this->registration->ID;
+		return $attendee;
+	}
+
 	/**
-	 * Add action
+	 * Add action renders the add attendee form.
 	 * @param HTTPRequest $request
 	 * @return array
 	 */
 	public function add($request) {
+		$tickets = $this->registration->Event()->getAvailableTickets();
 		$form = $this->AttendeeForm();
-		$ticket = $this->registration->Event()->Tickets()
-						->byID((int)$request->param('ID'));
+		// check tickets are actually available
+		if (!$tickets->count()) {
+			return $this->redirect($this->BackURL);
+		}
+		$attendee = $this->createAttendee();
+		// ticket selection in url
+		$ticket = $tickets->byID((int)$request->param('ID'));
+		if($ticket && !$ticket->exists()){
+			$attendee->TicketID = $ticket->ID;
+			$form->setAllowedTickets(
+				$this->registration->Event()->getAvailableTickets()
+			);
+		}
+		$form->loadDataFrom($attendee);
 		if($ticket) {
 			$form->loadDataFrom(array(
 				"TicketID" => $ticket->ID
