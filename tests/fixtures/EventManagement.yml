@@ -10,8 +10,6 @@ RegistrableEvent:
 CalendarDateTime:
   time:
     Title: Test Time
-    StartDate: 2011-01-01
-    EndDate: 2011-01-01
     Event: =>RegistrableEvent.event
 
 EventTicket:

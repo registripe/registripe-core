@@ -305,12 +305,15 @@ class RegistrableEvent extends CalendarEvent {
 		return false;
 	}
 
+	/**
+	 * Get available tickets
+	 * @return DataList
+	 */
 	public function getAvailableTickets() {
 		$now = date('Y-m-d H:i:s');
-
 		return $this->Tickets()
-			->filter("StartDate:LessThan", $now)
-			->filter("EndDate:GreaterThan", $now);
+			->where("\"StartDate\" <= '".$now."' OR \"StartDate\" IS NULL")
+			->where("\"EndDate\" >= '".$now."' OR \"EndDate\" IS NULL");
 	}
 
 	/**
