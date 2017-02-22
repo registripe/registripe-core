@@ -84,8 +84,9 @@ class EventRegisterController extends Page_Controller {
 	/**
 	 * Create/edit attendee step
 	 */
-	public function attendee() {
-		$registration = $this->getCurrentRegistration();
+	public function attendee($request) {
+		$forcewrite = $request->isPOST(); // start rego if form is submitting
+		$registration = $this->getCurrentRegistration($forcewrite);
 		$nexturl = $this->Link('review');
 		$backurl = $this->canReview() ?	$nexturl : $this->Link();
 		$record = new Page(array(
@@ -120,6 +121,9 @@ class EventRegisterController extends Page_Controller {
 		);
 	}
 
+	/**
+	 * Check if registration has started, and attendees exist on it.
+	 */
 	public function canReview(){
 		$registration = $this->getCurrentRegistration(false);
 		return $registration && $registration->Attendees()->exists();
@@ -146,6 +150,10 @@ class EventRegisterController extends Page_Controller {
 		return $form;
 	}
 
+	/**
+	 * Submit review action
+	 * @param data
+	 */
 	public function submitreview($data, $form) {
 		$registration = $this->getCurrentRegistration();
 		//save registrant
@@ -159,7 +167,6 @@ class EventRegisterController extends Page_Controller {
 		}
 		$form->saveInto($registration);
 		$registration->write();
-
 		//redirect to appropriate place, based on total cost
 		if($registration->canPay()){
 			return $this->redirect($this->Link('payment'));
@@ -172,7 +179,6 @@ class EventRegisterController extends Page_Controller {
 		if(!$registration){
 			return $this->redirect($this->Link());
 		}
-
 		$controller = new PaymentController($this, "payment", $registration, $registration->Total);
 		$controller->setSuccessURL($this->Link('complete'));
 		$controller->setCancelURL($this->Link('payment'));
@@ -181,6 +187,9 @@ class EventRegisterController extends Page_Controller {
 		return $controller;
 	}
 
+	/**
+	 * Completed registration action
+	 */
 	public function complete() {
 		$registration = $this->getCurrentRegistration(false);
 		if(!$registration){
@@ -207,25 +216,33 @@ class EventRegisterController extends Page_Controller {
 
 	/**
 	 * Find or make the current registration in the session.
-	 * @param boolean $autostart
+	 * @param boolean $write
 	 * @return EventRegistration|null
 	 */
-	public function getCurrentRegistration($autostart = true) {
+	public function getCurrentRegistration($write = true) {
+		$registration = null;
 		// local reference
 		if($this->registration && !$this->registration->isSubmitted()) {
-			return $this->registration;
+			$registration = $this->registration;
 		}
-		// get from session
-		$this->registration = $this->regSession->get();
-		if($this->registration){
-			return $this->registration;
+		if(!$registration){
+			// get from session
+			$registration = $this->regSession->get();
 		}
-		if(!$autostart){
-			return null;
+		
+		if (!$registration) {
+			// create a new
+			if($write){
+				// persist immediately
+				$registration = $this->regSession->start();
+			} else {
+				// create new in memory
+				$registration = EventRegistration::create();
+				$registration->EventID = $this->event->ID;	
+			}
 		}
-		// auto start new
-		$this->registration = $this->regSession->start();
-
+		// store locally
+		$this->registration = $registration;
 		return $this->registration;
 	}
 
