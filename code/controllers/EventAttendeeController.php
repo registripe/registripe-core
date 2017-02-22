@@ -61,7 +61,6 @@ class EventAttendeeController extends Page_Controller{
 				$form->loadDataFrom($latestattendee, 0, $prepops);	
 			}
 		}
-
 		return array(
 			'Title' => $ticket ? $ticket->Title : null,
 			'Form' => $form
@@ -69,7 +68,7 @@ class EventAttendeeController extends Page_Controller{
 	}
 
 	/**
-	 * Edit action
+	 * Edit action renders the attendee form, populated with existing details.
 	 * @param HTTPRequest $request
 	 * @return array
 	 */
@@ -78,7 +77,7 @@ class EventAttendeeController extends Page_Controller{
 		$attendee = $this->registration->Attendees()
 			->byID($request->param('ID'));
 		if(!$attendee) {
-			return $this->httpError(400, "Attendee not found");
+			return $this->httpError(404, "Attendee not found");
 		}
 		$form = $this->AttendeeForm();
 		//add tickets dropdown, if there is no selected ticket
@@ -112,6 +111,7 @@ class EventAttendeeController extends Page_Controller{
 	 * Save new and edited attendees
 	 * @param  array $data
 	 * @param  Form $form
+	 * @return HTTPResponse
 	 */
 	public function save($data, $form) {
 		//look for attendee id in form field or request params
@@ -148,13 +148,12 @@ class EventAttendeeController extends Page_Controller{
 		$attendee = $this->registration->Attendees()
 			->byID($request->param('ID'));
 		if(!$attendee) {
-			return $this->httpError(400, "Attendee not found");
+			return $this->httpError(404, "Attendee not found");
 		}elseif($this->registration->Attendees()->count() <= 1){
 			//there must be at least one attendee
 		}else{
 			$attendee->delete();
 		}
-
 		return $this->redirect($this->BackURL);
 	}
 
