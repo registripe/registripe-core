@@ -89,9 +89,8 @@ class EventAttendeeController extends Page_Controller{
 			);
 		}
 		$form->loadDataFrom($attendee);
-		$form->addCancelLink($this->BackURL);
+		//add tickets dropdown, if there is no selected ticket
 		$form->getValidator()->addRequiredField("ID");
-
 		return array(
 			'Title' => $attendee->Ticket()->Title,
 			'Form' => $form
@@ -100,11 +99,12 @@ class EventAttendeeController extends Page_Controller{
 
 	/**
 	 * Create the EventAttendeeForm for adding/editing records
+	 * @return EventAttendeeForm
 	 */
 	public function AttendeeForm() {
 		$form = new EventAttendeeForm($this, "AttendeeForm");
-		$this->extend("updateAttendeeForm", $form);
-
+		$this->extend("updateAttendeeForm", $form, $this->registration);
+		$form->addCancelLink($this->BackURL);
 		return $form;
 	}
 
