@@ -126,7 +126,7 @@ class EventAttendeeController extends Page_Controller{
 		}
 		//create attendee
 		if(!$attendee){
-			$attendee = new EventAttendee();
+			$attendee = EventAttendee::create();
 			$attendee->RegistrationID = $this->registration->ID;
 		}
 		//save ticket selection

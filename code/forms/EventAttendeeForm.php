@@ -9,7 +9,7 @@ class EventAttendeeForm extends Form{
 	public function __construct($controller, $name = "EventAttendeeForm") {
 		$fields = singleton("EventAttendee")
 					->getFrontEndFields();
-		//hide the ticket id by default (can be re-enabled using setAllowedTickets)
+		//hide the ticketd field by default (can be re-introduced using setAllowedTickets)
 		$fields->push(
 			new HiddenField("TicketID")
 		);
@@ -25,8 +25,7 @@ class EventAttendeeForm extends Form{
 		if(!$required){
 			$required = array("FirstName", "Surname", "Email");
 		}
-		 //ticket is always required
-		$required[] = "TicketID";
+		$required[] = "TicketID"; //ticket is always required
 		$validator = new RequiredFields($required);
 
 		parent::__construct($controller, $name, $fields, $actions, $validator);

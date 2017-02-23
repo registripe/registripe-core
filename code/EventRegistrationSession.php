@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Creates, stores, retrieves and deletes the current registration.
+ * Creates, stores, retrieves and deletes the current registration id.
  */
 class EventRegistrationSession{
 
