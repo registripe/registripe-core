@@ -3,7 +3,7 @@
 class EventRegisterControllerTest extends FunctionalTest{
 
 	protected static $fixture_file = array(
-		'fixtures/EventManagement.yml'
+		'../fixtures/EventManagement.yml'
 	);
 
 	public function setUp() {
