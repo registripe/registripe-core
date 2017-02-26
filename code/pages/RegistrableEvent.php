@@ -5,7 +5,6 @@
 class RegistrableEvent extends CalendarEvent {
 
 	private static $db = array(
-		'TicketGenerator'       => 'Varchar(255)',
 		'OneRegPerEmail'        => 'Boolean',
 		'RequireLoggedIn'       => 'Boolean',
 		'RegistrationTimeLimit' => 'Int',
@@ -112,26 +111,6 @@ class RegistrableEvent extends CalendarEvent {
 			$this->Tickets(),
 			GridFieldConfig_RecordEditor::create()
 		));
-
-		$generators = ClassInfo::implementorsOf('EventRegistrationTicketGenerator');
-		if (self::config()->generate_ticket_files && $generators) {
-			foreach ($generators as $generator) {
-				$instance = new $generator();
-				$generators[$generator] = $instance->getGeneratorTitle();
-			}
-			$generator = new DropdownField(
-				'TicketGenerator',
-				_t('EventRegistration.TICKET_GENERATOR', 'Ticket generator'),
-				$generators
-			);
-			$generator->setEmptyString(_t('EventManagement.NONE', '(None)'));
-			$generator->setDescription(_t(
-				'EventManagement.TICKET_GENERATOR_NOTE',
-				'The ticket generator is used to generate a ticket file for the user to download.'
-			));
-
-			$fields->addFieldToTab('Root.Tickets', $generator);
-		}
 
 		//registrations
 		$fields->addFieldToTab('Root.Registrations', $this->getRegistrationsFields());
