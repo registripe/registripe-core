@@ -32,6 +32,9 @@ class EventRegisterController extends Page_Controller {
 		parent::__construct($parent->data());
 	}
 
+	/**
+	 * Perform a security check
+	 */
 	public function init() {
 		parent::init();
 		if ($this->event->RequireLoggedIn && !Member::currentUserID()) {
@@ -42,7 +45,8 @@ class EventRegisterController extends Page_Controller {
 	}
 
 	/**
-	 * Select ticket step
+	 * Select ticket action
+	 * @return HTMLText
 	 */
 	public function index() {
 		$exclude  = null;
@@ -82,7 +86,8 @@ class EventRegisterController extends Page_Controller {
 	}
 
 	/**
-	 * Create/edit attendee step
+	 * Create/edit attendee action
+	 * @return EventAttendeeController
 	 */
 	public function attendee($request) {
 		$forcewrite = $request->isPOST(); // start rego if form is submitting
@@ -103,6 +108,7 @@ class EventRegisterController extends Page_Controller {
 
 	/**
 	 * Review step
+	 * @return array
 	 */
 	public function review() {
 		if(!$this->canReview()){
@@ -129,6 +135,10 @@ class EventRegisterController extends Page_Controller {
 		return $registration && $registration->Attendees()->exists();
 	}
 
+	/**
+	 * Review attendees
+	 * @return Form
+	 */
 	public function ReviewForm() {
 		$registration = $this->getCurrentRegistration();
 		$fields = new FieldList(
@@ -174,6 +184,10 @@ class EventRegisterController extends Page_Controller {
 		return $this->redirect($this->Link('complete'));
 	}
 
+	/**
+	* Payment handling action
+	* @return PaymentController
+	*/
 	public function payment() {
 		$registration = $this->getCurrentRegistration(false);
 		if(!$registration){
@@ -189,6 +203,7 @@ class EventRegisterController extends Page_Controller {
 
 	/**
 	 * Completed registration action
+	 * @return HTTPResponse
 	 */
 	public function complete() {
 		$registration = $this->getCurrentRegistration(false);
@@ -217,7 +232,7 @@ class EventRegisterController extends Page_Controller {
 	/**
 	 * Find or make the current registration in the session.
 	 * @param boolean $write
-	 * @return EventRegistration|null
+	 * @return EventRegistration
 	 */
 	public function getCurrentRegistration($write = true) {
 		$registration = null;

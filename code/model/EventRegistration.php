@@ -145,7 +145,6 @@ class EventRegistration extends DataObject {
 		$attendee->TicketID = $ticket->ID;
 		$attendee->write();
 		$this->Attendees()->add($attendee);
-
 		return $attendee;
 	}
 

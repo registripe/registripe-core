@@ -299,7 +299,7 @@ class RegistrableEvent extends CalendarEvent {
 	 */
 	public function getCompletedRegistrations() {
 		return $this->Registrations()
-			->filter("Status","Valid");
+			->filter("Status", "Valid");
 	}
 
 	/**
