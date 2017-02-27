@@ -40,7 +40,6 @@ Note that the TicketID will always be required.
 
 ## Maintainer Contacts
 
-*   Andrew Short (<andrew@silverstripe.com.au>)
 *   Jeremy Shipman (<jeremy@burnbright.net>)
 
 ## Requirements
