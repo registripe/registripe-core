@@ -15,12 +15,6 @@ class EventAttendeeController extends Page_Controller{
 		parent::__construct($record);
 		$this->registration = $registration;
 	}
-	
-	protected function createAttendee() {
-		$attendee = EventAttendee::create();
-		$attendee->RegistrationID = $this->registration->ID;
-		return $attendee;
-	}
 
 	/**
 	 * Add action renders the add attendee form.
@@ -124,10 +118,9 @@ class EventAttendeeController extends Page_Controller{
 			$form->sessionMessage('You cannot change the ticket', 'bad');
 			return $this->redirectBack();
 		}
-		//create attendee
+		//create new attendee
 		if(!$attendee){
-			$attendee = EventAttendee::create();
-			$attendee->RegistrationID = $this->registration->ID;
+			$attendee = $this->createAttendee();
 		}
 		//save ticket selection
 		$form->saveInto($attendee);
@@ -142,6 +135,7 @@ class EventAttendeeController extends Page_Controller{
 	/**
 	 * Delete action
 	 * @param  HTTPRequest $request
+	 * @return HTTPResponse
 	 */
 	public function delete($request) {
 		//get attendee from registration
@@ -155,6 +149,15 @@ class EventAttendeeController extends Page_Controller{
 			$attendee->delete();
 		}
 		return $this->redirect($this->BackURL);
+	}
+
+	/**
+	 * Helper for creating new attendee on registration.
+	 */
+	protected function createAttendee() {
+		$attendee = EventAttendee::create();
+		$attendee->RegistrationID = $this->registration->ID;
+		return $attendee;
 	}
 
 }
