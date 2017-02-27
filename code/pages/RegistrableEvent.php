@@ -22,9 +22,7 @@ class RegistrableEvent extends CalendarEvent {
 		'AfterRegContent'       => 'HTMLText',
 		'AfterUnregTitle'       => 'Varchar(255)',
 		'AfterUnregContent'     => 'HTMLText',
-		'Capacity'              => 'Int',
-		'EmailReminder'         => 'Boolean',
-		'RemindDays'            => 'Int'
+		'Capacity'              => 'Int'
 	);
 
 	private static $has_many = array(
@@ -344,12 +342,6 @@ class RegistrableEvent extends CalendarEvent {
 	public function validate() {
 		$result   = parent::validate();
 		$currency = null;
-
-		// Ensure that if we are sending a reminder email it has an interval
-		// to send at.
-		if ($this->EmailReminder && !$this->RemindDays) {
-			$result->error('You must enter a time to send the reminder at.');
-		}
 
 		// Ensure that we only have tickets in one currency, since you can't
 		// make a payment across currencies.

@@ -16,7 +16,6 @@ The event management module allows you to manage event details and registrations
     canceling a registration.
 *   Send registered users a notification email when event details change.
 *   Invite people to the event, either from member groups or from past events.
-*   Send reminder emails a fixed time before an event starts.
 
 ## Configuration
 
@@ -50,7 +49,6 @@ Note that the TicketID will always be required.
 *   The [MultiForm](https://github.com/silverstripe/silverstripe-multiform) module.
 *   The [ItemSetField](https://github.com/ajshort/silverstripe-itemsetfield) module.
 *   Optionally requires the [Omnipay](https://github.com/burnbright/silverstripe-omnipay) module for collecting payments with registration.
-*   Optionally requires the [Queued Jobs](https://github.com/nyeholt/silverstripe-queuedjobs) module for sending out event reminder emails.
 
 ## Installation
 

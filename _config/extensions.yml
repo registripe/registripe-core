@@ -10,10 +10,3 @@ Currency:
 EventRegistration:
   extensions:
     - Payable
----
-only:
-  classexists: QueuedJob
----
-RegistrableDateTime:
-  extensions:
-    - RegistrableDateTimeReminderExtension

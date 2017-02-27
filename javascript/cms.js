@@ -2,8 +2,7 @@ jQuery(function($) {
 	$.entwine("ss", function($) {
 		var conditionals = {
 			"#Form_EditForm_RegEmailConfirm": "#EmailConfirmMessage, #ConfirmTimeLimit",
-			"#Form_EditForm_EmailNotifyChanges" : "#NotifyChangeFields",
-			"#Form_ItemEditForm_EmailReminder": "#RemindDays"
+			"#Form_EditForm_EmailNotifyChanges" : "#NotifyChangeFields"
 		};
 
 		$.each(conditionals, function (check, target) {

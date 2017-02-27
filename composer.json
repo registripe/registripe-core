@@ -6,10 +6,6 @@
 	"license": "BSD-3-Clause",
 	"authors": [
 		{
-			"name": "Andrew Short",
-			"email": "andrewjshort@gmail.com"
-		},
-		{
 			"name": "Jeremy Shipman",
 			"email": "jeremy@burnbright.net"
 		}
@@ -21,9 +17,6 @@
 		"silverstripe-australia/gridfieldextensions": "dev-master",
 		"burnbright/silverstripe-anchorfield": "dev-master",
 		"burnbright/silverstripe-omnipay": "1.2.x"
-	},
-	"suggest": {
-		"silverstripe/queuedjobs": "Allows sending out event reminder emails"
 	},
 	"extra": {
 		"installer-name": "eventmanagement"
