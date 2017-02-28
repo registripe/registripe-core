@@ -429,4 +429,14 @@ class RegistrableEvent_Controller extends Page_Controller {
 		return new EventRegistrationDetailsController($this, $rego);
 	}
 
+	/**
+	 * Optionally show register controller on index
+	 */
+	public function index($request) {
+		if (self::config()->register_at_index) {
+			return $this->register();
+		}
+		return array();
+	}
+
 }
