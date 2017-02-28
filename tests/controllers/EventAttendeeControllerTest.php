@@ -11,7 +11,6 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	public function setUp() {
 		$this->resetConfigs();
 		parent::setUp();
-		$this->objFromFixture('Calendar', 'calendar')->publish('Stage', 'Live');
 		$this->event = $this->objFromFixture('RegistrableEvent', 'event');
 		$this->event->publish('Stage', 'Live');
 	}
@@ -23,7 +22,7 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	}
 
 	public function testAddAction() {
-		$response = $this->get('calendar/test-event/register/attendee/add');
+		$response = $this->get('test-event/register/attendee/add');
 		$this->assertEquals(200, $response->getStatusCode());
 		// TODO: assert form elements
 	}
@@ -31,7 +30,7 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	public function testAddActionWithTicketSelected() {
 		$this->setUpExistingRegistration();
 		$ticket = $this->objFromFixture('EventTicket', 'ticket_a');
-		$response = $this->get('calendar/test-event/register/attendee/add/'.$ticket->ID); // pre-selected ticket
+		$response = $this->get('test-event/register/attendee/add/'.$ticket->ID); // pre-selected ticket
 		$this->assertEquals(200, $response->getStatusCode());
 		// TODO: assert form elements
 	}
@@ -39,13 +38,13 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	public function testEditAction() {
 		$this->setUpExistingRegistration();
 		$attendee = $this->objFromFixture('EventAttendee', 'attendee_reg_a_1');
-		$response = $this->get('calendar/test-event/register/attendee/edit/'.$attendee->ID);
+		$response = $this->get('test-event/register/attendee/edit/'.$attendee->ID);
 		$this->assertEquals(200, $response->getStatusCode());
 	}
 
 	public function testSaveNew() {
 		$ticket = $this->objFromFixture("EventTicket", "ticket_a");
-		$response = $this->get('calendar/test-event/register/attendee/add');
+		$response = $this->get('test-event/register/attendee/add');
 		$response = $this->submitSaveForm($ticket);
 		$reg = EventRegistration::get()->sort('ID', 'DESC')->first();
 		$attendees = $reg->Attendees();
@@ -59,7 +58,7 @@ class EventAttendeeControllerTest extends FunctionalTest{
 		$this->setUpExistingRegistration();
 		$attendee = $this->objFromFixture('EventAttendee', 'attendee_reg_a_1');
 		$this->assertEquals("alice.bob@example.com", $attendee->Email);
-		$this->get('calendar/test-event/register/attendee/edit/'.$attendee->ID);
+		$this->get('test-event/register/attendee/edit/'.$attendee->ID);
 		$this->submitSaveData(array(
 			"ID" => $attendee->ID,
 			"TicketID" => $attendee->TicketID,
@@ -88,7 +87,7 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	public function testDeleteSingle() {
 		$this->setUpExistingRegistration();
 		$attendee = $this->objFromFixture('EventAttendee', 'attendee_reg_a_1');
-		$response = $this->get('calendar/test-event/register/attendee/delete/'.$attendee->ID);
+		$response = $this->get('test-event/register/attendee/delete/'.$attendee->ID);
 		$attendees = $this->registration->Attendees();
 		$this->assertEquals(1, $attendees->count(), "Single rego should not be deleted");
 	}
@@ -96,7 +95,7 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	public function testDeleteNotFound() {
 		$this->setUpExistingRegistration();
 		$attendee = $this->objFromFixture('EventAttendee', 'attendee_reg_a_1');
-		$response = $this->get('calendar/test-event/register/attendee/delete/999');
+		$response = $this->get('test-event/register/attendee/delete/999');
 		$this->assertEquals(404, $response->getStatusCode());
 	}
 

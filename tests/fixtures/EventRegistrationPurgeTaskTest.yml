@@ -4,31 +4,19 @@ RegistrableEvent:
     ConfirmTimeLimit: 21600
     RegistrationTimeLimit: 900
 
-CalendarDateTime:
-  time:
-    Title: Test Time
-    StartDate: 2011-01-01
-    EndDate: 2011-01-01
-    Event: =>RegistrableEvent.event
-
 EventRegistration:
   unconfirmed_1:
     Name: First Registration
     Status: Unconfirmed
-    Time: =>CalendarDateTime.time
   unconfirmed_2:
     Name: Second Registration
     Status: Unconfirmed
-    Time: =>CalendarDateTime.time
   confirmed:
     Name: Third Registration
     Status: Valid
-    Time: =>CalendarDateTime.time
   unsubmitted_1:
     Name: Fourth Registration
     Status: Unsubmitted
-    Time: =>CalendarDateTime.time
   unsubmitted_2:
     Name: Fifth Registration
     Status: Unsubmitted
-    Time: =>CalendarDateTime.time

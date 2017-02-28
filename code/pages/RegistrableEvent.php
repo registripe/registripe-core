@@ -1,8 +1,8 @@
 <?php
 /**
- * A calendar event that can people can register to attend.
+ * An event that can people can register to attend.
  */
-class RegistrableEvent extends CalendarEvent {
+class RegistrableEvent extends Page {
 
 	private static $db = array(
 		'OneRegPerEmail'        => 'Boolean',
@@ -53,9 +53,6 @@ class RegistrableEvent extends CalendarEvent {
 		SiteTree::disableCMSFieldsExtensions();
 		$fields = parent::getCMSFields();
 		SiteTree::enableCMSFieldsExtensions();
-
-		//remove recursion options from RegistrableEvents
-		$fields->removeByName(_t('CalendarEvent.RECURSION','Recursion'));
 
 		$fields->insertAfter(
 			new ToggleCompositeField(
@@ -387,7 +384,7 @@ class RegistrableEvent extends CalendarEvent {
 
 }
 
-class RegistrableEvent_Controller extends CalendarEvent_Controller {
+class RegistrableEvent_Controller extends Page_Controller {
 
 	public static $allowed_actions = array(
 		'register',

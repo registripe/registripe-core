@@ -2,13 +2,6 @@ RegistrableEvent:
   empty_event:
     Title: Empty Test Event
 
-CalendarDateTime:
-  empty_event_time:
-    Event: =>RegistrableEvent.empty_event
-    Title: Test Time
-    StartDate: 2011-01-01
-    EndDate: 2011-01-01
-
 EventRegistration:
   empty:
     FirstName: Joe

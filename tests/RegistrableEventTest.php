@@ -9,13 +9,12 @@ class RegistrableEventTest extends FunctionalTest{
 
 	public function setUp() {
 		parent::setUp();
-		$this->objFromFixture('Calendar', 'calendar')->publish('Stage', 'Live');
 		$this->event = $this->objFromFixture('RegistrableEvent', 'event');
 		$this->event->publish('Stage', 'Live');
 	}
 
 	public function testVisitEventPage(){
-		$page = $this->get('calendar/test-event');
+		$page = $this->get('test-event');
 		$this->assertEquals(200, $page->getStatusCode());
 	}
 
@@ -24,7 +23,6 @@ class RegistrableEventTest extends FunctionalTest{
 	}
 
 	public function testAvailableTickets() {
-		$this->objFromFixture('Calendar', 'ticketcalendar')->publish('Stage', 'Live');
 		$ticketevent = $this->objFromFixture('RegistrableEvent', 'ticketevent');
 		$ticketevent->publish('Stage', 'Live');
 		$tickets = $ticketevent->getAvailableTickets();

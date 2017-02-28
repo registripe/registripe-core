@@ -13,7 +13,6 @@
 	"require": {
 		"silverstripe/framework": "~3.1",
 		"silverstripe/cms": "~3.1",
-		"unclecheese/eventcalendar": "~1.0",
 		"silverstripe-australia/gridfieldextensions": "~1.4",
 		"burnbright/silverstripe-anchorfield": "dev-master",
 		"silverstripe/silverstripe-omnipay": "~2.1"

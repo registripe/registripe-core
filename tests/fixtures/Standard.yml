@@ -2,13 +2,6 @@ RegistrableEvent:
   event:
     Title: Standard Test Event
 
-CalendarDateTime:
-  event_time:
-    Event: =>RegistrableEvent.event
-    Title: Test Time
-    StartDate: 2011-01-01
-    EndDate: 2011-01-01
-
 EventTicket:
   standard:
     Event: =>RegistrableEvent.event

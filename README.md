@@ -44,9 +44,6 @@ Note that the TicketID will always be required.
 
 ## Requirements
 *   SilverStripe 3.1+
-*   The [Event Calendar](https://github.com/unclecheese/EventCalendar) module.
-*   The [MultiForm](https://github.com/silverstripe/silverstripe-multiform) module.
-*   The [ItemSetField](https://github.com/ajshort/silverstripe-itemsetfield) module.
 *   Optionally requires the [Omnipay](https://github.com/burnbright/silverstripe-omnipay) module for collecting payments with registration.
 
 ## Installation

@@ -1,10 +1,5 @@
-Calendar:
-  ticketcalendar:
-    Title: Ticket Calendar
-
 RegistrableEvent:
   ticketevent:
-    Parent: =>Calendar.ticketcalendar
     Title: Ticket Event
 
 EventTicket:

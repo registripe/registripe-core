@@ -8,7 +8,6 @@ class EventRegisterControllerTest extends FunctionalTest{
 
 	public function setUp() {
 		parent::setUp();
-		$this->objFromFixture('Calendar', 'calendar')->publish('Stage', 'Live');
 		$this->event = $this->objFromFixture('RegistrableEvent', 'event');
 		$this->event->publish('Stage', 'Live');
 	}
@@ -19,22 +18,22 @@ class EventRegisterControllerTest extends FunctionalTest{
 	}
 
 	public function testIndex() {
-		$response = $this->get('calendar/test-event/register');
+		$response = $this->get('test-event/register');
 		$this->assertEquals(200, $response->getStatusCode());
 	}
 
 	public function testAttendee() {
-		$response = $this->get('calendar/test-event/register/attendee');
+		$response = $this->get('test-event/register/attendee');
 		$this->assertEquals(200, $response->getStatusCode());
 		$this->markTestIncomplete("Should be a redirect here");
 	}
 
 	public function testReviewRedirect() {
 		$this->autoFollowRedirection = false;
-		$response = $this->get('calendar/test-event/register/review');
+		$response = $this->get('test-event/register/review');
 		$this->assertEquals(302, $response->getStatusCode(), "Should redirect if no rego started");
 		$actual = $response->getHeader('Location');
-		$this->assertEquals(Director::baseURL() .'calendar/test-event/register', $actual, "Should redirect to register");
+		$this->assertEquals(Director::baseURL() .'test-event/register', $actual, "Should redirect to register");
 	}
 
 	public function testSubmitReview() {

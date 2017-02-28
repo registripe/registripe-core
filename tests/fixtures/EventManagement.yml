@@ -1,16 +1,6 @@
-Calendar:
-  calendar:
-    Title: Calendar
-
 RegistrableEvent:
   event:
-    Parent: =>Calendar.calendar
     Title: Test Event
-
-CalendarDateTime:
-  time:
-    Title: Test Time
-    Event: =>RegistrableEvent.event
 
 EventTicket:
   ticket_a:
