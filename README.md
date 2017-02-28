@@ -44,12 +44,12 @@ Note that the TicketID will always be required.
 
 ## Requirements
 *   SilverStripe 3.1+
-*   Optionally requires the [Omnipay](https://github.com/burnbright/silverstripe-omnipay) module for collecting payments with registration.
+*   [Omnipay](https://github.com/burnbright/silverstripe-omnipay) module for collecting payments with registration.
 
 ## Installation
 
-See [Installation](https://github.com/ajshort/silverstripe-eventmanagement/wiki/Installation).
+See [Installation](https://github.com/jedateach/silverstripe-eventmanagement/wiki/Installation).
 
 ## Project Links
-*   [GitHub Project Page](https://github.com/ajshort/silverstripe-eventmanagement)
-*   [Issue Tracker](https://github.com/ajshort/silverstripe-eventmanagement/issues)
+*   [GitHub Project Page](https://github.com/jedateach/silverstripe-eventmanagement)
+*   [Issue Tracker](https://github.com/jedateach/silverstripe-eventmanagement/issues)
