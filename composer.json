@@ -1,5 +1,5 @@
 {
-	"name": "silverstripe-australia/eventmanagement",
+	"name": "jedateach/silverstripe-eventmanagement",
 	"description": "SilverStripe event management and registration module",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe", "event"],
@@ -11,17 +11,14 @@
 		}
 	],
 	"require": {
-		"silverstripe/framework": ">=3.1",
-		"silverstripe/cms": ">=3.1",
-		"unclecheese/eventcalendar": "dev-master",
-		"silverstripe-australia/gridfieldextensions": "dev-master",
+		"silverstripe/framework": "~3.1",
+		"silverstripe/cms": "~3.1",
+		"unclecheese/eventcalendar": "~1.0",
+		"silverstripe-australia/gridfieldextensions": "~1.4",
 		"burnbright/silverstripe-anchorfield": "dev-master",
-		"burnbright/silverstripe-omnipay": "1.2.x"
+		"silverstripe/silverstripe-omnipay": "~2.1"
 	},
 	"extra": {
 		"installer-name": "eventmanagement"
-	},
-	"replace": {
-		"ajshort/silverstripe-eventmanagement": "self.version"
 	}
 }
