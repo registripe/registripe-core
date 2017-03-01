@@ -175,10 +175,8 @@ class EventRegistration extends DataObject {
 	}
 
 	public function calculateTotal(){
-		$calculator = Injector::inst()->get(
-			"EventRegistrationCostCalculator", true,  array($this)
-		);
-		$amount = $calculator->calculate();
+		$calculator = new EventRegistrationCalculator();
+		$amount = $calculator->calculate($this);
 
 		return $this->Total = $amount;
 	}

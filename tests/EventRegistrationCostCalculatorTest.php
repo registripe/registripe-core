@@ -8,10 +8,14 @@ class EventRegistrationCostCalculatorTest extends SapphireTest
 		'fixtures/Empty.yml'
 	);
 
+	public function setUp() {
+		parent::setUp();
+		$this->calculator = new EventRegistrationCalculator(); // defaults to cost calculator
+	}
+
 	// helper for asserting calculator results
 	protected function assertCalculation($reg, $expected, $message = "") {
-		$calculator = new EventRegistrationCostCalculator($reg);
-		$this->assertEquals($expected, $calculator->calculate(), $message);
+		$this->assertEquals($expected, $this->calculator->calculate($reg), $message);
 	}
 
 	public function testEmpty() {
