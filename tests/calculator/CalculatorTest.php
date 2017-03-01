@@ -1,16 +1,18 @@
 <?php
 
-class EventRegistrationCostCalculatorTest extends SapphireTest
+namespace EventRegistration\Calculator\Tests;
+
+class CalculatorTest extends \SapphireTest
 {
 
 	protected static $fixture_file = array(
-		'fixtures/Standard.yml',
-		'fixtures/Empty.yml'
+		'../fixtures/Standard.yml',
+		'../fixtures/Empty.yml'
 	);
 
 	public function setUp() {
 		parent::setUp();
-		$this->calculator = new EventRegistrationCalculator(); // defaults to cost calculator
+		$this->calculator = new \EventRegistration\Calculator(); // defaults to cost calculator
 	}
 
 	// helper for asserting calculator results

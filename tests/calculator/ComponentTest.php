@@ -1,12 +1,17 @@
 <?php
 
+namespace EventRegistration\Calculator\Tests;
 
-class EventRegistrationCalculatorComponentTest extends SapphireTest {
+use \SapphireTest;
+use EventRegistration\Calculator;
+use EventRegistration\Calculator\AbstractComponent;
+
+class ComponentTest extends SapphireTest
+{
 	
-
 	protected static $fixture_file = array(
-		'fixtures/Standard.yml',
-		'fixtures/Empty.yml'
+		'../fixtures/Standard.yml',
+		'../fixtures/Empty.yml'
 	);
 
 	public function setUp() {
@@ -17,8 +22,8 @@ class EventRegistrationCalculatorComponentTest extends SapphireTest {
 	}
 
 	public function testCustomCalculatorComponent() {
-		$calculator = new EventRegistrationCalculator(array(
-			new EventRegistrationCalculatorTestComponent()
+		$calculator = new Calculator(array(
+			new CustomComponent()
 		)); 
 		$this->assertEquals(6789, $calculator->calculate($this->emptyReg), 'should be fixed output');
 		$this->assertEquals(6789, $calculator->calculate($this->singleReg), 'should be fixed output');
@@ -27,7 +32,10 @@ class EventRegistrationCalculatorComponentTest extends SapphireTest {
 
 }
 
-class EventRegistrationCalculatorTestComponent extends EventRegistrationCalculatorBaseComponent {
+use \EventAttendee;
+use \EventRegistration;
+
+class CustomComponent extends AbstractComponent {
 
 	public function calculateAttendee(EventAttendee $attendee, EventRegistration $registration, $running) {
 		return 12345;
