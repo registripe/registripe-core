@@ -1,5 +1,6 @@
 <?php
 
+
 class EventAttendeeControllerTest extends FunctionalTest{
 
 	protected static $fixture_file = array(
@@ -18,7 +19,7 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	// put existing registration into session
 	protected function setUpExistingRegistration() {	
 		$this->registration = $this->objFromFixture('EventRegistration', 'reg_a');
-		(new EventRegistrationSession($this->event))->set($this->registration);
+		(new \EventRegistration\Session($this->event))->set($this->registration);
 	}
 
 	public function testAddAction() {

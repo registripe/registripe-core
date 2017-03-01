@@ -1,10 +1,12 @@
 <?php
 
-class RegistrableEventTest extends FunctionalTest{
+namespace EventRegistration\Tests;
+
+class RegistrableEventTest extends \FunctionalTest{
 	
 	protected static $fixture_file = array(
-		'fixtures/EventManagement.yml',
-		'fixtures/Tickets.yml'
+		'../fixtures/EventManagement.yml',
+		'../fixtures/Tickets.yml'
 	);
 
 	public function setUp() {

@@ -1,9 +1,14 @@
 <?php
 
+namespace EventRegistration;
+
+use \Session as SS_Session;
+use \EventRegistration;
+
 /**
  * Creates, stores, retrieves and deletes the current registration id.
  */
-class EventRegistrationSession{
+class Session{
 
 	protected $event;
 
@@ -17,12 +22,12 @@ class EventRegistrationSession{
 
 	public function get() {
 		return EventRegistration::get()->byID(
-			Session::get($this->sessionKey())
+			SS_Session::get($this->sessionKey())
 		);
 	}
 
 	public function set($registration) {
-		Session::set($this->sessionKey(), $registration->ID);
+		SS_Session::set($this->sessionKey(), $registration->ID);
 	}
 
 	public function start() {
@@ -34,8 +39,8 @@ class EventRegistrationSession{
 	}
 
 	public function end() {
-		Session::set($this->sessionKey(), null);
-		Session::clear($this->sessionKey());
+		SS_Session::set($this->sessionKey(), null);
+		SS_Session::clear($this->sessionKey());
 	}
 
 }

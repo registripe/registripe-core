@@ -1,11 +1,8 @@
 <?php
-/**
- * Contains tests for the {@link EventTicket} class.
- *
- * @package    silverstripe-eventmanagement
- * @subpackage tests
- */
-class EventTicketTest extends SapphireTest {
+
+namespace EventRegistration\Tests;
+
+class EventTicketTest extends \SapphireTest {
 
 	public function testCMSFields() {
 		$this->markTestIncomplete("Test CMS Fields");

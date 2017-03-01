@@ -1,6 +1,8 @@
 <?php
 
-class EventRegistrationSessionTest extends SapphireTest{
+namespace EventRegistration\Tests;
+
+class SessionTest extends \SapphireTest{
 
 	protected static $fixture_file = array(
 		'fixtures/EventManagement.yml'
@@ -8,7 +10,7 @@ class EventRegistrationSessionTest extends SapphireTest{
 
 	public function testSessionGetStartEnd() {
 		$event = $this->objFromFixture("RegistrableEvent", "event");
-		$session = new EventRegistrationSession($event);
+		$session = new \EventRegistration\Session($event);
 		$this->assertNull($session->get(), "No session started");
 		$reg = $session->start();
 		$this->assertNotNull($reg = $session->get(), "Registration");

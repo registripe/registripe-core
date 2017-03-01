@@ -28,7 +28,7 @@ class EventRegisterController extends Page_Controller {
 	public function __construct($parent, $event) {
 		$this->parent   = $parent;
 		$this->event = $event;
-		$this->regSession = new EventRegistrationSession($this->event);
+		$this->regSession = new \EventRegistration\Session($this->event);
 		parent::__construct($parent->data());
 	}
 
