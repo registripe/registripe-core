@@ -1,7 +1,7 @@
 # SilverStripe Event Management Module
 The event management module allows you to manage event details and registrations from within the CMS.
 
-[![Build Status](https://travis-ci.org/jedateach/silverstripe-eventmanagement.svg?branch=1.2)](https://travis-ci.org/jedateach/silverstripe-eventmanagement)
+[![Build Status](https://travis-ci.org/burnbright/silverstripe-eventmanagement.svg?branch=rebuild)](https://travis-ci.org/burnbright/silverstripe-eventmanagement)
 
 ## Features
 
@@ -47,8 +47,8 @@ Note that the TicketID will always be required.
 
 ## Installation
 
-See [Installation](https://github.com/jedateach/silverstripe-eventmanagement/wiki/Installation).
+See [Installation](https://github.com/burnbright/silverstripe-eventmanagement/wiki/Installation).
 
 ## Project Links
-*   [GitHub Project Page](https://github.com/jedateach/silverstripe-eventmanagement)
-*   [Issue Tracker](https://github.com/jedateach/silverstripe-eventmanagement/issues)
+*   [GitHub Project Page](https://github.com/burnbright/silverstripe-eventmanagement)
+*   [Issue Tracker](https://github.com/burnbright/silverstripe-eventmanagement/issues)
