@@ -19,7 +19,8 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	// put existing registration into session
 	protected function setUpExistingRegistration() {	
 		$this->registration = $this->objFromFixture('EventRegistration', 'reg_a');
-		(new \EventRegistration\Session($this->event))->set($this->registration);
+		$session = new \EventRegistration\Session($this->event);
+		$session->set($this->registration);
 	}
 
 	public function testAddAction() {
