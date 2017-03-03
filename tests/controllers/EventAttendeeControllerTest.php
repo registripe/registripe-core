@@ -114,7 +114,7 @@ class EventAttendeeControllerTest extends FunctionalTest{
 			Config::inst()->remove($class, 'extensions');
 		}
 		// add back base extensions
-		Config::inst()->update('EventRegistration', 'extensions', ['Payable']);
+		Config::inst()->update('EventRegistration', 'extensions', array('Payable'));
  		// just use defaults
 		Config::inst()->remove('EventRegistration', 'calculator_components');
 		Config::inst()->remove("EventAttendee", 'required_fields');
