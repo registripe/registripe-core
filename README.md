@@ -1,4 +1,4 @@
-# SilverStripe Event Management Module
+# Registripe: SilverStripe Event Management Module
 The event management module allows you to manage event details and registrations from within the CMS.
 
 [![Build Status](https://travis-ci.org/registripe/registripe-core.svg)](https://travis-ci.org/registripe/registripe-core)
