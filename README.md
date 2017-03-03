@@ -15,7 +15,6 @@ The event management module allows you to manage event details and registrations
 *   Require email confirmation for confirming free event registrations, or
     canceling a registration.
 *   Send registered users a notification email when event details change.
-*   Invite people to the event, either from member groups or from past events.
 
 ## Configuration
 
