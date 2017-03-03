@@ -22,26 +22,30 @@ class ComponentTest extends SapphireTest
 	}
 
 	public function testCustomCalculatorComponent() {
-		$calculator = new Calculator(array(
-			new CustomComponent()
-		)); 
-		$this->assertEquals(6789, $calculator->calculate($this->emptyReg), 'should be fixed output');
-		$this->assertEquals(6789, $calculator->calculate($this->singleReg), 'should be fixed output');
-		$this->assertEquals(6789, $calculator->calculate($this->multipleReg), 'should be fixed output');
+		$calculator = new Calculator($this->emptyReg, array("Custom")); 
+		$this->assertEquals(6789, $calculator->calculate(), 'should be fixed output');
+
+		$calculator = new Calculator($this->singleReg, array("Custom")); 
+		$this->assertEquals(6789, $calculator->calculate(), 'should be fixed output');
+
+		$calculator = new Calculator($this->multipleReg, array("Custom")); 
+		$this->assertEquals(6789, $calculator->calculate(), 'should be fixed output');
 	}
 
 }
+
+namespace EventRegistration\Calculator;
 
 use \EventAttendee;
 use \EventRegistration;
 
 class CustomComponent extends AbstractComponent {
 
-	public function calculateAttendee(EventAttendee $attendee, EventRegistration $registration, $running) {
+	public function calculateAttendee(EventAttendee $attendee, $total) {
 		return 12345;
 	}
 
-	public function calculateRegistration(EventRegistration $registration, $running) {
+	public function calculateRegistration($total) {
 		return 6789;
 	}
 

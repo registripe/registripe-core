@@ -4,11 +4,23 @@ namespace EventRegistration\Calculator;
 
 abstract class AbstractComponent implements ComponentInterface{
 
-	public function calculateAttendee(\EventAttendee $attendee, \EventRegistration $registration, $total) {
+	protected $registration;
+
+	public function __construct(\EventRegistration $registration) {
+		$this->registration = $registration;
+	}
+
+	/**
+	 * Runnig total for given attendee
+	 */
+	public function calculateAttendee(\EventAttendee $attendee, $total) {
 		return $total;
 	}
 
-	public function calculateRegistration(\EventRegistration $registration, $total) {
+	/**
+	 * Running total for registration
+	 */
+	public function calculateRegistration($total) {
 		return $total;
 	}
 

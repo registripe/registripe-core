@@ -175,26 +175,11 @@ class EventRegistration extends DataObject {
 	}
 
 	public function calculateTotal(){
-		$calculator = new \EventRegistration\Calculator(
-			$this->getCalculatorComponents()
-		);
-		$amount = $calculator->calculate($this);
+		$componentNames = self::config()->calculator_components;
+		$calculator = new \EventRegistration\Calculator($this, $componentNames);
+		$amount = $calculator->calculate();
 
 		return $this->Total = $amount;
-	}
-
-	/**
-	 * Creates instances of components from config
-	 * @return array
-	 */
-	protected function getCalculatorComponents() {
-		$componentNames = self::config()->calculator_components;
-		$components = array();
-		foreach($componentNames as $name) {
-			$className = sprintf("EventRegistration\Calculator\%sComponent", $name);
-			array_push($components, Injector::inst()->create($className));
-		}
-		return $components;
 	}
 
 	public function getTotalOutstanding() {

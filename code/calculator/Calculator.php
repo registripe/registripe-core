@@ -11,17 +11,19 @@ use EventRegistration\Calculator\CostComponent;
  * calculations.
  */
 class Calculator {
-	
+
+	protected $registration;
+
 	protected $storeattendeecost = true;
 
 	protected $components = array();
 
-	function __construct($components = null) {
-		if (!$components) {
-			$components = self::defaultComponents();
+	function __construct(\EventRegistration $registration, $componentNames = null) {
+		$this->registration = $registration;
+		if (!$componentNames) {
+			$componentNames = self::defaultComponentNames();
 		}
-
-		$this->components = $components;
+		$this->components = $this->initComponents($componentNames);
 	}
 
 	public function setStoreAttendeeCost($store = true){
@@ -29,13 +31,13 @@ class Calculator {
 		return $this;
 	}
 
-	public function calculate($registration) {
+	public function calculate() {		
 		$total = 0;
 		// each attendee
-		foreach($registration->Attendees() as $attendee) {
+		foreach($this->registration->Attendees() as $attendee) {
 			$cost = 0;
 			foreach($this->components as $component) {
-				$cost = $component->calculateAttendee($attendee, $registration, $cost);
+				$cost = $component->calculateAttendee($attendee, $cost);
 			}
 			if($this->storeattendeecost) {
 				$attendee->Cost = $cost;
@@ -45,7 +47,7 @@ class Calculator {
 		}
 		// registration
 		foreach($this->components as $component) {
-			$total = $component->calculateRegistration($registration, $total);
+			$total = $component->calculateRegistration($total);
 		}
 		return $total;
 	}
@@ -53,8 +55,22 @@ class Calculator {
 	/**
 	 * Create default calculator components
 	 */
-	protected static function defaultComponents(){
-		return array(new CostComponent());
+	protected static function defaultComponentNames(){
+		return array("Cost");
+	}
+
+	/**
+	 * Creates instances of components from component name strings
+	 * @param array componentNames
+	 * @return array
+	 */
+	protected function initComponents($componentNames) {
+		$components = array();
+		foreach($componentNames as $name) {
+			$className = sprintf("EventRegistration\Calculator\%sComponent", $name);
+			array_push($components, \Injector::inst()->create($className, $this->registration));
+		}
+		return $components;
 	}
 
 }

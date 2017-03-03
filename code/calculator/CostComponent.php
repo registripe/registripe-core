@@ -7,7 +7,7 @@ namespace EventRegistration\Calculator;
  */
 class CostComponent extends AbstractComponent{
 
-	public function calculateAttendee(\EventAttendee $attendee, \EventRegistration $registration, $cost) {
+	public function calculateAttendee(\EventAttendee $attendee, $cost) {
 		$ticket = $attendee->Ticket();
 		if($ticket->hasPrice()){
 			$cost += $ticket->obj('Price')->getAmount();

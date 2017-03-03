@@ -10,14 +10,10 @@ class CalculatorTest extends \SapphireTest
 		'../fixtures/Empty.yml'
 	);
 
-	public function setUp() {
-		parent::setUp();
-		$this->calculator = new \EventRegistration\Calculator(); // defaults to cost calculator
-	}
-
 	// helper for asserting calculator results
 	protected function assertCalculation($reg, $expected, $message = "") {
-		$this->assertEquals($expected, $this->calculator->calculate($reg), $message);
+		$this->calculator = new \EventRegistration\Calculator($reg);
+		$this->assertEquals($expected, $this->calculator->calculate(), $message);
 	}
 
 	public function testEmpty() {

@@ -13,15 +13,15 @@ interface ComponentInterface {
 	/**
 	 * First, each calulator works out and manipulates attendee costs.
 	 * @param EventAttendee
-	 * @param EventRegistration
 	 * @return float
 	 */
-	public function calculateAttendee(EventAttendee $attendee, EventRegistration $registration, $total);
+	public function calculateAttendee(EventAttendee $attendee, $total);
 
 	/**
 	 * Second, each caulator works out and manipulates total registration cost.
-	 * @return float
+   * @param float incoming total
+	 * @return float updated total
 	 */
-	public function calculateRegistration(EventRegistration $registration, $total);
+	public function calculateRegistration($total);
 
 }
