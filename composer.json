@@ -1,8 +1,8 @@
 {
-	"name": "jedateach/silverstripe-eventmanagement",
+	"name": "registripe/registripe-core",
 	"description": "SilverStripe event management and registration module",
 	"type": "silverstripe-module",
-	"keywords": ["silverstripe", "event"],
+	"keywords": ["silverstripe", "event", "registration"],
 	"license": "BSD-3-Clause",
 	"authors": [
 		{
@@ -18,6 +18,6 @@
 		"silverstripe/silverstripe-omnipay": "~2.1"
 	},
 	"extra": {
-		"installer-name": "eventmanagement"
+		"installer-name": "registripe"
 	}
 }

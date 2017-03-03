@@ -45,7 +45,7 @@ class RegistrableEvent extends Page {
 		'NotifyChangeFields'    => 'StartDate,EndDate,StartTime,EndTime'
 	);
 
-	private static $icon = "eventmanagement/images/date_edit.png";
+	private static $icon = "registripe/images/date_edit.png";
 
 	private static $description = "An event that can be registered for.";
 
@@ -141,7 +141,7 @@ class RegistrableEvent extends Page {
 
 		//complete
 		$registrationsGrid = new GridField('Registrations',
-			_t('EventManagement.REGISTRATIONS', 'Registrations'),
+			_t('Registripe.REGISTRATIONS', 'Registrations'),
 			$this->getCompletedRegistrations()
 				->sort("LastEdited", "DESC"),
 			$regGridFieldConfig
@@ -151,7 +151,7 @@ class RegistrableEvent extends Page {
 		//unconfirmed
 		if ($this->RegEmailConfirm) {
 			$unconfirmedGrid = new GridField('UnconfirmedRegistrations',
-				_t('EventManagement.UNCONFIRMED', 'Unconfirmed'),
+				_t('Registripe.UNCONFIRMED', 'Unconfirmed'),
 				$this->getUnconfirmedRegistrations()
 					->sort("LastEdited", "DESC")
 			);
@@ -163,7 +163,7 @@ class RegistrableEvent extends Page {
 						->sort("LastEdited", "DESC");
 		if($incomplete->exists()){
 			$incompleteGrid = new GridField('IncompleteRegistrations',
-				_t('EventManagement.INCOMPLETE', 'Incomplete'),
+				_t('Registripe.INCOMPLETE', 'Incomplete'),
 				$incomplete,
 				$regGridFieldConfig
 			);
@@ -175,7 +175,7 @@ class RegistrableEvent extends Page {
 						->sort("LastEdited", "DESC");
 		if($cancelled->exists()){
 			$cancelledGrid = new GridField('CancelledRegistrations',
-				_t('EventManagement.CANCELLATIONS', 'Cancellations'),
+				_t('Registripe.CANCELLATIONS', 'Cancellations'),
 				$cancelled,
 				$regGridFieldConfig
 			);
@@ -202,63 +202,63 @@ class RegistrableEvent extends Page {
 	public function getSettingsFields() {
 		$fields = parent::getSettingsFields();
 
-		Requirements::javascript('eventmanagement/javascript/cms.js');
+		Requirements::javascript('registripe/javascript/cms.js');
 
 		$fields->addFieldsToTab('Root.Registration', array(
 			new CheckboxField(
 				'OneRegPerEmail',
-				_t('EventManagement.ONE_REG_PER_EMAIL', 'Limit to one registration per email address?')
+				_t('Registripe.ONE_REG_PER_EMAIL', 'Limit to one registration per email address?')
 			),
 			new CheckboxField(
 				'RequireLoggedIn',
-				_t('EventManagement.REQUIRE_LOGGED_IN', 'Require users to be logged in to register?')
+				_t('Registripe.REQUIRE_LOGGED_IN', 'Require users to be logged in to register?')
 			),
 			$limit = new NumericField(
 				'RegistrationTimeLimit',
-				_t('EventManagement.REG_TIME_LIMIT', 'Registration time limit')
+				_t('Registripe.REG_TIME_LIMIT', 'Registration time limit')
 			),
 		));
 
 		$limit->setDescription(_t(
-			'EventManagement.REG_TIME_LIMIT_NOTE',
+			'Registripe.REG_TIME_LIMIT_NOTE',
 			'The time limit to complete registration, in seconds. Set to 0 to disable place holding.'
 		));
 
 		$fields->addFieldsToTab('Root.Email', array(
 			new CheckboxField(
 				'RegEmailConfirm',
-				_t('EventManagement.REQ_EMAIL_CONFIRM', 'Require email confirmation to complete free registrations?')
+				_t('Registripe.REQ_EMAIL_CONFIRM', 'Require email confirmation to complete free registrations?')
 			),
 			$info = new TextField(
 				'EmailConfirmMessage',
-				_t('EventManagement.EMAIL_CONFIRM_INFO', 'Email confirmation information')
+				_t('Registripe.EMAIL_CONFIRM_INFO', 'Email confirmation information')
 			),
 			$limit = new NumericField(
 				'ConfirmTimeLimit',
-				_t('EventManagement.EMAIL_CONFIRM_TIME_LIMIT', 'Email confirmation time limit')
+				_t('Registripe.EMAIL_CONFIRM_TIME_LIMIT', 'Email confirmation time limit')
 			),
 			new CheckboxField(
 				'UnRegEmailConfirm',
-				_t('EventManagement.REQ_UN_REG_EMAIL_CONFIRM', 'Require email confirmation to un-register?')
+				_t('Registripe.REQ_UN_REG_EMAIL_CONFIRM', 'Require email confirmation to un-register?')
 			),
 			new CheckboxField(
 				'EmailNotifyChanges',
-				_t('EventManagement.EMAIL_NOTIFY_CHANGES', 'Notify registered users of event changes via email?')
+				_t('Registripe.EMAIL_NOTIFY_CHANGES', 'Notify registered users of event changes via email?')
 			),
 			new CheckboxSetField(
 				'NotifyChangeFields',
-				_t('EventManagement.NOTIFY_CHANGE_IN', 'Notify of changes in'),
+				_t('Registripe.NOTIFY_CHANGE_IN', 'Notify of changes in'),
 				singleton('RegistrableDateTime')->fieldLabels(false)
 			)
 		));
 
 		$info->setDescription(_t(
-			'EventManagement.EMAIL_CONFIRM_INFO_NOTE',
+			'Registripe.EMAIL_CONFIRM_INFO_NOTE',
 			'This message is displayed to users to let them know they need to confirm their registration.'
 		));
 
 		$limit->setDescription(_t(
-			'EventManagement.CONFIRM_TIME_LIMIT_NOTE',
+			'Registripe.CONFIRM_TIME_LIMIT_NOTE',
 			'The time limit to conform registration, in seconds. Set to 0 for no limit.'
 		));
 

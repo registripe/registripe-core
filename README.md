@@ -1,7 +1,7 @@
 # SilverStripe Event Management Module
 The event management module allows you to manage event details and registrations from within the CMS.
 
-[![Build Status](https://travis-ci.org/burnbright/silverstripe-eventmanagement.svg?branch=rebuild)](https://travis-ci.org/burnbright/silverstripe-eventmanagement)
+[![Build Status](https://travis-ci.org/registripe/registripe-core.svg)](https://travis-ci.org/registripe/registripe-core)
 
 ## Features
 
@@ -37,18 +37,14 @@ EventAttendee:
 ```
 Note that the TicketID will always be required.
 
-## Maintainer Contacts
-
-*   Jeremy Shipman (<jeremy@burnbright.net>)
-
 ## Requirements
 *   SilverStripe 3.1+
-*   [Omnipay](https://github.com/burnbright/silverstripe-omnipay) module for collecting payments with registration.
+*   [Omnipay](https://github.com/silverstripe/silverstripe-omnipay) module for collecting payments with registration.
 
 ## Installation
 
-See [Installation](https://github.com/burnbright/silverstripe-eventmanagement/wiki/Installation).
+See [Installation](https://github.com/registripe/registripe-core/wiki/Installation).
 
 ## Project Links
-*   [GitHub Project Page](https://github.com/burnbright/silverstripe-eventmanagement)
-*   [Issue Tracker](https://github.com/burnbright/silverstripe-eventmanagement/issues)
+*   [GitHub Project Page](https://github.com/registripe/registripe-core)
+*   [Issue Tracker](https://github.com/registripe/registripe-core/issues)

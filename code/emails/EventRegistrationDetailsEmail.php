@@ -2,7 +2,7 @@
 /**
  * An email that contains the details for an event registration.
  *
- * @package silverstripe-eventmanagement
+ * @package registripe
  */
 class EventRegistrationDetailsEmail extends Email {
 

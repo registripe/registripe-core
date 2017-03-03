@@ -3,7 +3,7 @@
  * Handles collecting the users details and creating a registration to an event
  * for them.
  *
- * @package silverstripe-eventmanagement
+ * @package registripe
  */
 class EventRegisterController extends Page_Controller {
 

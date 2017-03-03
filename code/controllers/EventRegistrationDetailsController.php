@@ -3,7 +3,7 @@
  * Allows a user to view details for an event registration, provided they have
  * the correct token value, or are the member attached to the registration.
  *
- * @package silverstripe-eventmanagement
+ * @package registripe
  */
 class EventRegistrationDetailsController extends Page_Controller {
 

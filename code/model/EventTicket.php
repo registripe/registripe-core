@@ -3,7 +3,7 @@
  * A ticket type that can be attached to a registrable event. Each ticket can
  * have a specific quantity available for each event time.
  *
- * @package silverstripe-eventmanagement
+ * @package registripe
  */
 class EventTicket extends DataObject {
 
@@ -42,7 +42,7 @@ class EventTicket extends DataObject {
 		$fields = parent::getCMSFields();
 
 		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-		Requirements::javascript('eventmanagement/javascript/event-ticket-cms.js');
+		Requirements::javascript('registripe/javascript/event-ticket-cms.js');
 
 		$fields->removeByName('EventID');
 		$fields->removeByName('StartDate');

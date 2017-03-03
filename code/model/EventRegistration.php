@@ -2,7 +2,7 @@
 /**
  * Represents a registration to an event.
  *
- * @package silverstripe-eventmanagement
+ * @package registripe
  */
 class EventRegistration extends DataObject {
 

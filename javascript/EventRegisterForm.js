@@ -15,7 +15,7 @@
 				// page so they are redirected by the server back to the start.
 				if (total <= 0) {
 					alert(ss.i18n._t(
-						'EventManagement.REGISTRATIONEXPIRED', 'Sorry, but your'
+						'Registripe.REGISTRATIONEXPIRED', 'Sorry, but your'
 						+ ' registration session has expired and your tickets'
 						+ ' have been released. Please try registering again.'));
 

@@ -2,7 +2,7 @@
 /**
  * Allows a user to cancel their registration by entering their email address.
  *
- * @package silverstripe-eventmanagement
+ * @package registripe
  */
 class EventUnregisterController extends Page_Controller {
 
@@ -36,10 +36,10 @@ class EventUnregisterController extends Page_Controller {
 			$this,
 			'UnregisterForm',
 			new FieldList(new EmailField(
-				'Email', _t('EventManagement.EMAIL_ADDRESS', 'Email address')
+				'Email', _t('Registripe.EMAIL_ADDRESS', 'Email address')
 			)),
 			new FieldList(new FormAction(
-				'doUnregister', _t('EventManagement.UN_REGISTER', 'Un-register')
+				'doUnregister', _t('Registripe.UN_REGISTER', 'Un-register')
 			)),
 			new RequiredFields('Email')
 		);
@@ -67,7 +67,7 @@ class EventUnregisterController extends Page_Controller {
 
 			$email->setTo($addr);
 			$email->setSubject(sprintf(
-				_t('EventManagement.CONFIRMUNREGFOR', 'Confirm Un-Registration For %s (%s)'),
+				_t('Registripe.CONFIRMUNREGFOR', 'Confirm Un-Registration For %s (%s)'),
 				$this->event->Title, SiteConfig::current_site_config()->Title));
 
 			$email->setTemplate('EventUnregistrationConfirmationEmail');

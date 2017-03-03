@@ -25,4 +25,4 @@ before_script:
  - cd ~/builds/ss
 
 script: 
- - phpunit eventmanagement/tests/
+ - phpunit registripe/tests/
