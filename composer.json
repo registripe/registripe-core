@@ -3,7 +3,7 @@
 	"description": "SilverStripe event management and registration module",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe", "event", "registration"],
-	"license": "BSD-3-Clause",
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Jeremy Shipman",
