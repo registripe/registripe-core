@@ -10,8 +10,6 @@ The event management module allows you to manage event details and registrations
 *   Attach multiple ticket types to each event. Each ticket can have its own
     price, go on sale in different time ranges and have different quantities
     available.
-*   Hold event tickets during the registration process to ensure they are
-    available.
 *   Require email confirmation for confirming free event registrations, or
     canceling a registration.
 *   Send registered users a notification email when event details change.
