@@ -29,3 +29,5 @@
 		<% end_loop %>
 	</tbody>
 </table>
+
+$NextLink

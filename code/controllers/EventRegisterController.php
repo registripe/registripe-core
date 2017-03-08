@@ -63,17 +63,18 @@ class EventRegisterController extends Page_Controller {
 		} else {
 			$tickets = $this->event->getAvailableTickets();
 			$data = new ArrayData(array(
-				'Tickets' => $tickets,
-				'Link' => $this->event->Link()
+				'Tickets' => $tickets
 			));
-			$content = $data->renderWith("EventTicketSelector");
 			$registration = $this->getCurrentRegistration();
 			if($registration->Attendees()->exists()){
-				$link = $this->Link("review");
-				$content .= AnchorField::create("review",
-					_t("EventRegisterController.BACKTOREVIEW", "Back to Review"), $link
+				$data->NextURL = $this->Link("review");
+				$data->NextLink = AnchorField::create("review",
+					_t("EventRegisterController.BACKTOREVIEW", "Back to Review"),
+					$data->NextURL
 				)->Field();
 			}
+			$template = self::config()->ticket_select_template;
+			$content = $this->renderWith($template, $data);
 			$data = array(
 				'Title' => 'Register For ' . $this->event->Title,
 				'Form'  => '',
@@ -102,8 +103,10 @@ class EventRegisterController extends Page_Controller {
 			'BackURL' => $backurl,
 			'NextURL' => $this->Link('review')
 		));
-
-		return new EventAttendeeController($record, $registration);
+		$controller = new EventAttendeeController($record, $registration);
+		$this->extend("updateEventAttendeeController", $controller, $record, $registration);
+		
+		return $controller;
 	}
 
 	/**

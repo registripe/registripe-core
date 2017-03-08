@@ -7,3 +7,5 @@ LeftAndMain:
 Payment:
   has_one:
     EventRegistration: EventRegistration
+EventRegisterController:
+  ticket_select_template: EventTicketSelector
