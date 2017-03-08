@@ -128,6 +128,8 @@ class EventAttendeeController extends Page_Controller{
 
 		$this->registration->calculateTotal();
 		$this->registration->write();
+
+		$this->extend("onSave", $attendee, $this->registration);
 		
 		return $this->redirect($this->NextURL);
 	}
