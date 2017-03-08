@@ -44,6 +44,10 @@ class EventRegisterController extends Page_Controller {
 		}
 	}
 
+	public function getEvent() {
+		return $this->event;
+	}
+
 	/**
 	 * Select ticket action
 	 * @return HTMLText
@@ -152,8 +156,13 @@ class EventRegisterController extends Page_Controller {
 			)
 		);
 		$actions = new FieldList(
-			new AnchorField("addticket", _t("EventRegisterController.ADDANOTHER", "Add Another Ticket"), $this->Link()),
-			$nextaction = new FormAction("submitreview", _t("EventRegisterController.NEXTSTEP", "Next Step"))
+			new AnchorField("addticket",
+				_t("EventRegisterController.ADDANOTHER", "Add Another Ticket"),
+				$this->Link()
+			),
+			$nextaction = new FormAction(
+				"submitreview", _t("EventRegisterController.NEXTSTEP", "Next Step")
+			)
 		);
 		if($registration->getTotalOutstanding() > 0){
 			$nextaction->setTitle("Make Payment");
