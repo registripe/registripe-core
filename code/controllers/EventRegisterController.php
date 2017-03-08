@@ -7,7 +7,7 @@
  */
 class EventRegisterController extends Page_Controller {
 
-	public static $allowed_actions = array(
+	private static $allowed_actions = array(
 		'attendee',
 		'review',
 		'ReviewForm',
