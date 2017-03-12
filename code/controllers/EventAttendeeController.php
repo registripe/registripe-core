@@ -55,6 +55,7 @@ class EventAttendeeController extends Page_Controller{
 				$form->loadDataFrom($latestattendee, 0, $prepops);	
 			}
 		}
+		$this->extend("onAdd", $form, $this->registration);
 		return array(
 			'Title' => $ticket ? $ticket->Title : null,
 			'Form' => $form
@@ -84,6 +85,7 @@ class EventAttendeeController extends Page_Controller{
 		$form->loadDataFrom($attendee);
 		//add tickets dropdown, if there is no selected ticket
 		$form->getValidator()->addRequiredField("ID");
+		$this->extend("onEdit", $form, $attendee, $this->registration);
 		return array(
 			'Title' => $attendee->Ticket()->Title,
 			'Form' => $form
