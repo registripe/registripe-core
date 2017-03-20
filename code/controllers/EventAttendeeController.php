@@ -16,6 +16,10 @@ class EventAttendeeController extends Page_Controller{
 		$this->registration = $registration;
 	}
 
+	public function index($request) {
+		return $this->add($request);
+	}
+
 	/**
 	 * Add action renders the add attendee form.
 	 * @param HTTPRequest $request
