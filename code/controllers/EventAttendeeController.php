@@ -97,7 +97,7 @@ class EventAttendeeController extends Page_Controller{
 	}
 
 	/**
-	 * Create the EventAttendeeForm for adding/editing records
+	 * Create the form for adding/editing records
 	 * @return EventAttendeeForm
 	 */
 	public function AttendeeForm() {
