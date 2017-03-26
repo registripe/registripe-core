@@ -26,7 +26,7 @@ class EventRegisterController extends Page_Controller {
 	 * @param RegistrableEvent $event
 	 */
 	public function __construct($parent, $event) {
-		$this->parent   = $parent;
+		$this->parent = $parent;
 		$this->event = $event;
 		$this->regSession = new \EventRegistration\Session($this->event);
 		parent::__construct($parent->data());
@@ -105,7 +105,7 @@ class EventRegisterController extends Page_Controller {
 			'ParentID' => $this->ID,
 			'URLSegment' => 'register/attendee',
 			'BackURL' => $backurl,
-			'NextURL' => $this->Link('review')
+			'NextURL' => $nexturl
 		));
 		$controller = new EventAttendeeController($record, $registration);
 		$this->extend("updateEventAttendeeController", $controller, $record, $registration);
