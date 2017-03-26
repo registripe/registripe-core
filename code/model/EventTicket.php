@@ -82,7 +82,7 @@ class EventTicket extends DataObject {
 	 * @return RequiredFields
 	 */
 	public function getValidator() {
-		return new RequiredFields('Title', 'Type', 'StartDate', 'EndDate');
+		return new RequiredFields('Title', 'Type');
 	}
 
 	public function validate() {
@@ -90,13 +90,6 @@ class EventTicket extends DataObject {
 		if ($this->Type == 'Price' && !$this->Price->exists()) {
 			$result->error('You must enter a currency and price for fixed price tickets');
 		}
-		if (!$this->StartDate){
-			$result->error('You must enter a start date');	
-		}
-		if (!$this->EndDate) {
-			$result->error('You must enter an end date');
-		}
-
 		return $result;
 	}
 
