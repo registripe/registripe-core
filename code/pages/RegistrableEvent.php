@@ -100,12 +100,22 @@ class RegistrableEvent extends Page {
 			));
 		}
 
+		$ticketsconfig = GridFieldConfig_RecordEditor::create();
 		$fields->addFieldToTab('Root.Tickets', new GridField(
 			'Tickets',
 			'Ticket Types',
 			$this->Tickets(),
-			GridFieldConfig_RecordEditor::create()
+			$ticketsconfig
 		));
+
+		// customise if ticket sub-classes are present
+		if (count(ClassInfo::subclassesFor("EventTicket")) > 1 ) {
+			$ticketsconfig
+				->removeComponentsByType('GridFieldAddNewButton')
+				->addComponent(new GridFieldAddNewMultiClass());
+
+				// TODO: add type column to grid
+		}
 
 		//registrations
 		$fields->addFieldToTab('Root.Registrations', $this->getRegistrationsFields());
@@ -397,7 +407,7 @@ class RegistrableEvent_Controller extends Page_Controller {
 	 */
 	public function register() {
 		$record = $this->dataRecord;
-		$record->Content = "";
+		$record->Content = '';
 		return new EventRegisterController($this, $record);
 	}
 
