@@ -38,6 +38,9 @@ class EventTicket extends DataObject {
 		'Type'
 	);
 
+	private static $singular_name = "Ticket";
+	private static $plural_name = "Tickets";
+
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 
