@@ -151,12 +151,16 @@ class EventAttendeeController extends Page_Controller{
 			->byID($request->param('ID'));
 		if(!$attendee) {
 			return $this->httpError(404, "Attendee not found");
-		}elseif($this->registration->Attendees()->count() <= 1){
+		}else if($this->canDelete()){
 			//there must be at least one attendee
-		}else{
+			$this->extend("onBeforeDelete", $attendee, $this->registration);
 			$attendee->delete();
 		}
 		return $this->redirect($this->BackURL);
+	}
+
+	protected function canDelete() {
+		return $this->registration->Attendees()->count() <= 1;
 	}
 
 	/**
