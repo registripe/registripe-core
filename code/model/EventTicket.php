@@ -9,8 +9,7 @@ class EventTicket extends DataObject {
 
 	private static $db = array(
 		'Title'       => 'Varchar(255)',
-		'Type'        => 'Enum("Free, Price")',
-		'Price'       => 'Money',
+		'Price'       => 'Currency',
 		'Description' => 'Text',
 		'StartDate'   => 'SS_Datetime',
 		'EndDate'     => 'SS_Datetime',
@@ -34,8 +33,7 @@ class EventTicket extends DataObject {
 	);
 
 	private static $searchable_fields = array(
-		'Title',
-		'Type'
+		'Title'
 	);
 
 	private static $singular_name = "Ticket";
@@ -44,26 +42,10 @@ class EventTicket extends DataObject {
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 
-		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
-		Requirements::javascript('registripe/javascript/event-ticket-cms.js');
-
 		$fields->removeByName('EventID');
 		$fields->removeByName('StartDate');
 		$fields->removeByName('EndDate');
 		$fields->removeByName('Attendees');
-
-		if (class_exists('Payment')) {
-			$fields->insertBefore(
-				new OptionSetField('Type', 'Ticket type', array(
-					'Free'  => 'Free ticket',
-					'Price' => 'Fixed price ticket'
-				)),
-				'Price'
-			);
-		} else {
-			$fields->removeByName('Type');
-			$fields->removeByName('Price');
-		}
 
 		foreach (array('Start', 'End') as $type) {
 			$fields->addFieldsToTab('Root.Main', 
@@ -85,33 +67,12 @@ class EventTicket extends DataObject {
 	 * @return RequiredFields
 	 */
 	public function getValidator() {
-		return new RequiredFields('Title', 'Type');
-	}
-
-	public function validate() {
-		$result = parent::validate();
-		if ($this->Type == 'Price' && !$this->Price->exists()) {
-			$result->error('You must enter a currency and price for fixed price tickets');
-		}
-		return $result;
+		return new RequiredFields('Title');
 	}
 
 	public function populateDefaults() {
 		$this->StartDate = date('Y-m-d H:i:s');
 		parent::populateDefaults();
-	}
-
-	protected function onBeforeWrite() {
-		if (!class_exists('Payment')) {
-			$this->Type = 'Free';
-		}
-		//clear price if ticket is free
-		if($this->Type != "Price"){
-			$this->Price = "";
-			$this->PriceAmount = 0;
-			$this->PriceCurrency = "";
-		}
-		parent::onBeforeWrite();
 	}
 
 	/**
@@ -195,10 +156,7 @@ class EventTicket extends DataObject {
 	 * @return string
 	 */
 	public function PriceSummary() {
-		switch ($this->Type) {
-			case 'Free':  return 'Free';
-			case 'Price': return $this->obj('Price')->Nice();
-		}
+		return $this->obj('Price')->Nicer();
 	}
 
 	/**
@@ -206,7 +164,15 @@ class EventTicket extends DataObject {
 	 * @return boolean
 	 */
 	public function hasPrice(){
-		return $this->Type == "Price" && $this->obj('Price')->getAmount() > 0;
+		return $this->Price > 0;
+	}
+
+	/**
+	 * Check if this ticket is a free one.
+	 * @return boolean
+	 */
+	public function isFree(){
+		return $this->Price <= 0;
 	}
 
 	/**

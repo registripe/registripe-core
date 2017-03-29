@@ -10,7 +10,7 @@ class CostComponent extends AbstractComponent{
 	public function calculateAttendee(\EventAttendee $attendee, $cost) {
 		$ticket = $attendee->Ticket();
 		if($ticket->hasPrice()){
-			$cost += $ticket->obj('Price')->getAmount();
+			$cost += $ticket->Price;
 		}
 		return $cost;
 	}

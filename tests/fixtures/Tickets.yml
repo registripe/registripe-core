@@ -6,22 +6,22 @@ EventTicket:
   ticket_dateless:
     Title: Dateless Ticket
     Event: =>RegistrableEvent.ticketevent
-    PriceAmount: 1
+    Price: 1
   ticket_current:
     Event: =>RegistrableEvent.ticketevent
     Title: Current Ticket
     StartDate: 1999-01-01
     EndDate: 2200-01-01
-    PriceAmount: 20
+    Price: 20
   ticket_unreleased:
     Event: =>RegistrableEvent.ticketevent
     Title: Unreleased Ticket
     StartDate: 2200-01-01
     EndDate: 2200-01-01
-    PriceAmount: 300
+    Price: 300
   ticket_expired:
     Event: =>RegistrableEvent.ticketevent
     Title: Expired Ticket
     StartDate: 1999-01-01
     EndDate: 1999-01-01
-    PriceAmount: 4000
+    Price: 4000

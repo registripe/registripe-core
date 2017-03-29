@@ -6,13 +6,12 @@ EventTicket:
   standard:
     Event: =>RegistrableEvent.event
     Title: Standard
-    Type: Price
-    PriceAmount: 10
+    Price: 10
   free:
     Event: =>RegistrableEvent.event
     Title: Infant
     Type: Free
-    PriceAmount: 0
+    Price: 0
 
 EventRegistration:
   single:

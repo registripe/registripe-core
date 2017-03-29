@@ -346,29 +346,6 @@ class RegistrableEvent extends Page {
 			->filter("EventRegistration.EventID", $this->ID);
 	}
 
-	public function validate() {
-		$result   = parent::validate();
-		$currency = null;
-
-		// Ensure that we only have tickets in one currency, since you can't
-		// make a payment across currencies.
-		foreach ($this->Tickets() as $ticket) {
-			if ($ticket->Type == 'Price') {
-				$ticketCurr = $ticket->Price->getCurrency();
-				if ($ticketCurr && $currency && $ticketCurr != $currency) {
-					$result->error(sprintf(
-						'You cannot attach tickets with different currencies '
-						. 'to one event. You have tickets in both "%s" and "%s".',
-						$currency, $ticketCurr));
-					return $result;
-				}
-				$currency = $ticketCurr;
-			}
-		}
-
-		return $result;
-	}
-
 	/**
 	 * Returns the overall number of places remaining at this event, TRUE if
 	 * there are unlimited places or FALSE if they are all taken.

@@ -6,8 +6,7 @@ EventTicket:
   ticket_a:
     Event: =>RegistrableEvent.event
     Title: Test Ticket
-    Type: Price
-    PriceAmount: 100
+    Price: 100
 
 EventRegistration:
   reg_a:
