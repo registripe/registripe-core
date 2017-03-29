@@ -1,6 +1,6 @@
 <?php
 /**
- * A ticket type that can be attached to a registrable event. Each ticket can
+ * A ticket that can be attached to a registrable event. Each ticket can
  * have a specific quantity available for each event time.
  *
  * @package registripe
