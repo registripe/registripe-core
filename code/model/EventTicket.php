@@ -56,8 +56,8 @@ class EventTicket extends DataObject {
 		}
 		$fields->addFieldsToTab('Root.Main', array(
 			new TextareaField('Description', 'Description'),
-			new NumericField('MinTickets', 'Minimum tickets per order'),
-			new NumericField('MaxTickets', 'Maximum tickets per order')
+			NumericField::create('MinTickets', 'Minimum tickets')->setDescription("(Per registration)"),
+			NumericField::create('MaxTickets', 'Maximum tickets')->setDescription("(Per registration)")
 		));
 
 		return $fields;
