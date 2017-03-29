@@ -212,8 +212,6 @@ class RegistrableEvent extends Page {
 	public function getSettingsFields() {
 		$fields = parent::getSettingsFields();
 
-		Requirements::javascript('registripe/javascript/cms.js');
-
 		$fields->addFieldsToTab('Root.Registration', array(
 			new CheckboxField(
 				'OneRegPerEmail',

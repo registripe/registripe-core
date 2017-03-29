@@ -1,9 +1,6 @@
 ---
 name: registripe#admin
 ---
-LeftAndMain:
-  extra_requirements_javascript:
-    - registripe/javascript/cms.js
 Payment:
   has_one:
     EventRegistration: EventRegistration
