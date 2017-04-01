@@ -100,7 +100,6 @@ class EventTicket extends DataObject {
 	/**
 	 * Returns the number of tickets available for an event time.
 	 *
-	 * @param  RegistrableDateTime $time
 	 * @param  int $excludeId A registration ID to exclude from calculations.
 	 * @return array
 	 */

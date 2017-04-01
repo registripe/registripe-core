@@ -252,11 +252,6 @@ class RegistrableEvent extends Page {
 			new CheckboxField(
 				'EmailNotifyChanges',
 				_t('Registripe.EMAIL_NOTIFY_CHANGES', 'Notify registered users of event changes via email?')
-			),
-			new CheckboxSetField(
-				'NotifyChangeFields',
-				_t('Registripe.NOTIFY_CHANGE_IN', 'Notify of changes in'),
-				singleton('RegistrableDateTime')->fieldLabels(false)
 			)
 		));
 
