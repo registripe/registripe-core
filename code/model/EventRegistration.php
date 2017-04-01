@@ -63,6 +63,7 @@ class EventRegistration extends DataObject {
 				->setConfig($conf)
 				->performReadonlyTransformation();
 		}
+		$this->extend("updateCMSFields", $fields);
 
 		return $fields;
 	}
