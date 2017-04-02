@@ -168,8 +168,8 @@ class EventRegisterController extends Page_Controller {
 			$nextaction->setTitle("Make Payment");
 		}
 
-		$form = new Form($this, "ReviewForm", $fields, $actions);
-		return $form;
+		$this->extend("updateReviewForm", $fields, $actions);
+		return new Form($this, "ReviewForm", $fields, $actions);
 	}
 
 	/**
