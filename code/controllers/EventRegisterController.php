@@ -121,10 +121,11 @@ class EventRegisterController extends Page_Controller {
 		if(!$this->canReview()){
 			return $this->redirect($this->Link());
 		}
-		$registration = $this->getCurrentRegistration()
-			->customise(array(
+		$registration = $this->getCurrentRegistration();
+		$registration = $registration->customise(array(
 				'EditLink' => $this->Link('attendee/edit'),
-				'DeleteLink' => $this->Link('attendee/delete')
+				'DeleteLink' => $this->Link('attendee/delete'),
+				'Total' => $registration->obj('calculateTotal')
 			))->renderWith("AttendeesReviewTable");
 
 		return array(

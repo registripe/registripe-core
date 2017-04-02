@@ -33,6 +33,10 @@ class EventRegistration extends DataObject {
 		'Created.Nice' 		=> 'Date'
 	);
 
+	private static $casting = array(
+		'calculateTotal' => 'Currency'
+	);
+
 	protected function onBeforeWrite() {
 		if (!$this->isInDB()) {
 			$generator = new RandomGenerator();
