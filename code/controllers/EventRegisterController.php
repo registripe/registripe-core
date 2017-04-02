@@ -188,12 +188,11 @@ class EventRegisterController extends Page_Controller {
 			));
 		}
 		$form->saveInto($registration);
+		$registration->calculateTotal(); // final calculation
 		$registration->write();
 		//redirect to appropriate place, based on total cost
-		if($registration->canPay()){
-			return $this->redirect($this->Link('payment'));
-		}
-		return $this->redirect($this->Link('complete'));
+		$action = $registration->canPay() ? 'payment' : 'complete';
+		return $this->redirect($this->Link($action));
 	}
 
 	/**
