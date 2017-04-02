@@ -177,9 +177,9 @@ class EventRegistration extends DataObject {
 
 	public function calculateTotal(){
 		$componentNames = self::config()->calculator_components;
-		$calculator = new \EventRegistration\Calculator($this, $componentNames);
+		$className = "EventRegistration\Calculator";
+		$calculator = \Injector::inst()->create($className, $this, $componentNames);
 		$amount = $calculator->calculate();
-
 		return $this->Total = $amount;
 	}
 
