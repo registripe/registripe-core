@@ -12,9 +12,7 @@ class EventTicket extends DataObject {
 		'Price'       => 'Currency',
 		'Description' => 'Text',
 		'StartDate'   => 'SS_Datetime',
-		'EndDate'     => 'SS_Datetime',
-		'MinTickets'  => 'Int',
-		'MaxTickets'  => 'Int'
+		'EndDate'     => 'SS_Datetime'
 	);
 
 	private static $has_one = array(
@@ -43,8 +41,6 @@ class EventTicket extends DataObject {
 		$fields = parent::getCMSFields();
 
 		$fields->removeByName('EventID');
-		$fields->removeByName('StartDate');
-		$fields->removeByName('EndDate');
 		$fields->removeByName('Attendees');
 
 		foreach (array('Start', 'End') as $type) {
@@ -54,11 +50,6 @@ class EventTicket extends DataObject {
 			$dateTime->getDateField()->setConfig('showcalendar', true);
 			$dateTime->getTimeField()->setConfig('showdropdown', true);
 		}
-		$fields->addFieldsToTab('Root.Main', array(
-			new TextareaField('Description', 'Description'),
-			NumericField::create('MinTickets', 'Minimum tickets')->setDescription("(Per registration)"),
-			NumericField::create('MaxTickets', 'Maximum tickets')->setDescription("(Per registration)")
-		));
 
 		return $fields;
 	}
