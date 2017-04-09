@@ -61,11 +61,6 @@ class EventTicket extends DataObject {
 		return new RequiredFields('Title');
 	}
 
-	public function populateDefaults() {
-		$this->StartDate = date('Y-m-d H:i:s');
-		parent::populateDefaults();
-	}
-
 	/**
 	 * Get the attendees that have booked this ticket.
 	 * @return DataList
