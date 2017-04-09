@@ -112,7 +112,8 @@ class RegistrableEvent extends Page {
 		if (count(ClassInfo::subclassesFor("EventTicket")) > 1 ) {
 			$ticketsconfig
 				->removeComponentsByType('GridFieldAddNewButton')
-				->addComponent(new GridFieldAddNewMultiClass());
+				->addComponent(new GridFieldAddNewMultiClass())
+				->addComponent(new GridFieldOrderableRows());
 
 				// TODO: add type column to grid
 		}
@@ -125,7 +126,7 @@ class RegistrableEvent extends Page {
 			$fields->addFieldToTab("Root.Attendees", $attendeesfield);
 		}
 
-		$this->extend('updateCMSFields',$fields);
+		$this->extend('updateCMSFields', $fields);
 
 		return $fields;
 	}

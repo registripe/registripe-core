@@ -12,7 +12,8 @@ class EventTicket extends DataObject {
 		'Price'       => 'Currency',
 		'Description' => 'Text',
 		'StartDate'   => 'SS_Datetime',
-		'EndDate'     => 'SS_Datetime'
+		'EndDate'     => 'SS_Datetime',
+		'Sort'       => 'Int'
 	);
 
 	private static $has_one = array(
@@ -33,6 +34,8 @@ class EventTicket extends DataObject {
 	private static $searchable_fields = array(
 		'Title'
 	);
+
+	private static $default_sort = "Sort ASC, Created ASC";
 
 	private static $singular_name = "Ticket";
 	private static $plural_name = "Tickets";
