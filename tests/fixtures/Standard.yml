@@ -10,7 +10,6 @@ EventTicket:
   free:
     Event: =>RegistrableEvent.event
     Title: Infant
-    Type: Free
     Price: 0
 
 EventRegistration:
