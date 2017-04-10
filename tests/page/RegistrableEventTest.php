@@ -2,7 +2,7 @@
 
 namespace EventRegistration\Tests;
 
-class RegistrableEventTest extends \FunctionalTest{
+class RegistrableEventTest extends \SapphireTest{
 	
 	protected static $fixture_file = array(
 		'../fixtures/EventManagement.yml',
@@ -15,13 +15,8 @@ class RegistrableEventTest extends \FunctionalTest{
 		$this->event->publish('Stage', 'Live');
 	}
 
-	public function testVisitEventPage(){
-		$page = $this->get('test-event');
-		$this->assertEquals(200, $page->getStatusCode());
-	}
-
 	public function testCMSFields() {
-		$this->markTestIncomplete("Test CMS Fields");
+		$fields = $this->event->getCMSFields();
 	}
 
 	public function testAvailableTickets() {
@@ -30,5 +25,14 @@ class RegistrableEventTest extends \FunctionalTest{
 		$tickets = $ticketevent->getAvailableTickets();
 		$this->assertEquals(2, $tickets->count(), "Two ticket types qualify currently");
 	}
+
+	// TODO: Test
+	// canRegister
+	// getCompletedRegistrations
+	// getUnconfirmedRegistrations
+	// getIncompleteRegistrations
+	// getCancelledRegistrations
+	// getValidAttendees
+	// getRemainingCapacity
 
 }
