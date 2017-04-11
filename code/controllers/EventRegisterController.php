@@ -149,12 +149,19 @@ class EventRegisterController extends Page_Controller {
 	 */
 	public function ReviewForm() {
 		$registration = $this->getCurrentRegistration();
-		$fields = new FieldList(
-			new DropdownField("RegistrantAttendeeID",
+		$attendees = $registration->Attendees();
+
+		$maincontactfield = $attendees->count() === 1 ?
+			HiddenField::create("RegistrantAttendeeID")->setValue(
+				$attendees->first()->ID
+			) :
+			DropdownField::create("RegistrantAttendeeID",
 				_t("EventRegisterController.MAINCONTACT", "Main Contact"),
-				$registration->Attendees()
-					->map()->toArray()
-			)
+				$attendees->map()->toArray()
+			);
+
+		$fields = new FieldList(
+			$maincontactfield
 		);
 		$actions = new FieldList(
 			new AnchorField("addticket",
