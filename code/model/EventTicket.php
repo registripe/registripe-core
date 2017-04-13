@@ -43,8 +43,7 @@ class EventTicket extends DataObject {
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 
-		$fields->removeByName('EventID');
-		$fields->removeByName('Attendees');
+		$fields->removeByName(array('EventID', 'Attendees', 'Sort'));
 
 		foreach (array('Start', 'End') as $type) {
 			$fields->addFieldsToTab('Root.Main', 
