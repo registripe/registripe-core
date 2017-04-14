@@ -102,16 +102,6 @@ class RegistrableEvent extends Page {
 		);
 		$tabset->push(new Tab("Completed", $registrationsGrid));
 
-		//unconfirmed
-		if ($this->RegEmailConfirm) {
-			$unconfirmedGrid = new GridField('UnconfirmedRegistrations',
-				_t('Registripe.UNCONFIRMED', 'Unconfirmed'),
-				$this->getUnconfirmedRegistrations()
-					->sort("LastEdited", "DESC")
-			);
-			$tabset->push(new Tab("Unconfirmed", $unconfirmedGrid));
-		}
-
 		//incomplete
 		$incomplete = $this->getIncompleteRegistrations()
 						->sort("LastEdited", "DESC");
