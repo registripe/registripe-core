@@ -119,7 +119,9 @@ class EventAttendeeController extends Page_Controller{
 	public function AttendeeForm() {
 		$form = new EventAttendeeForm($this, "AttendeeForm");
 		$this->extend("updateAttendeeForm", $form, $this->registration);
-		$form->addCancelLink($this->BackURL);
+		if ($this->BackURL) {
+			$form->addCancelLink($this->BackURL);
+		}
 		return $form;
 	}
 
