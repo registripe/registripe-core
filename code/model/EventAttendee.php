@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Represents the details of an event registration attendee.
+ * Event Registration Attendee.
  */
 class EventAttendee extends DataObject{
 

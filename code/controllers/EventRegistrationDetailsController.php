@@ -28,12 +28,12 @@ class EventRegistrationDetailsController extends Page_Controller {
 		parent::init();
 
 		$request = $this->request;
-		$rego    = $this->registration;
+		$rego = $this->registration;
 
 		$hasToken = $request->getVar('token') == $rego->Token;
-		$hasMemb  = $rego->MemberID && Member::currentUserID() == $rego->MemberID;
+		$hasMember = $rego->MemberID && Member::currentUserID() == $rego->MemberID;
 
-		if (!$hasToken && !$hasMemb) {
+		if (!$hasToken && !$hasMember) {
 			return Security::permissionFailure($this);
 		}
 

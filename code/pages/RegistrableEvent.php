@@ -50,10 +50,7 @@ class RegistrableEvent extends Page {
 
 		$ticketsconfig = GridFieldConfig_RecordEditor::create();
 		$fields->addFieldToTab('Root.Tickets', new GridField(
-			'Tickets',
-			'Ticket Types',
-			$this->Tickets(),
-			$ticketsconfig
+			'Tickets', 'Ticket Types', $this->Tickets(), $ticketsconfig
 		));
 
 		// customise if ticket sub-classes are present
@@ -62,8 +59,6 @@ class RegistrableEvent extends Page {
 				->removeComponentsByType('GridFieldAddNewButton')
 				->addComponent(new GridFieldAddNewMultiClass())
 				->addComponent(new GridFieldOrderableRows());
-
-				// TODO: add type column to grid
 		}
 
 		//registrations
@@ -242,7 +237,12 @@ class RegistrableEvent extends Page {
 		return $this->Registrations()
 				->filter('Status', 'Canceled');
 	}
-
+	
+	/**
+	 * Get valid attendees
+	 *
+	 * @return DataList
+	 */
 	public function getValidAttendees() {
 		return EventAttendee::get()
 			->innerJoin("EventRegistration", "\"EventAttendee\".\"RegistrationID\" = \"EventRegistration\".\"ID\"")
