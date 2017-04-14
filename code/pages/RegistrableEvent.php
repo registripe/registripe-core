@@ -7,8 +7,6 @@ class RegistrableEvent extends Page {
 	private static $db = array(
 		'OneRegPerEmail'        => 'Boolean',
 		'RequireLoggedIn'       => 'Boolean',
-		'EmailNotifyChanges'    => 'Boolean',
-		'NotifyChangeFields'    => 'Text',
 		'AfterRegTitle'         => 'Varchar(255)',
 		'AfterRegContent'       => 'HTMLText',
 		'Capacity'              => 'Int'
@@ -22,7 +20,6 @@ class RegistrableEvent extends Page {
 	private static $defaults = array(
 		'AfterRegTitle'         => 'Thanks For Registering',
 		'AfterRegContent'       => '<p>Thanks for registering! We look forward to seeing you.</p>',
-		'NotifyChangeFields'    => 'StartDate,EndDate,StartTime,EndTime'
 	);
 
 	private static $icon = "registripe/images/date_edit.png";
@@ -150,14 +147,6 @@ class RegistrableEvent extends Page {
 			new CheckboxField(
 				'RequireLoggedIn',
 				_t('Registripe.REQUIRE_LOGGED_IN', 'Require users to be logged in to register?')
-			),
-		));
-
-
-		$fields->addFieldsToTab('Root.Email', array(
-			new CheckboxField(
-				'EmailNotifyChanges',
-				_t('Registripe.EMAIL_NOTIFY_CHANGES', 'Notify registered users of event changes via email?')
 			)
 		));
 		return $fields;
