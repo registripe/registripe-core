@@ -209,7 +209,7 @@ class EventRegisterController extends Page_Controller {
 	*/
 	public function payment() {
 		$registration = $this->getCurrentRegistration(false);
-		if(!$registration){
+		if(!$registration || !$registration->getTotalOutstanding()){
 			return $this->redirect($this->Link());
 		}
 		$controller = new PaymentController($this, "payment", $registration, $registration->Total);
