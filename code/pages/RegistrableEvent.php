@@ -5,20 +5,20 @@
 class RegistrableEvent extends Page {
 
 	private static $db = array(
-		'RequireLoggedIn'       => 'Boolean',
-		'AfterRegTitle'         => 'Varchar(255)',
-		'AfterRegContent'       => 'HTMLText',
-		'Capacity'              => 'Int'
+		'Capacity' => 'Int',
+		'RequireLoggedIn' => 'Boolean',
+		'AfterRegTitle' => 'Varchar(255)',
+		'AfterRegContent' => 'HTMLText'
 	);
 
 	private static $has_many = array(
-		'Tickets'     => 'EventTicket',
-		'Registrations'   => 'EventRegistration'
+		'Tickets' => 'EventTicket',
+		'Registrations' => 'EventRegistration'
 	);
 
 	private static $defaults = array(
-		'AfterRegTitle'         => 'Thanks For Registering',
-		'AfterRegContent'       => '<p>Thanks for registering! We look forward to seeing you.</p>',
+		'AfterRegTitle' => 'Thanks For Registering',
+		'AfterRegContent' => '<p>Thanks for registering! We look forward to seeing you.</p>'
 	);
 
 	private static $icon = "registripe/images/date_edit.png";
