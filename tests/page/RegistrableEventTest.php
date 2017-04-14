@@ -29,7 +29,6 @@ class RegistrableEventTest extends \SapphireTest{
 	// TODO: Test
 	// canRegister
 	// getCompletedRegistrations
-	// getUnconfirmedRegistrations
 	// getIncompleteRegistrations
 	// getCancelledRegistrations
 	// getValidAttendees

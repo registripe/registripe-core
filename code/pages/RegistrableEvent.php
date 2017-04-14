@@ -8,11 +8,6 @@ class RegistrableEvent extends Page {
 		'OneRegPerEmail'        => 'Boolean',
 		'RequireLoggedIn'       => 'Boolean',
 		'RegistrationTimeLimit' => 'Int',
-		'RegEmailConfirm'       => 'Boolean',
-		'EmailConfirmMessage'   => 'Varchar(255)',
-		'ConfirmTimeLimit'      => 'Int',
-		'AfterConfirmTitle'     => 'Varchar(255)',
-		'AfterConfirmContent'   => 'HTMLText',
 		'UnRegEmailConfirm'     => 'Boolean',
 		'AfterConfUnregTitle'   => 'Varchar(255)',
 		'AfterConfUnregContent' => 'HTMLText',
@@ -34,10 +29,6 @@ class RegistrableEvent extends Page {
 		'RegistrationTimeLimit' => 900,
 		'AfterRegTitle'         => 'Thanks For Registering',
 		'AfterRegContent'       => '<p>Thanks for registering! We look forward to seeing you.</p>',
-		'EmailConfirmMessage'   => 'Important: You must check your emails and confirm your registration before it is valid.',
-		'ConfirmTimeLimit'      => 21600,
-		'AfterConfirmTitle'     => 'Registration Confirmed',
-		'AfterConfirmContent'   => '<p>Thanks! Your registration has been confirmed</p>',
 		'AfterUnregTitle'       => 'Registration Canceled',
 		'AfterUnregContent'     => '<p>Your registration has been canceled.</p>',
 		'AfterConfUnregTitle'   => 'Un-Registration Confirmed',
@@ -77,17 +68,6 @@ class RegistrableEvent extends Page {
 			),
 			'AfterRegistrationContent'
 		);
-
-		if ($this->RegEmailConfirm) {
-			$fields->addFieldToTab('Root.Main', new ToggleCompositeField(
-				'AfterRegistrationConfirmation',
-				_t('EventRegistration.AFTER_REG_CONFIRM_CONTENT', 'After Registration Confirmation Content'),
-				array(
-					new TextField('AfterConfirmTitle', _t('EventRegistration.TITLE', 'Title')),
-					new HtmlEditorField('AfterConfirmContent', _t('EventRegistration.CONTENT', 'Content'))
-				)
-			));
-		}
 
 		if ($this->UnRegEmailConfirm) {
 			$fields->addFieldToTab('Root.Main', new ToggleCompositeField(
@@ -206,13 +186,11 @@ class RegistrableEvent extends Page {
 			$export = new GridFieldExportButton('buttons-after-left')
 		);
 		$export->setExportColumns($exportcolumns);
-
 		return new GridField("Attendees", "Attendees", $attendees, $config);			
 	}
 
 	public function getSettingsFields() {
 		$fields = parent::getSettingsFields();
-
 		$fields->addFieldsToTab('Root.Registration', array(
 			new CheckboxField(
 				'OneRegPerEmail',
@@ -235,37 +213,10 @@ class RegistrableEvent extends Page {
 
 		$fields->addFieldsToTab('Root.Email', array(
 			new CheckboxField(
-				'RegEmailConfirm',
-				_t('Registripe.REQ_EMAIL_CONFIRM', 'Require email confirmation to complete free registrations?')
-			),
-			$info = new TextField(
-				'EmailConfirmMessage',
-				_t('Registripe.EMAIL_CONFIRM_INFO', 'Email confirmation information')
-			),
-			$limit = new NumericField(
-				'ConfirmTimeLimit',
-				_t('Registripe.EMAIL_CONFIRM_TIME_LIMIT', 'Email confirmation time limit')
-			),
-			new CheckboxField(
-				'UnRegEmailConfirm',
-				_t('Registripe.REQ_UN_REG_EMAIL_CONFIRM', 'Require email confirmation to un-register?')
-			),
-			new CheckboxField(
 				'EmailNotifyChanges',
 				_t('Registripe.EMAIL_NOTIFY_CHANGES', 'Notify registered users of event changes via email?')
 			)
 		));
-
-		$info->setDescription(_t(
-			'Registripe.EMAIL_CONFIRM_INFO_NOTE',
-			'This message is displayed to users to let them know they need to confirm their registration.'
-		));
-
-		$limit->setDescription(_t(
-			'Registripe.CONFIRM_TIME_LIMIT_NOTE',
-			'The time limit to conform registration, in seconds. Set to 0 for no limit.'
-		));
-
 		return $fields;
 	}
 
@@ -301,15 +252,6 @@ class RegistrableEvent extends Page {
 	public function getCompletedRegistrations() {
 		return $this->Registrations()
 			->filter("Status", "Valid");
-	}
-
-	/**
-	 * Get the registrations that need to be confirmed
-	 * @return DataList
-	 */
-	public function getUnconfirmedRegistrations() {
-		return $this->Registrations()
-			->filter('Status', 'Unconfirmed');
 	}
 
 	/**
