@@ -5,7 +5,6 @@
 class RegistrableEvent extends Page {
 
 	private static $db = array(
-		'OneRegPerEmail'        => 'Boolean',
 		'RequireLoggedIn'       => 'Boolean',
 		'AfterRegTitle'         => 'Varchar(255)',
 		'AfterRegContent'       => 'HTMLText',
@@ -140,10 +139,6 @@ class RegistrableEvent extends Page {
 	public function getSettingsFields() {
 		$fields = parent::getSettingsFields();
 		$fields->addFieldsToTab('Root.Registration', array(
-			new CheckboxField(
-				'OneRegPerEmail',
-				_t('Registripe.ONE_REG_PER_EMAIL', 'Limit to one registration per email address?')
-			),
 			new CheckboxField(
 				'RequireLoggedIn',
 				_t('Registripe.REQUIRE_LOGGED_IN', 'Require users to be logged in to register?')
