@@ -32,6 +32,8 @@ class EventAttendeeController extends Page_Controller{
 		if (!$tickets->count()) {
 			return $this->redirect($this->BackURL);
 		}
+		$formHasData = $form->hasSessionData();
+
 		$attendee = $this->createAttendee();
 		// ticket selection in url
 		$ticket = $tickets->byID((int)$request->param('ID'));
@@ -41,7 +43,8 @@ class EventAttendeeController extends Page_Controller{
 				$this->registration->Event()->getAvailableTickets()
 			);
 		}
-		$form->loadDataFrom($attendee);
+		
+		// ticket is always required
 		if($ticket) {
 			$form->loadDataFrom(array(
 				"TicketID" => $ticket->ID
@@ -51,19 +54,30 @@ class EventAttendeeController extends Page_Controller{
 				$this->registration->Event()->getAvailableTickets()
 			);
 		}
-		//automatically populate from previous attendee
-		if($prepops = EventAttendee::config()->prepopulated_fields){
-			$latestattendee = $this->registration->Attendees()
-				->sort("LastEdited", "DESC")->first();
-			if($latestattendee){
-				$form->loadDataFrom($latestattendee, 0, $prepops);	
-			}
+		if(!$formHasData){
+			// load any default data
+			$form->loadDataFrom($attendee);
+			// automatically populate from previous attendee
+			$this->populatePreviousData($form);
 		}
 		$this->extend("onAdd", $form, $this->registration);
 		return array(
 			'Title' => $ticket ? $ticket->Title : null,
 			'Form' => $form
 		);
+	}
+
+	// poplate given form with specfific data from last attednee
+	protected function populatePreviousData(Form $form) {
+		$prepops = EventAttendee::config()->prepopulated_fields;
+		if (!$prepops) {
+			return;
+		}
+		$latestattendee = $this->registration->Attendees()
+			->sort("LastEdited", "DESC")->first();
+		if($latestattendee){
+			$form->loadDataFrom($latestattendee, Form::MERGE_DEFAULT, $prepops);	
+		}
 	}
 
 	/**
@@ -86,7 +100,9 @@ class EventAttendeeController extends Page_Controller{
 				$this->registration->Event()->getAvailableTickets()
 			);
 		}
-		$form->loadDataFrom($attendee);
+		if (!$form->hasSessionData()) {
+			$form->loadDataFrom($attendee);
+		}
 		//add tickets dropdown, if there is no selected ticket
 		$form->getValidator()->addRequiredField("ID");
 		$this->extend("onEdit", $form, $attendee, $this->registration);
