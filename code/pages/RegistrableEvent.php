@@ -144,6 +144,7 @@ class RegistrableEvent extends Page {
 				_t('Registripe.REQUIRE_LOGGED_IN', 'Require users to be logged in to register?')
 			)
 		));
+		$this->extend("updateSettingsCMSFields", $fields);
 		return $fields;
 	}
 
