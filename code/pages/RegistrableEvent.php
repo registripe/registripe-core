@@ -8,15 +8,10 @@ class RegistrableEvent extends Page {
 		'OneRegPerEmail'        => 'Boolean',
 		'RequireLoggedIn'       => 'Boolean',
 		'RegistrationTimeLimit' => 'Int',
-		'UnRegEmailConfirm'     => 'Boolean',
-		'AfterConfUnregTitle'   => 'Varchar(255)',
-		'AfterConfUnregContent' => 'HTMLText',
 		'EmailNotifyChanges'    => 'Boolean',
 		'NotifyChangeFields'    => 'Text',
 		'AfterRegTitle'         => 'Varchar(255)',
 		'AfterRegContent'       => 'HTMLText',
-		'AfterUnregTitle'       => 'Varchar(255)',
-		'AfterUnregContent'     => 'HTMLText',
 		'Capacity'              => 'Int'
 	);
 
@@ -29,10 +24,6 @@ class RegistrableEvent extends Page {
 		'RegistrationTimeLimit' => 900,
 		'AfterRegTitle'         => 'Thanks For Registering',
 		'AfterRegContent'       => '<p>Thanks for registering! We look forward to seeing you.</p>',
-		'AfterUnregTitle'       => 'Registration Canceled',
-		'AfterUnregContent'     => '<p>Your registration has been canceled.</p>',
-		'AfterConfUnregTitle'   => 'Un-Registration Confirmed',
-		'AfterConfUnregContent' => '<p>Your registration has been canceled.</p>',
 		'NotifyChangeFields'    => 'StartDate,EndDate,StartTime,EndTime'
 	);
 
@@ -56,29 +47,6 @@ class RegistrableEvent extends Page {
 			),
 			'Content'
 		);
-
-		$fields->insertAfter(
-			new ToggleCompositeField(
-				'AfterUnRegistrationContent',
-				_t('EventRegistration.AFTER_UNREG_CONTENT', 'After Un-Registration Content'),
-				array(
-					new TextField('AfterUnregTitle', _t('EventRegistration.TITLE', 'Title')),
-					new HtmlEditorField('AfterUnregContent', _t('EventRegistration.CONTENT', 'Content'))
-				)
-			),
-			'AfterRegistrationContent'
-		);
-
-		if ($this->UnRegEmailConfirm) {
-			$fields->addFieldToTab('Root.Main', new ToggleCompositeField(
-				'AfterUnRegistrationConfirmation',
-				_t('EventRegistration.AFTER_UNREG_CONFIRM_CONTENT', 'After Un-Registration Confirmation Content'),
-				array(
-					new TextField('AfterConfUnregTitle', _t('EventRegistration.TITLE', 'Title')),
-					new HtmlEditorField('AfterConfUnregContent', _t('EventRegistration.CONTENT', 'Content'))
-				)
-			));
-		}
 
 		$ticketsconfig = GridFieldConfig_RecordEditor::create();
 		$fields->addFieldToTab('Root.Tickets', new GridField(
@@ -311,7 +279,6 @@ class RegistrableEvent_Controller extends Page_Controller {
 
 	public static $allowed_actions = array(
 		'register',
-		'unregister',
 		'registration'
 	);
 
@@ -322,13 +289,6 @@ class RegistrableEvent_Controller extends Page_Controller {
 		$record = $this->dataRecord;
 		$record->Content = '';
 		return new EventRegisterController($this, $record);
-	}
-
-	/**
-	 * @return EventUnregisterController
-	 */
-	public function unregister() {
-		return new EventUnregisterController($this, $this->dataRecord);
 	}
 
 	/**
