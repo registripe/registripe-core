@@ -7,7 +7,6 @@ class RegistrableEvent extends Page {
 	private static $db = array(
 		'OneRegPerEmail'        => 'Boolean',
 		'RequireLoggedIn'       => 'Boolean',
-		'RegistrationTimeLimit' => 'Int',
 		'EmailNotifyChanges'    => 'Boolean',
 		'NotifyChangeFields'    => 'Text',
 		'AfterRegTitle'         => 'Varchar(255)',
@@ -21,7 +20,6 @@ class RegistrableEvent extends Page {
 	);
 
 	private static $defaults = array(
-		'RegistrationTimeLimit' => 900,
 		'AfterRegTitle'         => 'Thanks For Registering',
 		'AfterRegContent'       => '<p>Thanks for registering! We look forward to seeing you.</p>',
 		'NotifyChangeFields'    => 'StartDate,EndDate,StartTime,EndTime'
@@ -153,16 +151,8 @@ class RegistrableEvent extends Page {
 				'RequireLoggedIn',
 				_t('Registripe.REQUIRE_LOGGED_IN', 'Require users to be logged in to register?')
 			),
-			$limit = new NumericField(
-				'RegistrationTimeLimit',
-				_t('Registripe.REG_TIME_LIMIT', 'Registration time limit')
-			),
 		));
 
-		$limit->setDescription(_t(
-			'Registripe.REG_TIME_LIMIT_NOTE',
-			'The time limit to complete registration, in seconds. Set to 0 to disable place holding.'
-		));
 
 		$fields->addFieldsToTab('Root.Email', array(
 			new CheckboxField(
