@@ -16,8 +16,9 @@ class EventRegistrationDetailsController extends Page_Controller {
 	protected $message;
 
 	public function __construct(Controller $parent, EventRegistration $registration) {
-		$this->parent       = $parent;
+		$this->parent = $parent;
 		$this->registration = $registration;
+		$this->event = $registration->Event();
 
 		parent::__construct($parent->data()->customise(array(
 			'Title' => $this->Title()
@@ -62,7 +63,18 @@ class EventRegistrationDetailsController extends Page_Controller {
 	 * @return string
 	 */
 	public function Title() {
-		return 'Registration Details for ' . $this->registration->Event()->Title;
+		$title = $this->event->AfterRegTitle;
+		if (!$title) {
+			$title = _t(
+				"EventRegistrationDetailsController.DefaultTitle",
+				"Registration Details for " . $this->event->Title
+			);
+		}
+		return $title;
+	}
+
+	public function Content() {
+		return $this->event->AfterRegContent;
 	}
 
 	/**
