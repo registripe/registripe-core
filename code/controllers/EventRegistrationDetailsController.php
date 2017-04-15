@@ -73,6 +73,9 @@ class EventRegistrationDetailsController extends Page_Controller {
 		return $title;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function Content() {
 		return $this->event->AfterRegContent;
 	}
