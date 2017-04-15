@@ -150,7 +150,6 @@ class RegistrableEvent extends Page {
 
 	/**
 	 * Check if this event can currently be registered for.
-	 * Checks 
 	 * @return boolean
 	 */
 	public function canRegister(){
@@ -163,7 +162,7 @@ class RegistrableEvent extends Page {
 	}
 
 	/**
-	 * Get available tickets
+	 * Get available tickets.
 	 * @return DataList
 	 */
 	public function getAvailableTickets() {
