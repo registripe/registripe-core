@@ -264,11 +264,11 @@ class RegistrableEvent_Controller extends Page_Controller {
 	public function registration($request) {
 		$id = $request->param('ID');
 		if (!ctype_digit($id)) {
-			$this->httpError(404);
+			return $this->httpError(404);
 		}
 		$rego = EventRegistration::get()->byID($id);
 		if (!$rego || $rego->EventID != $this->ID) {
-			$this->httpError(404);
+			return $this->httpError(404);
 		}
 		$request->shift();
 		$request->shiftAllParams();
