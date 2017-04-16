@@ -7,16 +7,16 @@
 class EventRegistration extends DataObject {
 
 	private static $db = array(
-		'FirstName'   => 'Varchar',
+		'FirstName' => 'Varchar',
 		'Surname' => 'Varchar',
-		'Email'  => 'Varchar(255)',
+		'Email' => 'Varchar(255)',
 		'Status' => 'Enum("Unsubmitted, Unconfirmed, Valid, Canceled","Unsubmitted")',
-		'Total'  => 'Currency',
-		'Token'  => 'Varchar(40)'
+		'Total' => 'Currency',
+		'Token' => 'Varchar(40)'
 	);
 
 	private static $has_one = array(
-		'Event'   => 'RegistrableEvent',
+		'Event' => 'RegistrableEvent',
 		'Member' => 'Member',
 		'RegistrantAttendee' => 'EventAttendee'
 	);
@@ -26,11 +26,11 @@ class EventRegistration extends DataObject {
 	);
 
 	private static $summary_fields = array(
-		'Name'          => 'Name',
-		'Email'         => 'Email',
+		'Name' => 'Name',
+		'Email' => 'Email',
 		'TotalQuantity' => 'Places',
-		'Total.Nicer' 		=> 'Total',
-		'Created.Nice' 		=> 'Date'
+		'Total.Nicer' => 'Total',
+		'Created.Nice' => 'Date'
 	);
 
 	private static $casting = array(
@@ -59,20 +59,15 @@ class EventRegistration extends DataObject {
 			),
 			'includeRelations' => true
 		));
-
 		$conf = GridFieldConfig_RecordEditor::create()
-				 ->removeComponentsByType(
-				 	"GridFieldAddNewButton"
-				 );
+				 ->removeComponentsByType("GridFieldAddNewButton");
 		$fields->fieldByName("Attendees")->setConfig($conf);
-		
 		if (class_exists('Payment')) {
 			$fields->fieldByname("Payments")
 				->setConfig($conf)
 				->performReadonlyTransformation();
 		}
 		$this->extend("updateCMSFields", $fields);
-
 		return $fields;
 	}
 
@@ -132,6 +127,7 @@ class EventRegistration extends DataObject {
 
 	/**
 	 * Return an appropriate name for this registration
+	 * @return string
 	 */
 	public function getTitle() {
 		return $this->Name;
@@ -182,10 +178,9 @@ class EventRegistration extends DataObject {
 		$quantities = array();
 		foreach($this->Tickets() as $ticket){
 			$quantities[$ticket->ID] = $this->Attendees()
-										->filter("TicketID", $ticket->ID)
-										->count();
+				->filter("TicketID", $ticket->ID)
+				->count();
 		}
-		
 		return $quantities;
 	}
 
@@ -224,7 +219,6 @@ class EventRegistration extends DataObject {
 				$parts[] = $quantity."x".$ticket->Title;
 			}
 		}
-
 		return $this->Event()->Title.": ".implode(",", $parts);
 	}
 
@@ -255,7 +249,6 @@ class EventRegistration extends DataObject {
 	public function canSubmit() {
 		$hasattendees = $this->Attendees()->exists();
 		$hasoutstanding = $this->getTotalOutstanding() > 0;
-
 		return $hasattendees && !$hasoutstanding;
 	}
 

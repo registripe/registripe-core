@@ -164,7 +164,7 @@ class EventRegisterController extends Page_Controller {
 			)
 		);
 		if($registration->getTotalOutstanding() > 0){
-			$nextaction->setTitle("Make Payment");
+			$nextaction->setTitle(_t("EventRegisterController.MAKEPAYMENT", "Make Payment"));
 		}
 		
 		$validator = new RequiredFields("RegistrantAttendeeID");
@@ -192,6 +192,7 @@ class EventRegisterController extends Page_Controller {
 				'FirstName' => $attendee->FirstName,
 				'Surname' => $attendee->Surname,
 				'Email' => $attendee->Email
+				// TODO: make this extensible
 			));
 		}
 		$form->saveInto($registration);

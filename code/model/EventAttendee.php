@@ -70,7 +70,6 @@ class EventAttendee extends DataObject{
 		if(!$this->Registration()){
 			$result->error("Attendee must have a registration.");
 		}
-
 		return $result;
 	}
 
