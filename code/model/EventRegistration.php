@@ -37,21 +37,25 @@ class EventRegistration extends DataObject {
 		'calculateTotal' => 'Currency'
 	);
 
+	private static $registrant_fields = array(
+		'FirstName',
+		'Surname',
+		'Email'
+	);
+
 	protected function onBeforeWrite() {
 		if (!$this->isInDB()) {
 			$generator = new RandomGenerator();
 			$this->Token = substr($generator->randomToken(), 0,40);
 		}
-
 		parent::onBeforeWrite();
 	}
 
 	public function getCMSFields() {
 		$fields = $this->scaffoldFormFields(array(
-			'restrictFields' => array(
-				'FirstName', 'Surname', 'Email',
-				'Status',
-				'Attendees'
+			'restrictFields' => array_merge(
+				array('Status', 'Attendees'),
+				$this->stat('registrant_fields')
 			),
 			'includeRelations' => true
 		));
@@ -73,12 +77,57 @@ class EventRegistration extends DataObject {
 	}
 
 	public function getFrontEndFields($params = null) {
-		$fields = parent::getFrontEndFields();
-		$fields->removeByName(array(
-			"PaymentID", "MemberID", "EventID", "Status", "Total", "Token"
-		));
-
+		$fields = FieldList::create();
+		if ($this->stat("attendee_main_contact")) {
+			$fields->push($this->getMainContactField());
+		} else {
+			$fields->push($this->getRegistrantContactFieldsGroup());
+		}
+		$this->extend("updateFrontEndFields", $fields);
 		return $fields;
+	}
+
+	public function contactableAttendees() {
+		$attendees = $this->Attendees();
+		foreach ($this->stat("registrant_fields") as $field) {
+			$attendees = $attendees->where("\"".$field."\" IS NOT NULL");
+		}
+		return $attendees;
+	}
+
+	/**
+	 * Field for capturing which attendee is the main contact
+	 * @return FieldList
+	 */
+	public function getMainContactField($forcedropdown = false) {
+		$attendees = $this->contactableAttendees();
+		// Use a hidden field if there is only one attendee
+		if ($attendees->count() === 1 && !$forcedropdown) {
+			return HiddenField::create("RegistrantAttendeeID")->setValue(
+				$attendees->first()->ID
+			);
+		}
+		return DropdownField::create("RegistrantAttendeeID",
+			_t("EventRegisterController.MAINCONTACT", "Main Contact"),
+			$attendees->map()->toArray()
+		);
+	}
+
+	/**
+	 * Fields for capturing details of person doing registration.
+	 * @return FieldList
+	 */
+	public function getRegistrantContactFieldsGroup() {
+		$fieldNames = $this->stat('registrant_fields');
+		$fields = FieldList::create();
+		if ($fieldNames) {
+			$fields = $this->scaffoldFormFields(array(
+				'restrictFields' => $fieldNames
+			));
+		}
+		$this->extend("updateRegistrantContactFields", $fields);
+		return FieldGroup::create("RegistrantContactFields", $fields)
+			->setTitle("");
 	}
 
 	/**

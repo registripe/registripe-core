@@ -6,3 +6,5 @@ Payment:
     EventRegistration: EventRegistration
 EventRegisterController:
   ticket_select_template: EventTicketSelector
+EventRegistration:
+  attendee_main_contact: true

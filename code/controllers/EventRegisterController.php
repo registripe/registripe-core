@@ -151,18 +151,9 @@ class EventRegisterController extends Page_Controller {
 		$registration = $this->getCurrentRegistration();
 		$attendees = $registration->Attendees();
 
-		$maincontactfield = $attendees->count() === 1 ?
-			HiddenField::create("RegistrantAttendeeID")->setValue(
-				$attendees->first()->ID
-			) :
-			DropdownField::create("RegistrantAttendeeID",
-				_t("EventRegisterController.MAINCONTACT", "Main Contact"),
-				$attendees->map()->toArray()
-			);
-
-		$fields = new FieldList(
-			$maincontactfield
-		);
+		// registrant fields
+		$fields = $registration->getFrontEndFields();
+		
 		$actions = new FieldList(
 			new AnchorField("addticket",
 				_t("EventRegisterController.ADDANOTHER", "Add Another Ticket"),
@@ -175,9 +166,17 @@ class EventRegisterController extends Page_Controller {
 		if($registration->getTotalOutstanding() > 0){
 			$nextaction->setTitle("Make Payment");
 		}
-
+		
+		$validator = new RequiredFields("RegistrantAttendeeID");
+		
 		$this->extend("updateReviewForm", $fields, $actions);
-		return new Form($this, "ReviewForm", $fields, $actions);
+		$form = new EventRegisterForm($this, "ReviewForm", $fields, $actions, $validator);
+		$form->setRegistrantValidator(new RequiredFields(
+			$registration->stat('registrant_fields')
+		), $registration->contactableAttendees()->count() === 0);
+		$form->loadDataFrom($registration);
+
+		return $form;
 	}
 
 	/**
