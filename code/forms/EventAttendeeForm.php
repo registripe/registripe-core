@@ -63,9 +63,4 @@ class EventAttendeeForm extends Form{
 		);
 	}
 
-	public function hasSessionData() {
-		$session = Session::get("FormInfo.{$this->FormName()}");
-		return $session && $session["data"];
-	}
-
 }

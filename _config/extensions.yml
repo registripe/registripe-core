@@ -13,3 +13,6 @@ Money:
 EventRegistration:
   extensions:
     - Payable
+Form:
+  extensions:
+    - EventFormExtension
