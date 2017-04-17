@@ -71,17 +71,11 @@ class EventRegistration extends DataObject {
 		return $fields;
 	}
 
-	public function getFrontEndFields($params = null) {
-		$fields = FieldList::create();
-		if ($this->stat("attendee_main_contact")) {
-			$fields->push($this->getMainContactField());
-		} else {
-			$fields->push($this->getRegistrantContactFieldsGroup());
-		}
-		$this->extend("updateFrontEndFields", $fields);
-		return $fields;
-	}
-
+	/**
+	 * Get attendees that have populated registrant details.
+	 *
+	 * @return void
+	 */
 	public function contactableAttendees() {
 		$attendees = $this->Attendees();
 		foreach ($this->stat("registrant_fields") as $field) {
@@ -102,9 +96,11 @@ class EventRegistration extends DataObject {
 				$attendees->first()->ID
 			);
 		}
+		$source = $attendees->map()->toArray();
+		$source[0] = _t("EventRegistration.NOTLISTED", "Not listed");
 		return DropdownField::create("RegistrantAttendeeID",
-			_t("EventRegisterController.MAINCONTACT", "Main Contact"),
-			$attendees->map()->toArray()
+			_t("EventRegistration.MAINCONTACT", "Main Contact"),
+			$source
 		);
 	}
 
@@ -117,12 +113,15 @@ class EventRegistration extends DataObject {
 		$fields = FieldList::create();
 		if ($fieldNames) {
 			$fields = $this->scaffoldFormFields(array(
-				'restrictFields' => $fieldNames
+				'restrictFields' => $fieldNames,
+				'fieldClasses' => array(
+					'Email' => 'EmailField'
+				)
 			));
 		}
 		$this->extend("updateRegistrantContactFields", $fields);
-		return FieldGroup::create("RegistrantContactFields", $fields)
-			->setTitle("");
+		return CompositeField::create($fields)
+			->setName("RegistrantContactFields");
 	}
 
 	/**

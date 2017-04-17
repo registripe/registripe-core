@@ -144,15 +144,37 @@ class EventRegisterController extends Page_Controller {
 	}
 
 	/**
-	 * Review attendees
+	 * Review attendees and capture registrant contact details.
 	 * @return Form
 	 */
-	public function ReviewForm() {
+	public function ReviewForm($request = null) {
 		$registration = $this->getCurrentRegistration();
-		$attendees = $registration->Attendees();
+		$hasContactableAttendees = $registration->contactableAttendees()->count() > 0;
 
-		// registrant fields
-		$fields = $registration->getFrontEndFields();
+		$fields = FieldList::create();
+
+		$required = array();
+
+		// TODO: allow turning dropdown selection off
+
+		if ($hasContactableAttendees) {
+			$required[] = "RegistrantAttendeeID";
+			$fields->push($registration->getMainContactField(true));
+		}
+		
+		if (
+			!$request instanceof SS_HTTPRequest ||
+			!$hasContactableAttendees ||
+			$request->postVar("RegistrantAttendeeID") === "0"
+		) {
+			// add registrant contact fields
+			$fields->push($registration->getRegistrantContactFieldsGroup());
+				if ($regFields = $registration->stat('registrant_fields')) {
+				$required = array_merge($required, $regFields);
+			}
+		}
+
+		$validator = new RequiredFields($required);
 		
 		$actions = new FieldList(
 			new AnchorField("addticket",
@@ -166,15 +188,16 @@ class EventRegisterController extends Page_Controller {
 		if($registration->getTotalOutstanding() > 0){
 			$nextaction->setTitle(_t("EventRegisterController.MAKEPAYMENT", "Make Payment"));
 		}
-		
-		$validator = new RequiredFields("RegistrantAttendeeID");
-		
+
 		$this->extend("updateReviewForm", $fields, $actions);
-		$form = new EventRegisterForm($this, "ReviewForm", $fields, $actions, $validator);
-		$form->setRegistrantValidator(new RequiredFields(
-			$registration->stat('registrant_fields')
-		), $registration->contactableAttendees()->count() === 0);
-		$form->loadDataFrom($registration);
+		$form = new Form($this, "ReviewForm", $fields, $actions, $validator);
+		
+		// Use server-side validation only
+		$form->setAttribute("novalidate", "novalidate");
+
+		if (!$form->hasSessionData()) {
+			$form->loadDataFrom($registration);
+		}
 
 		return $form;
 	}
@@ -185,17 +208,18 @@ class EventRegisterController extends Page_Controller {
 	 */
 	public function submitreview($data, $form) {
 		$registration = $this->getCurrentRegistration();
-		//save registrant
+		$form->saveInto($registration);
+
+		//save registrant data if selected attendee
 		$registrantid = isset($data['RegistrantAttendeeID']) ? (int)$data['RegistrantAttendeeID'] : null;
 		if($registrantid && $attendee = $registration->Attendees()->byID($registrantid)) {
-			$registration->update(array(
-				'FirstName' => $attendee->FirstName,
-				'Surname' => $attendee->Surname,
-				'Email' => $attendee->Email
-				// TODO: make this extensible
-			));
+			$registrantData = array();
+			foreach ($registration->stat('registrant_fields') as $field) {
+				$registrantData[$field] = $attendee->$field;
+			};
+			$registration->update($registrantData);
 		}
-		$form->saveInto($registration);
+		
 		$registration->calculateTotal(); // final calculation
 		$registration->write();
 		//redirect to appropriate place, based on total cost
