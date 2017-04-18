@@ -109,15 +109,21 @@ class EventRegistration extends DataObject {
 	 * @return FieldList
 	 */
 	public function getRegistrantContactFieldsGroup() {
-		$fieldNames = $this->stat('registrant_fields');
+		$fieldNames = array_unique($this->stat('registrant_fields'));
 		$fields = FieldList::create();
 		if ($fieldNames) {
-			$fields = $this->scaffoldFormFields(array(
+			$scaffolded = $this->scaffoldFormFields(array(
 				'restrictFields' => $fieldNames,
 				'fieldClasses' => array(
 					'Email' => 'EmailField'
 				)
 			));
+			// order using registrant_fields config order
+			foreach ($fieldNames as $name) {
+				if ($field = $scaffolded->fieldByName($name)) {
+					$fields->push($field);
+				}
+			}
 		}
 		$this->extend("updateRegistrantContactFields", $fields);
 		return CompositeField::create($fields)
