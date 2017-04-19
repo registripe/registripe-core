@@ -34,7 +34,8 @@ class EventRegistration extends DataObject {
 	);
 
 	private static $casting = array(
-		'calculateTotal' => 'Currency'
+		'calculateTotal' => 'Currency',
+		'TotalPaid' => 'Currency'
 	);
 
 	private static $registrant_fields = array(
