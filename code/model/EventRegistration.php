@@ -245,7 +245,7 @@ class EventRegistration extends DataObject {
 	}
 
 	public function isSubmitted() {
-		return ($this->Status != "Unsubmitted");
+		return $this->Status && ($this->Status != "Unsubmitted");
 	}
 
 	public function canPay() {
