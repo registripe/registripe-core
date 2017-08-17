@@ -6,13 +6,10 @@ use \EventTicket;
 
 class EventTicketTest extends \SapphireTest {
 
-	protected static $fixture_file = array(
-		'../fixtures/Tickets.yml'
-	);
+	protected $usesDatabase = true;
 
 	public function testCMSFields() {
-		// smoke test
-		EventTicket::create()->getCMSFields();
+		EventTicket::create()->getCMSFields(); // smoke test
 	}
 
 	public function testActive() {

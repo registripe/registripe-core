@@ -10,6 +10,7 @@ class RegistrableEvent_ControllerTest extends \FunctionalTest{
 	);
 
 	public function setUp() {
+		Config::reset();
 		parent::setUp();
 		$this->event = $this->objFromFixture('RegistrableEvent', 'event');
 		$this->event->publish('Stage', 'Live');

@@ -1,12 +1,17 @@
 <?php
 
+use EventRegistration\Tests\Config;
+
 class EventRegisterControllerTest extends FunctionalTest{
+
+	protected static $disable_themes = true;
 
 	protected static $fixture_file = array(
 		'../fixtures/EventManagement.yml'
 	);
 
 	public function setUp() {
+		Config::reset();
 		parent::setUp();
 		$this->event = $this->objFromFixture('RegistrableEvent', 'event');
 		$this->event->publish('Stage', 'Live');

@@ -1,5 +1,6 @@
 <?php
 
+use EventRegistration\Tests\Config;
 
 class EventAttendeeControllerTest extends FunctionalTest{
 
@@ -10,7 +11,7 @@ class EventAttendeeControllerTest extends FunctionalTest{
 	protected static $disable_themes = true;
 
 	public function setUp() {
-		$this->resetConfigs();
+		Config::reset();
 		parent::setUp();
 		$this->event = $this->objFromFixture('RegistrableEvent', 'event');
 		$this->event->publish('Stage', 'Live');
@@ -99,25 +100,6 @@ class EventAttendeeControllerTest extends FunctionalTest{
 		$attendee = $this->objFromFixture('EventAttendee', 'attendee_reg_a_1');
 		$response = $this->get('test-event/register/attendee/delete/999');
 		$this->assertEquals(404, $response->getStatusCode());
-	}
-
-	/**
-	 * Prevent conflicts with extensions.
-	 * @todo implement a cleaner / better supported way to do this
-	 */
-	protected function resetConfigs() {
-		// remove any extensions that may conflict with base module code
-		foreach(array(
-			"EventAttendee", "EventRegistration", "EventAttendeeForm", "EventTicket",
-			"EventRegisterController", "EventAttendeeController"
-		 ) as $class) {
-			Config::inst()->remove($class, 'extensions');
-		}
-		// add back base extensions
-		Config::inst()->update('EventRegistration', 'extensions', array('Payable'));
- 		// just use defaults
-		Config::inst()->remove('EventRegistration', 'calculator_components');
-		Config::inst()->remove("EventAttendee", 'required_fields');
 	}
 
 	// helper for performing submissions
