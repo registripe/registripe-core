@@ -2,25 +2,33 @@
 
 namespace EventRegistration\Tests;
 
+use \EventTicket;
+
 class EventTicketTest extends \SapphireTest {
 
+	protected static $fixture_file = array(
+		'../fixtures/Tickets.yml'
+	);
+
 	public function testCMSFields() {
-		$this->markTestIncomplete("Test CMS Fields");
+		// smoke test
+		EventTicket::create()->getCMSFields();
 	}
-
+	
 	public function testAvailabilityByDate() {
-		$this->markTestIncomplete();
-		// assert true after sales start or no sales start
-		// assert true before sales end or no sales end
-		// assert false before sales start
-		// assert false after sales end
-	}
+		$ticket = EventTicket::create();
+		$ticket->populateDefaults();
 
-	public function testAvailabilityByTotalCount() {
-		$this->markTestIncomplete();
-		// assert true ticket max not reached
-		// assert true for no limit
-		// assert false ticket count reached
+		$ticket->StartDate = date("Y-m-d", strtotime("+1 day"));
+		$this->assertFalse($ticket->isAvailable(), "Start date tomorrow means unavailable");
+		$ticket->StartDate = date("Y-m-d", strtotime("-1 day"));
+		$this->assertTrue($ticket->isAvailable(), "Start date yesterday means available");
+		$ticket->StartDate = null;
+
+		$ticket->EndDate = date("Y-m-d", strtotime("-1 day"));
+		$this->assertFalse($ticket->isAvailable(), "Finish date yesterday means unavailable");
+		$ticket->EndDate = date("Y-m-d", strtotime("+1 day"));
+		$this->assertTrue($ticket->isAvailable(), "Finish date tomorrow means available");
 	}
 
 }
