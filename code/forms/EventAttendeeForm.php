@@ -54,11 +54,11 @@ class EventAttendeeForm extends Form{
 	 * the available tickets.
 	 * @param DataList $tickets 
 	 */
-	public function setAllowedTickets(DataList $tickets) {
+	public function setAllowedTickets(SS_List $tickets) {
 		$this->fields->removeByName("TicketID");
 		$this->fields->unshift(
 			new DropdownField("TicketID", "Ticket",
-				$tickets->map()->toArray()
+				$tickets->toArray()
 			)
 		);
 	}

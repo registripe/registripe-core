@@ -163,13 +163,17 @@ class RegistrableEvent extends Page {
 
 	/**
 	 * Get available tickets.
-	 * @return DataList
+	 * @return ArrayList
 	 */
 	public function getAvailableTickets() {
-		$now = date('Y-m-d H:i:s');
-		return $this->Tickets()
-			->where("\"StartDate\" <= '".$now."' OR \"StartDate\" IS NULL")
-			->where("\"EndDate\" >= '".$now."' OR \"EndDate\" IS NULL");
+		$available = ArrayList::create();
+		$tickets = $this->Tickets();
+		foreach($tickets as $ticket) {
+			if ($ticket->isAvailable()) {
+				$available->push($ticket);
+			}
+		}
+		return $available;
 	}
 
 	/**
