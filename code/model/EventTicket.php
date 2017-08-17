@@ -108,17 +108,19 @@ class EventTicket extends DataObject {
 			);
 		}
 		$start = strtotime($this->StartDate);
-		if ($start >= time()) {
+		if ($this->StartDate && $start >= time()) {
 			return array(
 				'available'    => false,
 				'reason'       => 'Tickets are not yet available.',
-				'available_at' => $start);
+				'available_at' => $start
+			);
 		}
 		$end = strtotime($this->EndDate);
-		if (time() >= $end) {
+		if ($this->EndDate && time() >= $end) {
 			return array(
 				'available' => false,
-				'reason'    => 'Tickets are no longer available.');
+				'reason'    => 'Tickets are no longer available.'
+			);
 		}
 		if (!$quantity = $this->Available) {
 			return array(
