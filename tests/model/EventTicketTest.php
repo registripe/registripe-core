@@ -14,7 +14,15 @@ class EventTicketTest extends \SapphireTest {
 		// smoke test
 		EventTicket::create()->getCMSFields();
 	}
-	
+
+	public function testActive() {
+		$ticket = EventTicket::create();
+		$ticket->populateDefaults();
+		$this->assertTrue($ticket->isAvailable(), "Ticket should be active/available by default");
+		$ticket->Active = false;
+		$this->assertFalse($ticket->isAvailable(), "Ticket should not be available when not active");
+	}
+
 	public function testAvailabilityByDate() {
 		$ticket = EventTicket::create();
 		$ticket->populateDefaults();

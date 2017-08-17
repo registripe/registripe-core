@@ -11,9 +11,10 @@ class EventTicket extends DataObject {
 		'Title'       => 'Varchar(255)',
 		'Price'       => 'Currency',
 		'Description' => 'Text',
+		'Active'      => 'Boolean',
 		'StartDate'   => 'SS_Datetime',
 		'EndDate'     => 'SS_Datetime',
-		'Sort'       => 'Int'
+		'Sort'        => 'Int'
 	);
 
 	private static $has_one = array(
@@ -26,6 +27,7 @@ class EventTicket extends DataObject {
 
 	private static $summary_fields = array(
 		'Title'        => 'Title',
+		'Active.Nice' => 'Active',
 		'StartSummary' => 'Sales Start',
 		'EndSummary' => 'Sales End',
 		'PriceSummary' => 'Price'
@@ -40,6 +42,10 @@ class EventTicket extends DataObject {
 	private static $singular_name = "Ticket";
 	private static $plural_name = "Tickets";
 
+	private static $defaults = array(
+		"Active" => true
+	);
+
 	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 
@@ -52,6 +58,9 @@ class EventTicket extends DataObject {
 			$dateTime->getDateField()->setConfig('showcalendar', true);
 			$dateTime->getTimeField()->setConfig('showdropdown', true);
 		}
+
+		$fields->addFieldToTab('Root.Main', $active = new CheckboxField("Active"), "StartDate");
+		$active->setDescription("Forces the registration availability of this ticket.");
 
 		return $fields;
 	}
@@ -92,6 +101,12 @@ class EventTicket extends DataObject {
 	 * @return array
 	 */
 	public function getAvailability($excludeId = null) {
+		if (!$this->Active) {
+			return array(
+				'available' => false,
+				'reason' => 'Ticket is not active.'
+			);
+		}
 		$start = strtotime($this->StartDate);
 		if ($start >= time()) {
 			return array(
