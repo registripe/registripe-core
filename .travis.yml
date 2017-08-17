@@ -25,6 +25,7 @@ before_script:
  - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
  - cd ~/builds/ss
+ - composer require phpunit/PHPUnit:^5.7
 
 script: 
- - phpunit registripe/tests/
+ - vendor/bin/phpunit registripe/tests/
