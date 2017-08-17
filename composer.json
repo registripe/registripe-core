@@ -17,6 +17,9 @@
 		"burnbright/silverstripe-anchorfield": "dev-master",
 		"silverstripe/silverstripe-omnipay": "~2.1"
 	},
+	"require-dev": {
+		"phpunit/PHPUnit": "^3"
+	},
 	"extra": {
 		"installer-name": "registripe"
 	}
