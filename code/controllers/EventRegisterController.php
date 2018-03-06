@@ -99,7 +99,7 @@ class EventRegisterController extends Page_Controller {
 		$registration = $this->getCurrentRegistration($forcewrite);
 		$nexturl = $this->Link('review');
 		$backurl = $this->canReview() ?	$nexturl : $this->Link();
-		$record = new Page(array(
+		$record = new RegistrableEvent(array(
 			'ID' => -1,
 			'Title' => $this->Title,
 			'ParentID' => $this->ID,
